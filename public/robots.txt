@@ -1,0 +1,16 @@
+# A Disallow line is a PUBLIC statement that a path exists. The previous version
+# named /admin.html, /account.html, /settings.html, /box-term.html and friends
+# one per line, which handed any scraper a labelled index of the exact pages
+# worth poking at - the opposite of what it was there to do. Crawlers that
+# respect robots.txt were never the threat; the ones that ignore it read the
+# Disallow list as a to-do.
+#
+# Those pages are protected by auth and by not being linked from the sitemap,
+# not by asking politely here. Only genuinely non-content paths are listed now,
+# and none of them reveal anything a visitor can't already see.
+
+User-agent: *
+Disallow: /api/
+Disallow: /vm/
+
+Sitemap: https://nocturne.lol/sitemap.xml

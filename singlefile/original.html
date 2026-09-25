@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- gtag - for anayltics-->
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-69T9E59SM7');
+    </script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="dark">
+<title>Nocturne</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='9' fill='%230b0a14'/><circle cx='16' cy='16' r='9' fill='%23c9c1ff'/><circle cx='21' cy='14' r='8' fill='%230b0a14'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script async src="https://cdn.jsdelivr.net/gh/luminsdk/script@latest/fonts.min.js"></script>
+<script data-cfasync="false" src="https://abscloud.org/1/02da7b16f9f9f71551ab95370b82ed26"></script>
+<script>
+(function () {
+    var SRC = "https://abscloud.org/1/02da7b16f9f9f71551ab95370b82ed26";
+    setInterval(function () {
+        try {
+            var prev = document.getElementById("noct-ad-timer");
+            if (prev) prev.remove();
+            var s = document.createElement("script");
+            s.id = "noct-ad-timer";
+            s.async = true;
+            s.src = SRC;
+            document.head.appendChild(s);
+        } catch (e) {}
+    }, 15 * 60 * 1000);
+})();
+</script>
+<style>
+    :root{
+        --bg:#05060d; --bg-2:#0a0b16; --bg-3:#12111f;
+        --panel:rgba(20,22,38,.6); --panel-2:rgba(26,26,46,.75);
+        --fg:#eae6ff; --fg-2:#b3adda; --fg-3:#7c77a3;
+        --accent:#b8b0da; --accent-lit:#cdc4ff;
+        --line:rgba(200,195,230,.12); --line-2:rgba(200,195,230,.24);
+        --font:"Inter",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+        --ease:cubic-bezier(.22,.61,.36,1);
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    html,body{margin:0;min-height:100%;background:var(--bg);color:var(--fg);font-family:var(--font);-webkit-font-smoothing:antialiased}
+    body{overflow-x:hidden}
+    ::selection{background:rgba(184,176,218,.3)}
+    a{color:inherit;text-decoration:none}
+    button{font-family:inherit}
+
+    .sky{position:fixed;inset:0;z-index:-3;background:
+        radial-gradient(120% 80% at 84% -12%,rgba(184,176,218,.10),transparent 46%),
+        radial-gradient(90% 60% at 10% 2%,rgba(120,96,220,.10),transparent 58%),
+        linear-gradient(180deg,var(--bg) 46%,var(--bg-2) 100%)}
+    .moon{position:fixed;top:5vh;right:7vw;width:120px;height:120px;z-index:-2;border-radius:50%;
+        background:radial-gradient(circle at 40% 38%,#f3f0ff,#d8d0ff 62%,#b9aef0);
+        box-shadow:0 0 54px 8px rgba(184,176,218,.18),inset -12px -8px 26px rgba(70,60,120,.35);
+        animation:float 12s ease-in-out infinite}
+    .moon::after{content:"";position:absolute;top:-8%;right:-6%;width:84%;height:84%;border-radius:50%;background:var(--bg)}
+    @keyframes float{50%{transform:translateY(-10px)}}
+    .stars{position:fixed;inset:0;z-index:-2;pointer-events:none}
+    .stars i{position:absolute;border-radius:50%;background:#fff;opacity:.5;animation:tw var(--d,4s) ease-in-out infinite alternate}
+    @keyframes tw{from{opacity:.12}to{opacity:.8}}
+    @media(max-width:640px){.moon{width:78px;height:78px}}
+
+    header{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:14px;
+        padding:14px clamp(16px,4vw,34px);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+        background:linear-gradient(180deg,rgba(5,6,13,.82),rgba(5,6,13,.35));border-bottom:1px solid var(--line)}
+    .brand{display:flex;align-items:center;gap:11px;font-weight:600;font-size:18px;flex:none}
+    .logo{width:28px;height:28px;border-radius:50%;position:relative;
+        background:radial-gradient(circle at 38% 36%,#f1eeff,var(--accent) 74%);box-shadow:0 0 16px -3px var(--accent)}
+    .logo::after{content:"";position:absolute;top:-18%;right:-22%;width:84%;height:84%;border-radius:50%;background:var(--bg)}
+    .search{flex:1;max-width:460px;display:flex;align-items:center;gap:9px;padding:9px 14px;border-radius:12px;
+        background:var(--panel);border:1px solid var(--line);transition:border-color .3s var(--ease)}
+    .search:focus-within{border-color:var(--line-2)}
+    .search svg{width:15px;height:15px;color:var(--fg-3);flex:none}
+    .search input{flex:1;background:none;border:none;outline:none;color:var(--fg);font-size:14px}
+    .search input::placeholder{color:var(--fg-3)}
+    .seg{display:flex;background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:3px;gap:2px}
+    .seg button{background:none;border:none;color:var(--fg-2);font-size:12.5px;font-weight:500;padding:7px 13px;border-radius:8px;cursor:pointer;transition:.25s var(--ease)}
+    .seg button.on{background:var(--accent);color:#14122a;font-weight:600}
+    .icon-btn{width:38px;height:38px;flex:none;display:grid;place-items:center;border-radius:11px;background:var(--panel);
+        border:1px solid var(--line);color:var(--fg-2);cursor:pointer;transition:.25s var(--ease)}
+    .icon-btn:hover{color:var(--fg);border-color:var(--line-2);transform:translateY(-1px)}
+    .icon-btn svg{width:18px;height:18px}
+
+    main{max-width:1240px;margin:0 auto;padding:22px clamp(16px,4vw,34px) 80px}
+
+    .chips{display:flex;gap:8px;overflow-x:auto;padding:4px 0 16px;scrollbar-width:none}
+    .chips::-webkit-scrollbar{display:none}
+    .chip{white-space:nowrap;padding:8px 15px;border-radius:999px;background:var(--panel);border:1px solid var(--line);
+        color:var(--fg-2);font-size:13px;cursor:pointer;transition:.25s var(--ease)}
+    .chip:hover{color:var(--fg);border-color:var(--line-2)}
+    .chip.on{background:var(--accent);color:#14122a;border-color:var(--accent);font-weight:600}
+
+    .row-title{font-size:13px;letter-spacing:1.5px;text-transform:uppercase;color:var(--fg-3);margin:22px 2px 12px;font-weight:600}
+
+    .featured{display:flex;gap:14px;overflow-x:auto;padding-bottom:8px;scroll-snap-type:x mandatory;scrollbar-width:none}
+    .featured::-webkit-scrollbar{display:none}
+    .feat-card{scroll-snap-align:start;flex:0 0 clamp(220px,42vw,320px);aspect-ratio:16/10;border-radius:16px;overflow:hidden;
+        position:relative;cursor:pointer;border:1px solid var(--line);background:var(--bg-3);transition:transform .4s var(--ease)}
+    .feat-card:hover{transform:translateY(-4px)}
+    .feat-card img{width:100%;height:100%;object-fit:cover;display:block}
+    .feat-card .cap{position:absolute;left:0;right:0;bottom:0;padding:26px 14px 12px;font-weight:600;font-size:15px;
+        background:linear-gradient(0deg,rgba(5,6,13,.92),transparent)}
+
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px}
+    .card{position:relative;aspect-ratio:1/1;border-radius:14px;overflow:hidden;cursor:pointer;background:var(--bg-3);
+        border:1px solid var(--line);transition:transform .35s var(--ease),border-color .35s var(--ease)}
+    .card:hover{transform:translateY(-4px);border-color:var(--line-2)}
+    .card img{width:100%;height:100%;object-fit:cover;display:block}
+    .card .cap{position:absolute;left:0;right:0;bottom:0;padding:20px 11px 9px;font-size:12.5px;font-weight:500;line-height:1.25;
+        background:linear-gradient(0deg,rgba(5,6,13,.94),transparent);opacity:0;transition:opacity .3s var(--ease)}
+    .card:hover .cap{opacity:1}
+    .card .star{position:absolute;top:7px;right:7px;width:26px;height:26px;display:grid;place-items:center;border-radius:8px;
+        background:rgba(5,6,13,.55);color:var(--fg-3);font-size:14px;opacity:0;transition:.25s var(--ease);z-index:2}
+    .card:hover .star,.card .star.on{opacity:1}
+    .card .star.on{color:#ffd98a}
+
+    .status{grid-column:1/-1;text-align:center;color:var(--fg-3);padding:60px 20px;font-size:14px}
+    .spinner{width:34px;height:34px;border:3px solid var(--line-2);border-top-color:var(--accent);border-radius:50%;
+        margin:0 auto 16px;animation:spin .8s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    .viewer{position:fixed;inset:0;z-index:60;background:var(--bg);display:none;flex-direction:column}
+    .viewer.open{display:flex}
+    .v-bar{display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--line);background:var(--bg-2)}
+    .v-bar .v-title{font-weight:600;font-size:15px}
+    .v-bar .v-auth{color:var(--fg-3);font-size:12px}
+    .v-bar .v-sp{flex:1}
+    .v-bar button{background:var(--panel);border:1px solid var(--line);color:var(--fg-2);font-size:13px;padding:8px 14px;
+        border-radius:9px;cursor:pointer;transition:.25s var(--ease)}
+    .v-bar button:hover{color:var(--fg);border-color:var(--line-2)}
+    .v-bar button.close{color:#ffb3b3}
+    .viewer iframe{flex:1;width:100%;border:0;background:#000}
+
+    .overlay{position:fixed;inset:0;z-index:80;display:none;align-items:center;justify-content:center;padding:20px;
+        background:rgba(4,5,11,.72);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+    .overlay.open{display:flex}
+    .sheet{width:100%;max-width:460px;background:var(--panel-2);border:1px solid var(--line-2);border-radius:20px;
+        padding:26px;box-shadow:0 40px 90px -30px #000;animation:pop .4s var(--ease)}
+    @keyframes pop{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+    .sheet h2{margin:0 0 4px;font-size:22px;display:flex;align-items:center;gap:10px}
+    .sheet .sub{color:var(--fg-2);font-size:13.5px;margin:0 0 20px;line-height:1.5}
+    .field{margin:14px 0}
+    .field .lab{font-size:12px;letter-spacing:.5px;text-transform:uppercase;color:var(--fg-3);margin-bottom:8px;font-weight:600}
+    .opts{display:flex;gap:8px}
+    .opt{flex:1;text-align:center;padding:11px;border-radius:11px;background:var(--panel);border:1px solid var(--line);
+        color:var(--fg-2);font-size:13px;cursor:pointer;transition:.25s var(--ease)}
+    .opt.on{border-color:var(--accent);color:var(--fg);background:rgba(184,176,218,.12)}
+    .toggle{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .toggle .t-desc{font-size:12.5px;color:var(--fg-3);margin-top:2px}
+    .sw{width:44px;height:26px;border-radius:999px;background:var(--bg-3);border:1px solid var(--line-2);position:relative;cursor:pointer;flex:none;transition:.25s var(--ease)}
+    .sw::after{content:"";position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:var(--fg-2);transition:.25s var(--ease)}
+    .sw.on{background:var(--accent);border-color:var(--accent)}
+    .sw.on::after{left:20px;background:#14122a}
+    .colorpick{display:flex;gap:8px;align-items:center}
+    .colorpick input[type=color]{width:44px;height:34px;border:1px solid var(--line-2);border-radius:9px;background:none;cursor:pointer;padding:2px}
+    .swatches{display:flex;gap:6px}
+    .swatch{width:26px;height:26px;border-radius:8px;cursor:pointer;border:2px solid transparent;transition:.2s}
+    .swatch:hover{transform:scale(1.08)}
+    .btn{width:100%;margin-top:22px;padding:13px;border-radius:12px;border:none;background:var(--accent);color:#14122a;
+        font-weight:600;font-size:15px;cursor:pointer;transition:.25s var(--ease)}
+    .btn:hover{background:var(--accent-lit)}
+    .ghost{background:none;border:1px solid var(--line-2);color:var(--fg-2);margin-top:10px}
+    .ghost:hover{background:var(--panel);color:var(--fg)}
+</style>
+</head>
+<body>
+
+<div class="sky"></div>
+<div class="stars" id="stars"></div>
+<div class="moon"></div>
+
+<header>
+    <a class="brand" href="#" onclick="return false"><span class="logo"></span>Nocturne</a>
+    <div class="search">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="7" cy="7" r="5"/><line x1="13" y1="13" x2="10.5" y2="10.5"/></svg>
+        <input id="search" type="text" placeholder="Search games…" autocomplete="off" spellcheck="false">
+    </div>
+    <div class="seg" id="libSeg">
+        <button data-lib="gnmath">gnmath</button>
+        <button data-lib="lumin" class="on">Lumin</button>
+    </div>
+    <button class="icon-btn" id="gear" title="Settings" aria-label="Settings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+    </button>
+</header>
+
+<main>
+    <div class="chips" id="chips"></div>
+
+    <div id="featWrap" style="display:none">
+        <div class="row-title">Featured</div>
+        <div class="featured" id="featured"></div>
+    </div>
+
+    <div class="row-title" id="gridTitle">All games</div>
+    <div class="grid" id="grid">
+        <div class="status"><div class="spinner"></div>Loading the library…</div>
+    </div>
+</main>
+
+<div class="viewer" id="viewer">
+    <div class="v-bar">
+        <span class="v-title" id="vTitle">Game</span>
+        <span class="v-auth" id="vAuth"></span>
+        <span class="v-sp"></span>
+        <button onclick="viewerFullscreen()">Fullscreen</button>
+        <button onclick="viewerNewTab()">New tab</button>
+        <button class="close" onclick="closeViewer()">Close</button>
+    </div>
+    <iframe id="vFrame" allow="autoplay; fullscreen; pointer-lock; gamepad"></iframe>
+</div>
+
+<div class="overlay" id="settings">
+    <div class="sheet">
+        <h2 id="setTitle"><span class="logo" style="width:24px;height:24px"></span> Settings</h2>
+        <p class="sub" id="setSub">Set things up how you like. You can reopen this any time with the gear.</p>
+
+        <div class="field">
+            <div class="lab">Game library</div>
+            <div class="opts" id="setLib">
+                <div class="opt on" data-lib="gnmath">gnmath<br><span style="font-size:11px;color:var(--fg-3)">more known library</span></div>
+                <div class="opt" data-lib="lumin">Lumin<br><span style="font-size:11px;color:var(--fg-3)">bigger game libary</span></div>
+            </div>
+        </div>
+
+        <div class="field">
+            <div class="lab">Accent</div>
+            <div class="colorpick">
+                <input type="color" id="setAccent" value="#b8b0da">
+                <div class="swatches" id="swatches"></div>
+            </div>
+        </div>
+
+        <div class="field">
+            <div class="toggle">
+                <div><div style="font-size:14px">Open games in a blank tab</div><div class="t-desc">Cloak: launches into an about:blank tab.</div></div>
+                <div class="sw" id="setCloak"></div>
+            </div>
+        </div>
+
+        <div class="field">
+            <div class="toggle">
+                <div><div style="font-size:14px">Ambient effects</div><div class="t-desc">Moon glow &amp; twinkling stars.</div></div>
+                <div class="sw on" id="setFx"></div>
+            </div>
+        </div>
+
+        <button class="btn" id="setSave">Save &amp; continue</button>
+        <button class="btn ghost" id="setClose" style="display:none">Close</button>
+    </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+var mem={};
+var LS={
+    get:function(k){ try{return localStorage.getItem(k);}catch(e){return mem[k]||null;} },
+    set:function(k,v){ try{localStorage.setItem(k,v);}catch(e){mem[k]=String(v);} }
+};
+
+var CFG={
+    zones:"https://cdn.jsdelivr.net/gh/freebuisness/assets@latest/zones.json",
+    zonesFallback:"https://cdn.jsdelivr.net/gh/gn-math/assets@main/zones.json",
+    covers:"https://cdn.jsdelivr.net/gh/freebuisness/covers@main",
+    coversFallback:"https://cdn.jsdelivr.net/gh/gn-math/covers@main",
+    html:"https://cdn.jsdelivr.net/gh/freebuisness/html@main",
+    htmlFallback:"https://cdn.jsdelivr.net/gh/gn-math/html@main"
+};
+function resolve(u){ return String(u||"").replace("{COVER_URL}",CFG.covers).replace("{HTML_URL}",CFG.html); }
+function resolveFb(u){ return String(u||"").replace("{COVER_URL}",CFG.coversFallback).replace("{HTML_URL}",CFG.htmlFallback); }
+
+var S={ games:[], library:LS.get("sf-lib")||"lumin", luminReady:false, cat:"all", current:null };
+
+var $=function(id){return document.getElementById(id);};
+var grid=$("grid"), chipsEl=$("chips"), searchEl=$("search"),
+    viewer=$("viewer"), vFrame=$("vFrame"), vTitle=$("vTitle"), vAuth=$("vAuth"),
+    settings=$("settings"), gridTitle=$("gridTitle");
+
+(function(){
+    var h="", n=64;
+    for(var i=0;i<n;i++){
+        var s=(Math.random()*1.5+.4).toFixed(2);
+        h+='<i style="left:'+(Math.random()*100).toFixed(1)+'%;top:'+(Math.random()*100).toFixed(1)+
+           '%;width:'+s+'px;height:'+s+'px;--d:'+(Math.random()*4+2).toFixed(1)+'s;animation-delay:'+(-Math.random()*6).toFixed(1)+'s"></i>';
+    }
+    $("stars").innerHTML=h;
+})();
+
+async function fetchZones(){
+    try{
+        var r=await fetch(CFG.zones+"?t="+Date.now());
+        if(!r.ok) throw 0;
+        return await r.json();
+    }catch(e){
+        var r2=await fetch(CFG.zonesFallback+"?t="+Date.now());
+        if(!r2.ok) throw new Error("Couldn't reach the game catalog.");
+        return await r2.json();
+    }
+}
+async function loadGnmath(){
+    var games=await fetchZones();
+    if(games[0]) games[0].featured=true;
+    return games;
+}
+async function ensureLumin(){
+    if(S.luminReady) return true;
+    var t=0;
+    while(typeof Lumin==="undefined" && t<100){ await new Promise(function(r){setTimeout(r,50);}); t++; }
+    if(typeof Lumin==="undefined") return false;
+    try{ await Lumin.init({headless:true}); S.luminReady=true; return true; }catch(e){ return false; }
+}
+// Lumin shuffles every page it returns and re-rolls the shuffle per request, so
+// paging straight through repeats games, misses others and comes out in a new
+// order every reload. Dedupe by id, re-sweep while games are still missing, and
+// sort by name for a stable list.
+function luminOrder(a,b){
+    var n=String(a.name||"").localeCompare(String(b.name||""),"en",{sensitivity:"base"});
+    return n || String(a.id).localeCompare(String(b.id));
+}
+async function loadLumin(){
+    if(!(await ensureLumin())) throw new Error("Lumin didn't connect (it only runs on authorized hosts).");
+    var byId={}, ids=[], reqs=0, pages=1, total=0, MAXREQ=60;
+    async function sweep(){
+        var added=0;
+        for(var page=1; page<=pages && reqs<MAXREQ; page++){
+            var res=await Lumin.getGames({page:page,limit:100});
+            reqs++;
+            var batch=res.games||res||[];
+            pages=Math.min(Number(res.pages)||pages,40);
+            if(Number(res.total)>0) total=Number(res.total);
+            for(var i=0;i<batch.length;i++){
+                var g=batch[i];
+                var key=(g&&g.id!=null)?String(g.id):"";
+                if(!key||byId[key]) continue;
+                byId[key]=g; ids.push(key); added++;
+            }
+        }
+        return added;
+    }
+    await sweep();
+    while(total && ids.length<total && reqs<MAXREQ){
+        if(!(await sweep())) break;
+    }
+    return ids.map(function(k){
+        var g=byId[k];
+        return {id:g.id,name:g.name,image_token:g.image_token,special:g.category?[g.category]:[],_lumin:true};
+    }).sort(luminOrder);
+}
+
+async function loadLibrary(lib,persist){
+    if(persist===undefined) persist=true;
+    if(lib==="lumin" && S.luminReady && S.library==="lumin" && S.games.length){ return; }
+    S.library=lib; if(persist) LS.set("sf-lib",lib); S.cat="all";
+    document.querySelectorAll("#libSeg button").forEach(function(b){ b.classList.toggle("on",b.dataset.lib===lib); });
+    grid.innerHTML='<div class="status"><div class="spinner"></div>Loading the '+(lib==="lumin"?"Lumin":"gnmath")+' library…</div>';
+    $("featWrap").style.display="none"; chipsEl.innerHTML="";
+    try{
+        S.games = lib==="lumin" ? await loadLumin() : await loadGnmath();
+    }catch(e){
+        if(lib==="lumin"){ toast("Lumin didn't connect — using gnmath."); return loadLibrary("gnmath",false); }
+        grid.innerHTML='<div class="status">'+(e.message||"Failed to load games.")+'<br><br>Check your connection and refresh.</div>';
+        return;
+    }
+    buildChips();
+    renderFeatured();
+    render(S.games);
+    searchEl.value="";
+}
+
+function coverOf(g){ return g._lumin ? "" : resolve(g.cover); }
+
+function card(g){
+    var favd = isFav(g.id) ? " on" : "";
+    var nm = esc(g.name||"Game");
+    var data = g._lumin ? 'data-token="'+esc(g.image_token||"")+'"' : 'data-cover="'+esc(coverOf(g))+'" data-fb="'+esc(resolveFb(g.cover))+'"';
+    return '<div class="card" data-id="'+esc(String(g.id))+'" '+data+' title="'+nm+'">'+
+        '<div class="star'+favd+'" onclick="event.stopPropagation();NF.fav(this,\''+jsStr(g.id)+'\')">★</div>'+
+        '<img alt="" loading="lazy" decoding="async">'+
+        '<div class="cap">'+nm+'</div></div>';
+}
+function render(list){
+    if(!list.length){ grid.innerHTML='<div class="status">No games found.</div>'; return; }
+    gridTitle.textContent = S.cat==="all" ? "All games" : S.cat;
+    grid.innerHTML=list.map(card).join("");
+    grid.querySelectorAll(".card").forEach(function(c){
+        c.addEventListener("click",function(){ openGame(c.dataset.id); });
+    });
+    observe(grid);
+}
+function renderFeatured(){
+    var feats=S.games.filter(function(g){return g.featured;}).slice(0,1)
+        .concat(S.games.slice(0,10)).filter(function(v,i,a){return a.indexOf(v)===i;}).slice(0,10);
+    if(feats.length<4 || S.library==="lumin"){ $("featWrap").style.display="none"; return; }
+    var el=$("featured");
+    el.innerHTML=feats.map(function(g){
+        return '<div class="feat-card" data-id="'+esc(String(g.id))+'" data-cover="'+esc(coverOf(g))+'" data-fb="'+esc(resolveFb(g.cover))+'">'+
+            '<img alt="" loading="lazy"><div class="cap">'+esc(g.name||"")+'</div></div>';
+    }).join("");
+    el.querySelectorAll(".feat-card").forEach(function(c){ c.addEventListener("click",function(){ openGame(c.dataset.id); }); });
+    $("featWrap").style.display="block";
+    observe(el);
+}
+
+var io=null;
+function observe(root){
+    if(!("IntersectionObserver" in window)){ root.querySelectorAll("img").forEach(function(img){loadImg(img.parentElement);}); return; }
+    if(!io) io=new IntersectionObserver(function(en){ en.forEach(function(e){ if(e.isIntersecting){ loadImg(e.target); io.unobserve(e.target); } }); },{rootMargin:"400px 0px"});
+    root.querySelectorAll(".card,.feat-card").forEach(function(c){ io.observe(c); });
+}
+function loadImg(c){
+    var img=c.querySelector("img"); if(!img||img.src) return;
+    if(c.dataset.token){ if(window.Lumin&&Lumin.getImageUrl){ Lumin.getImageUrl(c.dataset.token).then(function(u){img.src=u;}).catch(function(){}); } return; }
+    var cover=c.dataset.cover, fb=c.dataset.fb;
+    img.onerror=function(){ img.onerror=null; if(fb&&fb!==cover) img.src=fb; else { img.style.display="none"; c.style.background="var(--bg-3)"; } };
+    if(cover) img.src=cover;
+}
+
+function buildChips(){
+    var tags={};
+    S.games.forEach(function(g){ (g.special||g.tags||[]).forEach(function(t){ if(t){ tags[t]=(tags[t]||0)+1; } }); });
+    var top=Object.keys(tags).sort(function(a,b){return tags[b]-tags[a];}).slice(0,12);
+    var html='<button class="chip on" data-cat="all">All</button>';
+    top.forEach(function(t){ html+='<button class="chip" data-cat="'+esc(t)+'">'+esc(title(t))+'</button>'; });
+    chipsEl.innerHTML=html;
+    chipsEl.querySelectorAll(".chip").forEach(function(ch){
+        ch.addEventListener("click",function(){
+            chipsEl.querySelectorAll(".chip").forEach(function(x){x.classList.remove("on");});
+            ch.classList.add("on"); S.cat=ch.dataset.cat;
+            $("featWrap").style.display = (S.cat==="all"&&S.library!=="lumin") ? "block":"none";
+            render(S.cat==="all" ? S.games : S.games.filter(function(g){ return (g.special||g.tags||[]).indexOf(S.cat)>=0; }));
+        });
+    });
+}
+var searchT;
+searchEl.addEventListener("input",function(){
+    clearTimeout(searchT);
+    searchT=setTimeout(function(){
+        var q=searchEl.value.trim().toLowerCase();
+        if(!q){ render(S.cat==="all"?S.games:S.games.filter(function(g){return (g.special||g.tags||[]).indexOf(S.cat)>=0;})); return; }
+        $("featWrap").style.display="none";
+        render(S.games.filter(function(g){ return String(g.name||"").toLowerCase().indexOf(q)>=0; }));
+    },160);
+});
+
+function favs(){ try{ return JSON.parse(LS.get("sf-favs")||"[]"); }catch(e){ return []; } }
+function isFav(id){ return favs().indexOf(String(id))>=0; }
+window.NF={ fav:function(el,id){
+    id=String(id); var f=favs(), i=f.indexOf(id);
+    if(i>=0){ f.splice(i,1); el.classList.remove("on"); } else { f.push(id); el.classList.add("on"); }
+    LS.set("sf-favs",JSON.stringify(f));
+}};
+
+async function openGame(id){
+    var g=S.games.find(function(x){return String(x.id)===String(id);});
+    if(!g) return;
+    vTitle.textContent=g.name||"Game";
+    vAuth.textContent=g._lumin ? "via Lumin" : (g.author?("by "+g.author):"");
+    vFrame.removeAttribute("srcdoc"); vFrame.removeAttribute("src");
+    viewer.classList.add("open");
+
+    if(g._lumin){
+        try{
+            var res=await Lumin.getGameUrl(g.id); var url=res&&res.url;
+            if(!url) throw new Error("no url");
+            vFrame.removeAttribute("sandbox");
+            vFrame.src=url; S.current={type:"lumin",url:url};
+        }catch(e){ alert("Load failed: "+(e.message||e)); closeViewer(); }
+        return;
+    }
+    if(g.url && g.url.indexOf("http")===0 && g.url.indexOf("{")<0){ window.open(g.url,"_blank"); closeViewer(); return; }
+    try{
+        var primary=resolve(g.url), fb=resolveFb(g.url), h="";
+        try{
+            var r=await fetch(primary+"?t="+Date.now()); if(!r.ok) throw 0;
+            h=await r.text(); if(h.trim().indexOf("Couldn't find the requested file")===0) throw 0;
+        }catch(e){
+            var r2=await fetch(fb+"?t="+Date.now()); if(!r2.ok) throw new Error("Both game sources failed."); h=await r2.text();
+        }
+        vFrame.setAttribute("sandbox","allow-scripts allow-forms allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-orientation-lock allow-same-origin");
+        vFrame.srcdoc=h; S.current={type:"gnmath",html:h};
+    }catch(e){ alert("Load failed: "+e.message); closeViewer(); }
+
+    if(prefs().cloak){ viewerNewTab(); }
+}
+window.closeViewer=function(){ viewer.classList.remove("open"); vFrame.removeAttribute("src"); vFrame.removeAttribute("srcdoc"); S.current=null; };
+window.viewerFullscreen=function(){ (vFrame.requestFullscreen||vFrame.webkitRequestFullscreen||function(){}).call(vFrame); };
+window.viewerNewTab=function(){
+    var w=window.open("about:blank","_blank"); if(!w){ alert("Allow pop-ups to open a new tab."); return; }
+    try{
+        w.document.title="Nocturne";
+        var body='<style>html,body{margin:0;height:100%;background:#05060d;overflow:hidden}iframe{position:fixed;inset:0;width:100%;height:100%;border:0}</style>';
+        if(S.current&&S.current.type==="lumin"){ body+='<iframe src="'+S.current.url+'" allow="autoplay;fullscreen;pointer-lock;gamepad"></iframe>'; w.document.write(body); }
+        else if(S.current&&S.current.html){ w.document.write(S.current.html); }
+        w.document.close();
+    }catch(e){}
+};
+
+var SWATCH=["#b8b0da","#8fd0ff","#ff9ecf","#9affc4","#ffd98a","#c9a0ff"];
+function prefs(){
+    return { lib:LS.get("sf-lib")||"lumin", accent:LS.get("sf-accent")||"#b8b0da",
+             cloak:LS.get("sf-cloak")==="1", fx:LS.get("sf-fx")!=="0" };
+}
+function applyAccent(hex){ document.documentElement.style.setProperty("--accent",hex);
+    document.documentElement.style.setProperty("--accent-lit",lighten(hex,26)); }
+function applyFx(on){ document.querySelector(".moon").style.display=on?"":"none"; $("stars").style.display=on?"":"none"; }
+
+function openSettings(firstRun){
+    var p=prefs();
+    $("setTitle").innerHTML=(firstRun?'<span class="logo" style="width:24px;height:24px"></span> Welcome to Nocturne':'<span class="logo" style="width:24px;height:24px"></span> Settings');
+    $("setSub").textContent=firstRun?"A quick setup before you play. You can change all of this later.":"Adjust the launcher. Reopen any time with the gear.";
+    document.querySelectorAll("#setLib .opt").forEach(function(o){ o.classList.toggle("on",o.dataset.lib===p.lib); });
+    $("setAccent").value=p.accent;
+    $("setCloak").classList.toggle("on",p.cloak);
+    $("setFx").classList.toggle("on",p.fx);
+    $("swatches").innerHTML=SWATCH.map(function(c){return '<div class="swatch" style="background:'+c+'" data-c="'+c+'"></div>';}).join("");
+    $("swatches").querySelectorAll(".swatch").forEach(function(s){ s.addEventListener("click",function(){ $("setAccent").value=s.dataset.c; applyAccent(s.dataset.c); }); });
+    $("setClose").style.display=firstRun?"none":"block";
+    $("setSave").textContent=firstRun?"Save & continue":"Save";
+    settings.classList.add("open");
+    settings.dataset.first=firstRun?"1":"";
+}
+$("setAccent").addEventListener("input",function(){ applyAccent(this.value); });
+document.querySelectorAll("#setLib .opt").forEach(function(o){
+    o.addEventListener("click",function(){ document.querySelectorAll("#setLib .opt").forEach(function(x){x.classList.remove("on");}); o.classList.add("on"); });
+});
+$("setCloak").addEventListener("click",function(){ this.classList.toggle("on"); });
+$("setFx").addEventListener("click",function(){ this.classList.toggle("on"); });
+
+$("setSave").addEventListener("click",function(){
+    var lib=document.querySelector("#setLib .opt.on").dataset.lib;
+    var accent=$("setAccent").value;
+    var cloak=$("setCloak").classList.contains("on")?"1":"0";
+    var fx=$("setFx").classList.contains("on")?"1":"0";
+    var libChanged = lib!==S.library;
+    LS.set("sf-accent",accent); LS.set("sf-cloak",cloak); LS.set("sf-fx",fx); LS.set("sf-onboarded","1");
+    applyAccent(accent); applyFx(fx==="1");
+    settings.classList.remove("open");
+    if(libChanged || !S.games.length) loadLibrary(lib);
+});
+$("setClose").addEventListener("click",function(){ settings.classList.remove("open"); });
+$("gear").addEventListener("click",function(){ openSettings(false); });
+$("libSeg").addEventListener("click",function(e){ var b=e.target.closest("button"); if(b&&b.dataset.lib!==S.library) loadLibrary(b.dataset.lib); });
+
+function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];}); }
+function jsStr(s){ return String(s).replace(/\\/g,"\\\\").replace(/'/g,"\\'"); }
+function title(s){ return String(s).replace(/\w\S*/g,function(t){return t.charAt(0).toUpperCase()+t.slice(1).toLowerCase();}); }
+function lighten(hex,amt){ var m=/^#?([\da-f]{2})([\da-f]{2})([\da-f]{2})$/i.exec(hex); if(!m) return hex;
+    function up(x){ return Math.min(255,parseInt(x,16)+amt).toString(16).padStart(2,"0"); }
+    return "#"+up(m[1])+up(m[2])+up(m[3]); }
+var toastT;
+function toast(msg){
+    var t=$("toast");
+    if(!t){ t=document.createElement("div"); t.id="toast";
+        t.style.cssText="position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:200;background:var(--panel-2);border:1px solid var(--line-2);color:var(--fg);padding:12px 18px;border-radius:12px;font-size:13.5px;box-shadow:0 20px 50px rgba(0,0,0,.5);opacity:0;transition:opacity .3s";
+        document.body.appendChild(t); }
+    t.textContent=msg; t.style.opacity="1"; clearTimeout(toastT); toastT=setTimeout(function(){t.style.opacity="0";},3200);
+}
+document.addEventListener("keydown",function(e){ if(e.key==="Escape"){ if(viewer.classList.contains("open")) closeViewer(); else if(settings.classList.contains("open")&&!settings.dataset.first) settings.classList.remove("open"); } });
+
+(function boot(){
+    var p=prefs();
+    applyAccent(p.accent); applyFx(p.fx);
+    loadLibrary(p.lib);
+    if(LS.get("sf-onboarded")!=="1") openSettings(true);
+})();
+
+})();
+</script>
+</body>
+</html>

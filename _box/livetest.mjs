@@ -1,0 +1,25 @@
+import { WebSocket } from "ws";
+import fs from "fs";
+const OWNER_PASSWORD = process.env.NOCTURNE_OWNER_PASSWORD || fs.readFileSync(new URL("../data/owner-password", import.meta.url), "utf8").trim();
+const base = "http://localhost:8080";
+const lr = await fetch(base + "/api/auth/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username: "midnightsweat", password: OWNER_PASSWORD }) });
+const raw = lr.headers.getSetCookie ? lr.headers.getSetCookie().join("; ") : (lr.headers.get("set-cookie") || "");
+const cookie = "nocturne_sid=" + /nocturne_sid=([^;]+)/.exec(raw)[1];
+const H = { "Content-Type": "application/json", Cookie: cookie };
+const cr = await (await fetch(base + "/api/boxes/admin/create", { method: "POST", headers: H, body: JSON.stringify({ username: "midnightsweat", cpus: 0.5, memoryMb: 512, diskMb: 1024, name: "livetest" }) })).json();
+const id = cr.box && cr.box.id;
+console.log("  create -> " + (id ? ("#" + id + " " + cr.box.name) : JSON.stringify(cr)));
+if (!id) process.exit(1);
+const mine = await (await fetch(base + "/api/boxes/mine", { headers: { Cookie: cookie } })).json();
+console.log("  /api/boxes/mine (VMs area) -> " + (mine.boxes || []).map(b => "#" + b.id + " " + b.name + (b.up ? " up" : " down")).join(", "));
+await new Promise(r => setTimeout(r, 1800));
+await new Promise((resolve) => {
+  const ws = new WebSocket("ws://localhost:8080/api/boxes/term?id=" + id, { headers: { Cookie: cookie } });
+  let out = "", done = false; const fin = (m) => { if (done) return; done = true; console.log("  terminal -> " + m); try { ws.close(); } catch {} resolve(); };
+  ws.on("open", () => setTimeout(() => ws.send("uname -a\n"), 500));
+  ws.on("message", d => { out += d.toString(); if (/Linux/.test(out)) fin("PASS (" + JSON.stringify((out.match(/Linux[^\r\n]*/) || [""])[0].slice(0, 48)) + ")"); });
+  ws.on("error", e => fin("err " + e.message));
+  setTimeout(() => fin("timeout: " + JSON.stringify(out.slice(0, 80))), 5000);
+});
+console.log("  delete -> " + JSON.stringify(await (await fetch(base + "/api/boxes/admin/delete/" + id, { method: "POST", headers: { Cookie: cookie } })).json()));
+process.exit(0);

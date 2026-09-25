@@ -1,0 +1,15 @@
+# Live secrets, credentials, and the user database — never commit these
+data/
+
+# Dependencies
+node_modules/
+
+# Runtime logs
+*.log
+_boot.*.log
+_dev.*.log
+
+cherrigames/
+_tmp_cookies
+_tmp_altcha
+*.pre-scrub.*

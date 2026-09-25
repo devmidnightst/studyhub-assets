@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="dark">
+    <title>Nocturne VMs</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='13' fill='%23c9c1ff'/><circle cx='22' cy='14' r='11' fill='%23050610'/></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #05060d; --bg-2: #0a0b14;
+            --line: rgba(200,195,230,0.06); --line-2: rgba(200,195,230,0.11); --line-3: rgba(200,195,230,0.18);
+            --fg: #e8e5f4; --fg-2: #a9a3c7; --fg-3: #706b8f;
+            --accent: #b8b0da; --accent-2: #8a80b6;
+            --ease: cubic-bezier(0.22, 0.72, 0.14, 1);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            color: var(--fg);
+            background:
+                radial-gradient(70% 55% at 50% -5%, rgba(138,128,182,0.10), transparent 60%),
+                radial-gradient(50% 40% at 85% 100%, rgba(138,128,182,0.06), transparent 60%),
+                var(--bg);
+        }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: none; } }
+        @keyframes vmspin { to { transform: rotate(360deg); } }
+        @keyframes vmpulse { 50% { opacity: 0.5; } }
+
+        .vm-home {
+            position: relative; z-index: 2;
+            min-height: 100vh;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            text-align: center; padding: 32px;
+        }
+        .vm-icon {
+            width: 66px; height: 66px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 18px;
+            background: rgba(184, 176, 218, 0.07);
+            border: 1px solid var(--line-2);
+            color: var(--accent);
+            margin-bottom: 24px;
+            box-shadow: 0 0 46px rgba(184, 176, 218, 0.10);
+            opacity: 0; animation: slideDown 0.5s var(--ease) forwards;
+        }
+        .vm-title { font-size: 27px; font-weight: 600; letter-spacing: -0.02em; color: var(--fg); opacity: 0; animation: slideUp 0.55s var(--ease) 0.06s forwards; }
+        .vm-sub { font-size: 13.5px; color: var(--fg-2); margin-top: 9px; max-width: 380px; line-height: 1.65; opacity: 0; animation: slideUp 0.55s var(--ease) 0.12s forwards; }
+        .vm-avail { font-size: 12px; color: var(--fg-3); margin-top: 14px; min-height: 16px; opacity: 0; animation: slideUp 0.55s var(--ease) 0.16s forwards; }
+        .vm-avail b { color: var(--accent); font-weight: 600; }
+        .vm-specs { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; justify-content: center; opacity: 0; animation: slideUp 0.55s var(--ease) 0.18s forwards; }
+        .vm-chip { font-size: 11.5px; color: var(--fg-2); border: 1px solid var(--line-2); border-radius: 999px; padding: 5px 13px; background: rgba(200,195,230,0.02); display: inline-flex; align-items: center; gap: 7px; }
+        .vm-chip .d { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); }
+        .vm-launch {
+            margin-top: 30px;
+            display: inline-flex; align-items: center; gap: 9px;
+            background: linear-gradient(180deg, var(--accent), var(--accent-2));
+            color: #0b0a16; font-weight: 600; font-size: 14px; font-family: inherit;
+            border: none; border-radius: 11px; padding: 13px 34px; cursor: pointer;
+            box-shadow: 0 6px 26px rgba(138,128,182,0.30);
+            transition: transform 0.15s var(--ease), box-shadow 0.2s var(--ease), filter 0.15s var(--ease);
+            opacity: 0; animation: slideUp 0.55s var(--ease) 0.24s forwards;
+        }
+        .vm-launch:hover { transform: translateY(-1px); filter: brightness(1.07); box-shadow: 0 9px 32px rgba(138,128,182,0.42); }
+        .vm-launch:active { transform: translateY(0); }
+        .vm-launch:disabled { opacity: 0.55; cursor: default; filter: none; transform: none; box-shadow: none; }
+        .vm-status { margin-top: 18px; font-size: 12.5px; color: var(--fg-3); min-height: 18px; }
+        .vm-queue { margin-top: 6px; font-size: 12.5px; color: #e0b15e; min-height: 16px; }
+        .vm-spin { width: 13px; height: 13px; display: inline-block; vertical-align: -2px; margin-right: 8px; border: 2px solid var(--line-3); border-top-color: var(--accent); border-radius: 50%; animation: vmspin 0.7s linear infinite; }
+
+        .vm-active { position: fixed; inset: 0; z-index: 50; display: none; flex-direction: column; background: var(--bg); }
+        .vm-active.show { display: flex; }
+        .vm-bar { height: 46px; flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; padding: 0 14px; background: var(--bg-2); border-bottom: 1px solid var(--line); }
+        .vm-bar-left { display: flex; align-items: center; gap: 9px; font-size: 13px; font-weight: 500; color: var(--fg); }
+        .vm-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 10px var(--accent); }
+        .vm-bar-right { display: flex; align-items: center; gap: 9px; }
+        .vm-time { font-variant-numeric: tabular-nums; font-size: 13px; font-weight: 600; color: var(--accent); letter-spacing: 0.03em; padding: 5px 11px; border-radius: 8px; background: rgba(184,176,218,0.08); border: 1px solid var(--line-2); }
+        .vm-time.warn { color: #e8b06a; background: rgba(232,176,106,0.10); border-color: rgba(232,176,106,0.30); }
+        .vm-time.danger { color: #e87a7a; background: rgba(232,122,122,0.12); border-color: rgba(232,122,122,0.35); animation: vmpulse 1s var(--ease) infinite; }
+        .vm-btn { font-size: 12.5px; font-weight: 500; color: var(--fg-2); font-family: inherit; background: rgba(200,195,230,0.04); border: 1px solid var(--line-2); border-radius: 8px; padding: 6px 13px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: color 0.15s var(--ease), background 0.15s var(--ease), border-color 0.15s var(--ease); }
+        .vm-btn:hover { color: var(--fg); background: rgba(200,195,230,0.08); border-color: var(--line-3); }
+        .vm-btn.danger:hover { color: #ff9b9b; border-color: rgba(232,122,122,0.40); background: rgba(232,122,122,0.10); }
+        .vm-frame { flex: 1; border: none; width: 100%; background: #000; }
+    </style>
+</head>
+<body>
+
+<section id="vmHome" class="vm-home">
+    <div class="vm-icon">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
+        </svg>
+    </div>
+    <h1 class="vm-title">Nocturne VMs</h1>
+    <p class="vm-sub">A throwaway Ubuntu desktop, right in your browser. Each session lasts 10 minutes, then the machine wipes itself for the next person.</p>
+    <div id="vmAvail" class="vm-avail"></div>
+
+    <div class="vm-specs">
+        <span class="vm-chip"><span class="d"></span>Ubuntu 24.04</span>
+        <span class="vm-chip"><span class="d"></span>Xfce desktop</span>
+        <span class="vm-chip"><span class="d"></span>Resets on exit</span>
+    </div>
+
+    <button id="vmLaunch" class="vm-launch">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v9"/><path d="M18.4 6.6a9 9 0 1 1-12.8 0"/></svg>
+        Launch a VM
+    </button>
+
+    <div id="vmStatus" class="vm-status"></div>
+    <div id="vmQueue" class="vm-queue"></div>
+</section>
+
+<section id="vmActive" class="vm-active">
+    <div class="vm-bar">
+        <div class="vm-bar-left"><span class="vm-dot"></span> Nocturne VM</div>
+        <div class="vm-bar-right">
+            <span id="vmTime" class="vm-time">10:00</span>
+            <button id="vmFs" class="vm-btn">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
+                Fullscreen
+            </button>
+            <button id="vmEnd" class="vm-btn danger">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                End session
+            </button>
+        </div>
+    </div>
+    <iframe id="vmFrame" class="vm-frame" src="" allow="fullscreen; clipboard-read; clipboard-write" allowfullscreen></iframe>
+</section>
+
+<script>
+(function () {
+    "use strict";
+    var DEFAULT_MS = 600000;
+    var QUEUE_RETRY_MS = 5000;
+    var STATUS_POLL_MS = 8000;
+
+    var homeEl   = document.getElementById("vmHome");
+    var activeEl = document.getElementById("vmActive");
+    var frameEl  = document.getElementById("vmFrame");
+    var launchBtn = document.getElementById("vmLaunch");
+    var statusEl = document.getElementById("vmStatus");
+    var queueEl  = document.getElementById("vmQueue");
+    var availEl  = document.getElementById("vmAvail");
+    var timeEl   = document.getElementById("vmTime");
+
+    var slotId = null, userId = null, timer = null, statusPoll = null, timeLeft = 600, requesting = false;
+
+    function uid() {
+        try {
+            userId = userId || localStorage.getItem("noc-vm-uid");
+            if (!userId) { userId = Math.random().toString(36).slice(2) + Date.now().toString(36); localStorage.setItem("noc-vm-uid", userId); }
+        } catch (e) {
+            if (!userId) userId = Math.random().toString(36).slice(2) + Date.now().toString(36);
+        }
+        return userId;
+    }
+    function setStatus(html) { if (statusEl) statusEl.innerHTML = html || ""; }
+    function setQueue(html) { if (queueEl) queueEl.innerHTML = html || ""; }
+
+    async function requestVM() {
+        if (requesting) return;
+        requesting = true;
+        launchBtn.disabled = true;
+        setQueue("");
+        setStatus("<span class=\"vm-spin\"></span>Finding a free machine...");
+        try {
+            var res = await fetch("/api/request", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ userId: uid() })
+            });
+            if (!res.ok) throw new Error("HTTP " + res.status);
+            var data = await res.json();
+
+            if (data.status === "assigned") {
+                slotId = data.slotId || null;
+                connect(data.novncUrl, data.duration || DEFAULT_MS);
+            } else if (data.status === "queued") {
+                requesting = false;
+                setStatus("");
+                setQueue("You are #" + (data.position || "?") + " in line. Holding your spot...");
+                setTimeout(requestVM, QUEUE_RETRY_MS);
+            } else {
+                throw new Error(data.message || "No machines available right now.");
+            }
+        } catch (e) {
+            setStatus("Couldn't start a VM (" + (e && e.message ? e.message : e) + "). Try again in a moment.");
+            setQueue("");
+            requesting = false;
+            launchBtn.disabled = false;
+        }
+    }
+
+    function connect(url, durationMs) {
+        requesting = false;
+        stopStatusPoll();
+        setStatus(""); setQueue("");
+        timeLeft = Math.round((durationMs || DEFAULT_MS) / 1000);
+        frameEl.src = url;
+        homeEl.style.display = "none";
+        activeEl.classList.add("show");
+        startTimer();
+    }
+
+    function startTimer() {
+        stopTimer();
+        renderTime();
+        timer = setInterval(function () {
+            timeLeft--;
+            renderTime();
+            if (timeLeft <= 0) endSession();
+        }, 1000);
+    }
+    function stopTimer() { if (timer) { clearInterval(timer); timer = null; } }
+    function renderTime() {
+        var m = Math.max(0, Math.floor(timeLeft / 60)).toString();
+        var s = Math.max(0, timeLeft % 60).toString();
+        if (m.length < 2) m = "0" + m;
+        if (s.length < 2) s = "0" + s;
+        timeEl.textContent = m + ":" + s;
+        timeEl.classList.toggle("warn", timeLeft <= 120 && timeLeft > 30);
+        timeEl.classList.toggle("danger", timeLeft <= 30);
+    }
+
+    async function endSession() {
+        stopTimer();
+        var id = slotId;
+        slotId = null;
+        try { frameEl.src = "about:blank"; } catch (e) {}
+        activeEl.classList.remove("show");
+        homeEl.style.display = "flex";
+        setStatus(""); setQueue("");
+        requesting = false;
+        launchBtn.disabled = false;
+        startStatusPoll();
+        if (id) {
+            try {
+                await fetch("/api/end", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ slotId: id })
+                });
+            } catch (e) {}
+        }
+    }
+
+    function toggleFs() {
+        if (document.fullscreenElement) { document.exitFullscreen(); return; }
+        if (frameEl.requestFullscreen) frameEl.requestFullscreen();
+        else if (activeEl.requestFullscreen) activeEl.requestFullscreen();
+    }
+
+    async function refreshStatus() {
+        if (!availEl) return;
+        try {
+            var r = await fetch("/api/status", { cache: "no-store" });
+            if (!r.ok) return;
+            var s = await r.json();
+            var total = s.totalSlots || 0;
+            var free = total - (s.activeSlots || 0);
+            if (free > 0) availEl.innerHTML = "<b>" + free + "</b> of " + total + " machines free";
+            else availEl.innerHTML = "All " + total + " machines busy" + (s.queueLength ? " &middot; " + s.queueLength + " waiting" : "");
+        } catch (e) {}
+    }
+    function startStatusPoll() { stopStatusPoll(); refreshStatus(); statusPoll = setInterval(refreshStatus, STATUS_POLL_MS); }
+    function stopStatusPoll() { if (statusPoll) { clearInterval(statusPoll); statusPoll = null; } }
+
+    launchBtn.addEventListener("click", requestVM);
+    document.getElementById("vmEnd").addEventListener("click", endSession);
+    document.getElementById("vmFs").addEventListener("click", toggleFs);
+
+    window.addEventListener("pagehide", function () {
+        if (slotId && navigator.sendBeacon) {
+            try { navigator.sendBeacon("/api/end", JSON.stringify({ slotId: slotId })); } catch (e) {}
+        }
+    });
+
+    startStatusPoll();
+})();
+</script>
+
+</body>
+</html>

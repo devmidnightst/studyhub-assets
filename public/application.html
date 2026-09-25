@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-69T9E59SM7"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-69T9E59SM7');
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="dark">
+    <meta name="robots" content="noindex">
+    <title>nocturne</title>
+    <meta name="description" content="Apply to join the Nocturne team — developer, moderator, support and staff roles.">
+    <meta property="og:title" content="Nocturne · Applications">
+    <meta property="og:description" content="Apply for developer, moderator and staff roles at Nocturne.">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Nocturne · Applications">
+    <meta name="twitter:description" content="Apply for developer, moderator and staff roles at Nocturne.">
+    <meta property="og:site_name" content="Nocturne">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='9' fill='%230b0a14'/><circle cx='16' cy='16' r='9' fill='%23c9c1ff'/><circle cx='21' cy='14' r='8' fill='%230b0a14'/></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/src/css/global.css">
+    <link rel="stylesheet" href="/src/css/nocturne-select.css">
+    <style>
+        html, body { background:#05060d; color:#eae6ff; margin:0; font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; }
+        .ap-wrap { max-width:680px; margin:0 auto; padding:42px 20px 96px; position:relative; z-index:1; }
+        .ap-head { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; margin-bottom:8px; }
+        .ap-title { font-size:26px; font-weight:600; letter-spacing:-.01em; }
+        .ap-sub { color:#8a85a8; font-size:13.5px; margin-top:4px; line-height:1.5; }
+        .ap-back { color:#807a9f; text-decoration:none; font-size:12.5px; white-space:nowrap; padding-top:6px; transition:color .15s ease; }
+        .ap-back:hover { color:#eae6ff; }
+
+        .ap-discord {
+            display:flex; align-items:center; gap:14px;
+            margin:22px 0 26px; padding:16px 18px;
+            background:linear-gradient(135deg, rgba(88,101,242,.16), rgba(201,193,255,.07));
+            border:1px solid rgba(124,131,242,.34); border-radius:14px;
+        }
+        .ap-discord svg { flex-shrink:0; }
+        .ap-discord-txt { font-size:13.5px; line-height:1.5; color:#cdd0ff; }
+        .ap-discord-txt b { color:#fff; }
+        .ap-discord a { color:#fff; font-weight:600; text-decoration:none; border-bottom:1px solid rgba(255,255,255,.5); }
+        .ap-discord a:hover { border-bottom-color:#fff; }
+
+        .ap-form { display:flex; flex-direction:column; gap:18px; }
+        .field { display:flex; flex-direction:column; gap:7px; }
+        .field-label { font-size:13px; font-weight:500; color:#d8d3f0; }
+        .field-label .req { color:#c9a7ff; }
+        .field-hint { font-size:11.5px; color:#807a9f; margin-top:-2px; }
+        .ap-input, .ap-textarea {
+            width:100%; box-sizing:border-box;
+            background:rgba(255,255,255,.035); color:#eae6ff;
+            border:1px solid rgba(184,176,218,.16); border-radius:11px;
+            padding:11px 13px; font:inherit; font-size:14px;
+            transition:border-color .15s ease, background .15s ease;
+        }
+        .ap-input:focus, .ap-textarea:focus {
+            outline:none; border-color:rgba(201,193,255,.55); background:rgba(201,193,255,.06);
+        }
+        .ap-input::placeholder, .ap-textarea::placeholder { color:#5f5a7d; }
+        .ap-textarea { resize:vertical; min-height:96px; line-height:1.5; }
+        
+        .ap-form .noc-select { display:flex; width:100%; }
+        .ap-form .noc-select-trigger { width:100%; }
+        .ap-row { display:flex; gap:14px; }
+        .ap-row .field { flex:1; }
+
+        .ap-msg { font-size:13px; min-height:18px; }
+        .ap-msg.err { color:#ff9a9a; }
+        .ap-msg.ok { color:#9bdab0; }
+
+        .ap-submit {
+            align-self:flex-start; margin-top:4px;
+            background:#c9c1ff; color:#0b0a14; font:inherit; font-weight:600; font-size:14px;
+            border:0; border-radius:11px; padding:12px 26px; cursor:pointer;
+            transition:transform .12s ease, box-shadow .15s ease, opacity .15s ease;
+        }
+        .ap-submit:hover:not(:disabled) { transform:translateY(-1px); box-shadow:0 8px 24px rgba(201,193,255,.24); }
+        .ap-submit:disabled { opacity:.55; cursor:default; }
+        .ap-fine { font-size:11.5px; color:#6f6991; line-height:1.55; margin-top:2px; }
+        @media (max-width:520px){ .ap-row{ flex-direction:column; gap:18px; } }
+    </style>
+</head>
+<body>
+    <canvas id="bgCanvas" class="visible"></canvas>
+
+    <div class="ap-wrap">
+        <div class="ap-head">
+            <div>
+                <div class="ap-title">Join the Nocturne team</div>
+                <div class="ap-sub">Applications for developer, moderator &amp; staff roles. Read each field — low-effort applications get skipped.</div>
+            </div>
+            <a href="/" class="ap-back">← Home</a>
+        </div>
+
+        <div class="ap-discord">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="#c9ccff"><path d="M20.317 4.369A19.79 19.79 0 0 0 15.432 3a13.6 13.6 0 0 0-.617 1.267 18.27 18.27 0 0 0-5.487 0A12.6 12.6 0 0 0 8.71 3a19.74 19.74 0 0 0-4.886 1.37C.73 8.92-.13 13.36.302 17.74a19.9 19.9 0 0 0 6.063 3.058c.488-.665.922-1.37 1.296-2.111a12.9 12.9 0 0 1-2.04-.978c.171-.125.338-.255.5-.389a14.2 14.2 0 0 0 12.16 0c.164.14.331.27.5.389-.652.387-1.336.715-2.045.98.375.74.81 1.444 1.297 2.11a19.8 19.8 0 0 0 6.066-3.058c.5-5.077-.838-9.476-3.778-13.372ZM8.02 15.331c-1.183 0-2.157-1.085-2.157-2.42 0-1.334.955-2.42 2.157-2.42 1.21 0 2.176 1.095 2.157 2.42 0 1.335-.955 2.42-2.157 2.42Zm7.975 0c-1.183 0-2.157-1.085-2.157-2.42 0-1.334.955-2.42 2.157-2.42 1.21 0 2.176 1.095 2.157 2.42 0 1.335-.946 2.42-2.157 2.42Z"/></svg>
+            <div class="ap-discord-txt">
+                <b>You must be in our Discord to be considered.</b> Join here → <a href="https://discord.gg/lanschool" target="_blank" rel="noopener">discord.gg/lanschool</a><br>
+                We review applications and reach out to your Discord — so put your <b>real</b> username below.
+            </div>
+        </div>
+
+        <form class="ap-form" id="apForm" autocomplete="off">
+            <div class="field">
+                <label class="field-label" for="apRole">Role you're applying for <span class="req">*</span></label>
+                <select class="ap-input" id="apRole">
+                    <option value="" disabled selected>Choose a role…</option>
+                    <option>Developer</option>
+                    <option>Moderator</option>
+                    <option>Support</option>
+                    <option>Designer</option>
+                    <option>Content / Social</option>
+                    <option>Other</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label class="field-label" for="apDiscord">Your real Discord username <span class="req">*</span></label>
+                <input class="ap-input" id="apDiscord" type="text" maxlength="37" placeholder="e.g. yourname or yourname#1234" required>
+                <div class="field-hint">Exactly as it appears in Discord — we DM this to follow up. Fake/wrong usernames are auto-rejected.</div>
+            </div>
+
+            <div class="ap-row">
+                <div class="field">
+                    <label class="field-label" for="apAge">Age <span class="req">*</span></label>
+                    <input class="ap-input" id="apAge" type="number" min="10" max="99" placeholder="e.g. 17" required>
+                </div>
+                <div class="field">
+                    <label class="field-label" for="apTz">Timezone / availability</label>
+                    <input class="ap-input" id="apTz" type="text" maxlength="80" placeholder="e.g. EST, evenings &amp; weekends">
+                </div>
+            </div>
+
+            <div class="field">
+                <label class="field-label" for="apExp">Your expertise / experience <span class="req">*</span></label>
+                <textarea class="ap-textarea" id="apExp" maxlength="2000" required placeholder="Languages, tools, past projects, moderation experience, links to work, etc."></textarea>
+            </div>
+
+            <div class="field">
+                <label class="field-label" for="apReason">Why do you want this role &amp; why are you a good fit? <span class="req">*</span></label>
+                <textarea class="ap-textarea" id="apReason" maxlength="4000" required placeholder="Tell us what you'd bring to the team and why you're interested."></textarea>
+            </div>
+
+            <div class="ap-msg" id="apMsg"></div>
+            <button class="ap-submit" type="submit" id="apSubmit">Submit application</button>
+            <div class="ap-fine">By applying you confirm the information is accurate. Submissions are reviewed by the operator. You must be in <a href="https://discord.gg/lanschool" target="_blank" rel="noopener" style="color:#9a93c8">discord.gg/lanschool</a> to be contacted.</div>
+        </form>
+    </div>
+
+    <script src="/src/js/wz6714.js" defer></script>
+    <script src="/src/js/qt3674.js" defer></script>
+    <script>
+    (function () {
+        var form = document.getElementById("apForm");
+        var msg = document.getElementById("apMsg");
+        var btn = document.getElementById("apSubmit");
+        function show(text, ok) { msg.textContent = text; msg.className = "ap-msg " + (ok ? "ok" : "err"); }
+
+        form.addEventListener("submit", async function (e) {
+            e.preventDefault();
+            show("", true); msg.textContent = "";
+            var payload = {
+                role: document.getElementById("apRole").value,
+                discord: document.getElementById("apDiscord").value.trim(),
+                age: document.getElementById("apAge").value,
+                timezone: document.getElementById("apTz").value.trim(),
+                expertise: document.getElementById("apExp").value.trim(),
+                reason: document.getElementById("apReason").value.trim()
+            };
+            if (!payload.role) return show("Pick a role to apply for.");
+            if (payload.discord.replace(/^@+/, "").length < 2 || /\s/.test(payload.discord)) return show("Enter your real Discord username (no spaces).");
+            if (!payload.age) return show("Enter your age.");
+            if (payload.expertise.length < 5) return show("Tell us about your expertise.");
+            if (payload.reason.length < 10) return show("Tell us why you're a good fit (a little more detail).");
+
+            btn.disabled = true; btn.textContent = "Submitting…";
+            try {
+                var r = await fetch("/api/apply", {
+                    method: "POST", credentials: "same-origin",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+                var data = await r.json().catch(function () { return {}; });
+                if (!r.ok) throw new Error(data.error || ("HTTP " + r.status));
+                form.reset();
+                show("✓ Application submitted! Make sure you've joined discord.gg/lanschool so we can reach you.", true);
+                btn.textContent = "Submitted ✓";
+                setTimeout(function () { btn.disabled = false; btn.textContent = "Submit application"; }, 4000);
+            } catch (err) {
+                show(err.message || "Something went wrong.");
+                btn.disabled = false; btn.textContent = "Submit application";
+            }
+        });
+    })();
+    </script>
+<script src="/src/js/pu3927.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="dark">
+    <title>nocturne</title>
+    <style>html,body{background:#05060d;color:#eae6ff;margin:0}</style>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='9' fill='%230b0a14'/><circle cx='16' cy='16' r='9' fill='%23c9c1ff'/><circle cx='21' cy='14' r='8' fill='%230b0a14'/></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/src/css/global.css">
+    <link rel="stylesheet" href="/src/css/dock.css">
+    <link rel="stylesheet" href="/src/css/voice.css">
+</head>
+<body>
+
+<div class="page-header">
+    <div>
+        <span class="brand-title">Nocturne</span>
+        <span class="brand-sub">Voice</span>
+    </div>
+    <a href="/" class="back">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        Back
+    </a>
+</div>
+
+<div class="voice-wrap">
+    <div id="authWall" class="vc-auth-wall" style="display:none">
+        You need to <a href="/account.html">sign in</a> to use voice chat.
+    </div>
+    <div id="channelArea" class="voice-cols"></div>
+</div>
+
+<div class="vc-toolbar" id="toolbar">
+    <div class="vc-tb-info" id="tbInfo"></div>
+    <button class="vc-tb-btn mic" id="btnMic" title="Toggle microphone">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="1" width="6" height="11" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+    </button>
+    <button class="vc-tb-btn deafen" id="btnDeafen" title="Toggle deafen">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3z"/><path d="M3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>
+    </button>
+    <button class="vc-tb-btn hang" id="btnHang" title="Disconnect">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M2 12c0-4.4 4.5-8 10-8s10 3.6 10 8"/><path d="M5 15l-1 4h3l1-4a7.1 7.1 0 0 1 8 0l1 4h3l-1-4"/></svg>
+    </button>
+</div>
+
+<nav id="dock"></nav>
+<script src="/src/js/lr2815.js" defer></script>
+<script>
+(function(){
+var ws, myPeerId, myUsername, currentChannel, muted=false, deafened=false;
+var peerConnections={}, remoteAudios={}, userVolumes={}, localStream=null;
+var analyserNodes={}, speakingState={};
+
+var ICE={iceServers:[{urls:"stun:stun.l.google.com:19302"},{urls:"stun:stun1.l.google.com:19302"}]};
+
+var channelArea=document.getElementById("channelArea");
+var toolbar=document.getElementById("toolbar");
+var tbInfo=document.getElementById("tbInfo");
+var btnMic=document.getElementById("btnMic");
+var btnDeafen=document.getElementById("btnDeafen");
+var btnHang=document.getElementById("btnHang");
+var authWall=document.getElementById("authWall");
+
+function connect(){
+    var proto=location.protocol==="https:"?"wss":"ws";
+    var url=proto+"://"+location.host+"/api/voice";
+    var sid;try{sid=localStorage.getItem("noc-session")}catch(_){}
+    if(sid)url+="?sid="+encodeURIComponent(sid);
+    ws=new WebSocket(url);
+    ws.onmessage=function(e){
+        var msg;try{msg=JSON.parse(e.data)}catch(_){return}
+        handle(msg);
+    };
+    ws.onclose=function(){
+        cleanupAll();
+        toolbar.classList.remove("visible");
+        currentChannel=null;
+        setTimeout(connect,3000);
+    };
+    ws.onerror=function(){};
+}
+
+function send(msg){if(ws&&ws.readyState===1)ws.send(JSON.stringify(msg))}
+
+function handle(msg){
+    switch(msg.type){
+        case "hello":
+            myPeerId=msg.peerId;
+            myUsername=msg.username;
+            renderChannels(msg.channels);
+            break;
+        case "channels":
+            renderChannels(msg.channels);
+            break;
+        case "joined":
+            currentChannel=msg.channel;
+            toolbar.classList.add("visible");
+            updateToolbarInfo();
+            msg.members.forEach(function(m){
+                if(m.peerId!==myPeerId) createPeer(m.peerId,true);
+            });
+            break;
+        case "left":
+            cleanupAll();
+            currentChannel=null;
+            toolbar.classList.remove("visible");
+            break;
+        case "peer-joined":
+            createPeer(msg.peerId,false);
+            break;
+        case "peer-left":
+            destroyPeer(msg.peerId);
+            break;
+        case "peer-muted":
+            break;
+        case "offer":
+            handleOffer(msg);
+            break;
+        case "answer":
+            handleAnswer(msg);
+            break;
+        case "ice-candidate":
+            handleIce(msg);
+            break;
+    }
+}
+
+function renderChannels(channels){
+    channelArea.innerHTML="";
+    channels.forEach(function(ch){
+        var panel=document.createElement("div");
+        panel.className="vc-panel";
+        var inThis=currentChannel===ch.id;
+        var head=document.createElement("div");
+        head.className="vc-head";
+        var title=document.createElement("h2");
+        title.textContent=ch.name;
+        var right=document.createElement("div");
+        right.style.cssText="display:flex;align-items:center;gap:8px";
+        var count=document.createElement("span");
+        count.className="vc-count";
+        count.textContent=ch.members.length+" online";
+        right.appendChild(count);
+        var btn=document.createElement("button");
+        btn.className="vc-join "+(inThis?"leave":"join");
+        btn.textContent=inThis?"Leave":"Join";
+        btn.onclick=function(){
+            if(inThis){send({type:"leave"})}
+            else{
+                getMic().then(function(){send({type:"join",channel:ch.id})}).catch(function(err){
+                    alert("Microphone access is required for voice chat.");
+                });
+            }
+        };
+        if(currentChannel&&!inThis)btn.disabled=true;
+        right.appendChild(btn);
+        head.appendChild(title);
+        head.appendChild(right);
+        panel.appendChild(head);
+        var members=document.createElement("div");
+        members.className="vc-members";
+        if(!ch.members.length){
+            var empty=document.createElement("div");
+            empty.className="vc-empty";
+            empty.textContent="No one here yet";
+            members.appendChild(empty);
+        } else {
+            ch.members.forEach(function(m){
+                members.appendChild(makeMemberEl(m,inThis));
+            });
+        }
+        panel.appendChild(members);
+        channelArea.appendChild(panel);
+    });
+}
+
+function makeMemberEl(m,showControls){
+    var el=document.createElement("div");
+    el.className="vc-member";
+    el.id="member-"+m.peerId;
+    var av=document.createElement("div");
+    av.className="vc-avatar";
+    av.textContent=m.username.charAt(0);
+    el.appendChild(av);
+    var name=document.createElement("span");
+    name.className="vc-name"+(m.peerId===myPeerId?" is-you":"");
+    name.textContent=m.username+(m.peerId===myPeerId?" (you)":"");
+    el.appendChild(name);
+    if(m.muted){
+        var mi=document.createElement("span");
+        mi.className="vc-muted-icon";
+        mi.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="1" y1="1" x2="23" y2="23"/><path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"/><path d="M5 10a7 7 0 0 0 11.36 5.36"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>';
+        el.appendChild(mi);
+    }
+    if(showControls&&m.peerId!==myPeerId){
+        var ctrl=document.createElement("div");
+        ctrl.className="vc-controls";
+        var vol=document.createElement("input");
+        vol.type="range";
+        vol.className="vc-vol";
+        vol.min="0";vol.max="200";vol.value=userVolumes[m.peerId]!=null?userVolumes[m.peerId]:"100";
+        vol.title="Volume";
+        vol.oninput=function(){
+            userVolumes[m.peerId]=parseInt(vol.value,10);
+            applyVolume(m.peerId);
+        };
+        ctrl.appendChild(vol);
+        el.appendChild(ctrl);
+    }
+    return el;
+}
+
+function updateToolbarInfo(){
+    var ch=currentChannel;
+    if(!ch){tbInfo.innerHTML="";return}
+    var label=ch.charAt(0).toUpperCase()+ch.slice(1);
+    tbInfo.innerHTML="Connected to <strong>"+label+"</strong>";
+}
+
+async function getMic(){
+    if(localStream)return localStream;
+    localStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true},video:false});
+    if(muted)localStream.getAudioTracks().forEach(function(t){t.enabled=false});
+    return localStream;
+}
+
+function createPeer(peerId,initiator){
+    if(peerConnections[peerId])return;
+    var pc=new RTCPeerConnection(ICE);
+    peerConnections[peerId]=pc;
+    if(localStream){
+        localStream.getTracks().forEach(function(t){pc.addTrack(t,localStream)});
+    }
+    pc.ontrack=function(e){
+        var audio=document.createElement("audio");
+        audio.autoplay=true;
+        audio.srcObject=e.streams[0];
+        document.body.appendChild(audio);
+        remoteAudios[peerId]=audio;
+        applyVolume(peerId);
+        if(deafened)audio.volume=0;
+        setupSpeakingDetection(peerId,e.streams[0]);
+    };
+    pc.onicecandidate=function(e){
+        if(e.candidate)send({type:"ice-candidate",to:peerId,candidate:e.candidate});
+    };
+    pc.onconnectionstatechange=function(){
+        if(pc.connectionState==="failed"||pc.connectionState==="disconnected"){
+            destroyPeer(peerId);
+        }
+    };
+    if(initiator){
+        pc.createOffer().then(function(offer){
+            return pc.setLocalDescription(offer);
+        }).then(function(){
+            send({type:"offer",to:peerId,sdp:pc.localDescription});
+        });
+    }
+}
+
+function handleOffer(msg){
+    if(!peerConnections[msg.from])createPeer(msg.from,false);
+    var pc=peerConnections[msg.from];
+    pc.setRemoteDescription(new RTCSessionDescription(msg.sdp)).then(function(){
+        return pc.createAnswer();
+    }).then(function(answer){
+        return pc.setLocalDescription(answer);
+    }).then(function(){
+        send({type:"answer",to:msg.from,sdp:pc.localDescription});
+    });
+}
+
+function handleAnswer(msg){
+    var pc=peerConnections[msg.from];
+    if(pc)pc.setRemoteDescription(new RTCSessionDescription(msg.sdp));
+}
+
+function handleIce(msg){
+    var pc=peerConnections[msg.from];
+    if(pc&&msg.candidate)pc.addIceCandidate(new RTCIceCandidate(msg.candidate)).catch(function(){});
+}
+
+function destroyPeer(peerId){
+    var pc=peerConnections[peerId];
+    if(pc){pc.close();delete peerConnections[peerId]}
+    var audio=remoteAudios[peerId];
+    if(audio){audio.srcObject=null;audio.remove();delete remoteAudios[peerId]}
+    if(analyserNodes[peerId]){delete analyserNodes[peerId]}
+    delete speakingState[peerId];
+}
+
+function cleanupAll(){
+    Object.keys(peerConnections).forEach(destroyPeer);
+    if(localStream){localStream.getTracks().forEach(function(t){t.stop()});localStream=null}
+}
+
+function applyVolume(peerId){
+    var audio=remoteAudios[peerId];
+    if(!audio)return;
+    var v=userVolumes[peerId]!=null?userVolumes[peerId]:100;
+    audio.volume=deafened?0:Math.min(2,v/100);
+}
+
+function setupSpeakingDetection(peerId,stream){
+    try{
+        var ctx=new AudioContext();
+        var src=ctx.createMediaStreamSource(stream);
+        var analyser=ctx.createAnalyser();
+        analyser.fftSize=512;
+        analyser.smoothingTimeConstant=0.4;
+        src.connect(analyser);
+        analyserNodes[peerId]={analyser:analyser,data:new Uint8Array(analyser.frequencyBinCount)};
+    }catch(_){}
+}
+
+function speakingLoop(){
+    for(var pid in analyserNodes){
+        var node=analyserNodes[pid];
+        node.analyser.getByteFrequencyData(node.data);
+        var sum=0;
+        for(var i=0;i<node.data.length;i++)sum+=node.data[i];
+        var avg=sum/node.data.length;
+        var speaking=avg>15;
+        if(speaking!==speakingState[pid]){
+            speakingState[pid]=speaking;
+            var el=document.getElementById("member-"+pid);
+            if(el){
+                var av=el.querySelector(".vc-avatar");
+                if(av){if(speaking)av.classList.add("vc-speaking");else av.classList.remove("vc-speaking")}
+            }
+        }
+    }
+    requestAnimationFrame(speakingLoop);
+}
+requestAnimationFrame(speakingLoop);
+
+btnMic.onclick=function(){
+    muted=!muted;
+    btnMic.classList.toggle("off",muted);
+    btnMic.title=muted?"Unmute":"Mute";
+    if(localStream)localStream.getAudioTracks().forEach(function(t){t.enabled=!muted});
+    send({type:"mute",muted:muted});
+};
+
+btnDeafen.onclick=function(){
+    deafened=!deafened;
+    btnDeafen.classList.toggle("off",deafened);
+    btnDeafen.title=deafened?"Undeafen":"Deafen";
+    Object.keys(remoteAudios).forEach(function(pid){applyVolume(parseInt(pid,10))});
+    if(deafened&&!muted)btnMic.click();
+};
+
+btnHang.onclick=function(){
+    send({type:"leave"});
+};
+
+fetch("/api/auth/me",{credentials:"same-origin",cache:"no-store"}).then(function(r){return r.json()}).then(function(me){
+    if(!me||!me.authenticated||!me.user){
+        authWall.style.display="";
+        channelArea.style.display="none";
+        return;
+    }
+    connect();
+}).catch(function(){
+    authWall.style.display="";
+    channelArea.style.display="none";
+});
+})();
+</script>
+</body>
+</html>

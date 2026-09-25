@@ -1,0 +1,1 @@
+(function(){var _k=atob("X05F"),_c=self[_k].codec.xor;self[atob("X19uZSRjb25maWc=")]={prefix:"/view/",encodeUrl:_c.encode,decodeUrl:_c.decode,handler:"/app/modules/core/h.js",client:"/app/modules/core/c.js",bundle:"/app/modules/core/core.js",config:"/app/settings.js",sw:"/app/modules/core/s.js"};})();
