@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-69T9E59SM7"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-69T9E59SM7');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="dark">
+    <title>Nocturne - Legal</title>
+    <style>html,body{background:#060509;color:#ededf0;margin:0}</style>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='9' fill='%230b0a14'/><circle cx='16' cy='16' r='9' fill='%23c9c1ff'/><circle cx='21' cy='14' r='8' fill='%230b0a14'/></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.0/src/css/global.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.0/src/css/dock.css">
+    <style>
+        html, body { height: auto; overflow: auto; }
+        body { overflow-y: auto; }
+        .legal-wrap { max-width: 880px; margin: 0 auto; padding: 48px 32px 140px; position: relative; z-index: 2; }
+        .legal-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; opacity: 0; animation: slideDown 0.5s var(--ease) forwards; }
+        .legal-title { font-size: 22px; font-weight: 600; letter-spacing: -0.01em; color: var(--fg); }
+        .legal-sub { font-size: 12px; color: var(--fg-3); margin-top: 4px; }
+        .back { color: var(--fg-3); font-size: 12px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; transition: color 0.15s var(--ease), transform 0.15s var(--ease); }
+        .back:hover { color: var(--fg); transform: translateX(-2px); }
+        .legal-intro { font-size: 13.5px; line-height: 1.65; color: var(--fg-2); margin-bottom: 28px; opacity: 0; animation: slideUp 0.55s var(--ease) 0.1s forwards; }
+        .legal-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; }
+        .legal-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--line);
+            border-radius: 0;
+            padding: 18px 18px 20px;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            transition: border-color 0.2s var(--ease), background 0.2s var(--ease), transform 0.2s var(--ease);
+            opacity: 0;
+            animation: slideUp 0.55s var(--ease) forwards;
+        }
+        .legal-card:hover {
+            border-color: var(--line-3);
+            background: rgba(255, 255, 255, 0.04);
+            transform: translateY(-2px);
+        }
+        .legal-card:nth-child(1) { animation-delay: 0.18s; }
+        .legal-card:nth-child(2) { animation-delay: 0.26s; }
+        .legal-card:nth-child(3) { animation-delay: 0.34s; }
+        .legal-card:nth-child(4) { animation-delay: 0.42s; }
+        .lc-icon {
+            width: 32px; height: 32px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 0;
+            background: rgba(168, 152, 232, 0.056);
+            color: var(--accent);
+            margin-bottom: 4px;
+        }
+        .lc-name { font-size: 14px; font-weight: 500; color: var(--fg); }
+        .lc-desc { font-size: 12px; color: var(--fg-3); line-height: 1.5; }
+    </style>
+</head>
+<body>
+
+<canvas id="bgCanvas" class="visible"></canvas>
+
+<div class="legal-wrap">
+    <div class="legal-head">
+        <div>
+            <div class="legal-title">Legal</div>
+            <div class="legal-sub">Policies, terms, and copyright</div>
+        </div>
+        <a href="/" class="back">← Home</a>
+    </div>
+
+    <p class="legal-intro">The documents below describe how Nocturne is used and what rules apply. By using the service you agree to these terms.</p>
+
+    <div class="legal-grid">
+        <a class="legal-card" href="/terms.html">
+            <div class="lc-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M8 21h12a2 2 0 0 0 2-2v-2H10v2a2 2 0 1 1-4 0V5a2 2 0 1 0-4 0v3h4"/>
+                    <path d="M19 17V5a2 2 0 0 0-2-2H4"/>
+                    <path d="M15 8h-6"/>
+                    <path d="M15 12h-6"/>
+                </svg>
+            </div>
+            <div class="lc-name">Terms of Service</div>
+            <div class="lc-desc">Acceptable use, content filtering, enforcement, and liability.</div>
+        </a>
+
+        <a class="legal-card" href="/privacy.html">
+            <div class="lc-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                    <path d="M9 12l2 2 4-4"/>
+                </svg>
+            </div>
+            <div class="lc-name">Privacy Policy</div>
+            <div class="lc-desc">What is and isn't collected, local storage, and third parties.</div>
+        </a>
+
+        <a class="legal-card" href="/dmca.html">
+            <div class="lc-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                    <line x1="16" y1="13" x2="8" y2="13"/>
+                    <line x1="16" y1="17" x2="8" y2="17"/>
+                    <line x1="10" y1="9" x2="9" y2="9"/>
+                </svg>
+            </div>
+            <div class="lc-name">DMCA &amp; Copyright</div>
+            <div class="lc-desc">How to report infringing content and the takedown process.</div>
+        </a>
+
+        <a class="legal-card" href="/support.html">
+            <div class="lc-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                </svg>
+            </div>
+            <div class="lc-name">Support &amp; Requests</div>
+            <div class="lc-desc">Takedowns, feature requests, anything else. Direct line to the operator.</div>
+        </a>
+    </div>
+</div>
+
+<nav id="dock"></nav>
+<script src="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.0/src/js/lr2815.js" defer></script>
+
+<script src="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.0/src/js/wz6714.js" defer></script>
+
+<script src="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.0/src/js/pu3927.js?v=20260929-2" defer></script>
+</body>
+</html>

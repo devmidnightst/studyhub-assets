@@ -1,0 +1,1381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>
+        // This page must always be the real, top-level destination - never nested
+        // inside the SPA's internal tab iframe. If something ever links here without
+        // breaking out (target="_top"), force it to the real address bar ourselves.
+        try {
+            if (window.self !== window.top) window.top.location.href = "/api";
+        } catch (e) {}
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="dark">
+    <title>Nocturne - API Documentation</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='9' fill='%230b0a14'/><circle cx='16' cy='16' r='9' fill='%23c9c1ff'/><circle cx='21' cy='14' r='8' fill='%230b0a14'/></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+
+        :root{
+            --bg-0:#05060a;--bg-1:#0b0e16;--bg-2:#12151f;--bg-3:#1a1e2b;--bg-4:#22273a;
+            --border-1:#232837;--border-2:#343a4d;--border-3:#454c66;
+            --fg-0:#f4f5f8;--fg-1:#c2c6d6;--fg-2:#8a90a6;--fg-3:#5c6178;
+            --violet-3:#c4b0fb;--violet-5:#8b5cf6;--violet-6:#7c3aed;
+            --cyan-3:#8fe9f7;--cyan-5:#22d3ee;
+            --accent:var(--violet-5);--accent-hover:#a78bfa;--accent-active:var(--violet-6);--accent-soft:rgba(139,92,246,.14);
+            --accent-2:var(--cyan-5);--accent-2-hover:#67e8f9;--accent-2-soft:rgba(34,211,238,.14);
+            --success:#34d399;--success-soft:rgba(52,211,153,.14);
+            --warning:#fbbf24;--warning-soft:rgba(251,191,36,.14);
+            --danger:#f87171;--danger-soft:rgba(248,113,113,.14);
+            --surface-app:var(--bg-1);--surface-raised:var(--bg-2);--surface-card:var(--bg-3);--surface-overlay:var(--bg-4);
+            --text-primary:var(--fg-0);--text-secondary:var(--fg-1);--text-muted:var(--fg-2);--text-disabled:var(--fg-3);
+            --text-on-accent:#05060a;
+            --border-subtle:var(--border-1);--border-default:var(--border-2);--border-strong:var(--border-3);
+            --link:var(--accent-2);--link-hover:var(--accent-2-hover);
+            --font-display:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;
+            --font-body:'Inter',ui-sans-serif,system-ui,sans-serif;
+            --font-mono:'JetBrains Mono',ui-monospace,'SF Mono',monospace;
+            --text-xs:12px;--text-sm:13px;--text-base:15px;--text-md:17px;--text-lg:20px;--text-xl:26px;--text-2xl:34px;
+            --space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:20px;--space-6:24px;--space-8:32px;
+            --radius-sm:0;--radius-md:0;--radius-lg:0;--radius-pill:0;
+            --shadow-sm:0 1px 2px rgba(0,0,0,.4);
+            --shadow-md:0 4px 16px rgba(0,0,0,.45),0 1px 2px rgba(0,0,0,.5);
+            --shadow-lg:0 12px 40px rgba(0,0,0,.55),0 2px 8px rgba(0,0,0,.4);
+            --shadow-glow-violet:0 0 0 1px rgba(139,92,246,.4),0 0 24px rgba(139,92,246,.25);
+            --ease-standard:cubic-bezier(.4,0,.2,1);
+            --duration-fast:120ms;--duration-normal:200ms;--duration-slow:340ms;
+        }
+        *{box-sizing:border-box}
+        html,body{margin:0;padding:0;height:100%}
+        body{background:var(--surface-app);color:var(--text-primary);font-family:var(--font-body);font-size:var(--text-base);line-height:1.55;-webkit-font-smoothing:antialiased}
+        a{color:var(--link);text-decoration:none}
+        a:hover{color:var(--link-hover);text-decoration:underline}
+        code,pre,kbd{font-family:var(--font-mono)}
+        ::selection{background:var(--accent-soft);color:var(--text-primary)}
+        button{font-family:inherit}
+        details summary{cursor:pointer}
+
+        .gw-intro{position:fixed;inset:0;background:var(--bg-0);z-index:999;display:flex;align-items:center;justify-content:center;pointer-events:none}
+        .gw-intro canvas{position:absolute;inset:0;width:100%;height:100%}
+
+        .gw{display:flex;min-height:100vh}
+        .gw-side{width:216px;flex-shrink:0;border-right:1px solid var(--border-subtle);padding:20px 12px;display:flex;flex-direction:column;gap:2px;position:sticky;top:0;height:100vh;overflow-y:auto}
+        .gw-brand{display:flex;align-items:baseline;gap:6px;padding:4px 10px 18px;font-family:var(--font-display)}
+        .gw-brand b{font-size:16px;font-weight:700;color:var(--text-primary)}
+        .gw-brand span{font-size:12px;font-weight:500;color:var(--text-muted)}
+        .gw-nav{display:flex;flex-direction:column;gap:2px}
+        .gw-nav-btn{display:flex;align-items:center;gap:10px;text-align:left;background:transparent;border:none;border-radius: 0;color:var(--text-muted);font-weight:600;font-size:var(--text-sm);padding:9px 10px;cursor:pointer;transition:background var(--duration-fast) var(--ease-standard),color var(--duration-fast) var(--ease-standard)}
+        .gw-nav-btn svg{flex-shrink:0;opacity:.85}
+        .gw-nav-btn:hover{background:var(--bg-2);color:var(--text-primary)}
+        .gw-nav-btn.active{background:var(--bg-3);color:var(--text-primary)}
+        .gw-side-foot{margin-top:auto;padding-top:16px;border-top:1px solid var(--border-subtle);display:flex;flex-direction:column;gap:8px}
+        .gw-back{display:flex;align-items:center;gap:6px;color:var(--text-muted);font-size:var(--text-sm);font-weight:500;padding:0 10px}
+        .gw-back:hover{color:var(--text-primary);text-decoration:none}
+        .gw-version{color:var(--text-disabled);font-size:11px;padding:0 10px;font-family:var(--font-mono)}
+
+        .gw-main{flex:1;min-width:0;overflow-y:auto;height:100vh}
+        .gw-pane{display:none;max-width:920px;margin:0 auto;padding:40px 32px 96px}
+        .gw-pane.active{display:block}
+        .gw-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:24px}
+        .gw-head h1{font-family:var(--font-display);font-weight:700;font-size:var(--text-2xl);letter-spacing:-.02em;margin:0 0 6px;color:var(--text-primary)}
+        .gw-head p{color:var(--text-muted);font-size:var(--text-base);margin:0;max-width:56ch}
+
+        .card{background:var(--surface-card);border:1px solid var(--border-default);border-radius: 0;padding:20px;box-shadow:var(--shadow-sm)}
+        .card.flush{padding:0}
+        .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:600;font-size:var(--text-sm);border-radius: 0;padding:8px 15px;cursor:pointer;border:1px solid transparent;transition:background var(--duration-normal) var(--ease-standard),transform var(--duration-fast) var(--ease-standard),opacity var(--duration-normal) var(--ease-standard)}
+        .btn:active{transform:scale(.97)}
+        .btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+        .btn-primary{background:var(--accent);color:var(--text-on-accent)}
+        .btn-primary:hover:not(:disabled){background:var(--accent-hover)}
+        .btn-secondary{background:var(--surface-card);color:var(--text-primary);border-color:var(--border-default)}
+        .btn-secondary:hover:not(:disabled){background:var(--bg-4)}
+        .btn-ghost{background:transparent;color:var(--text-primary)}
+        .btn-ghost:hover:not(:disabled){background:var(--bg-3)}
+        .btn-danger{background:var(--danger-soft);color:var(--danger);border-color:rgba(248,113,113,.4)}
+        .btn-danger:hover:not(:disabled){background:rgba(248,113,113,.22)}
+        .btn-sm{padding:5px 11px;font-size:12.5px;border-radius: 0}
+        .spinner{width:12px;height:12px;border-radius:50%;border:2px solid currentColor;border-top-color:transparent;animation:ndsSpin .7s linear infinite;display:inline-block;flex-shrink:0}
+        @keyframes ndsSpin{to{transform:rotate(360deg)}}
+
+        .badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;padding:3px 9px;border-radius: 0;line-height:1.4;white-space:nowrap}
+        .badge .dot{width:6px;height:6px;border-radius:50%}
+        .badge-info{background:var(--accent-2-soft);color:var(--cyan-3)}.badge-info .dot{background:var(--accent-2)}
+        .badge-accent{background:var(--accent-soft);color:var(--violet-3)}.badge-accent .dot{background:var(--accent)}
+        .badge-success{background:var(--success-soft);color:var(--success)}.badge-success .dot{background:var(--success)}
+        .badge-warning{background:var(--warning-soft);color:var(--warning)}.badge-warning .dot{background:var(--warning)}
+        .badge-danger{background:var(--danger-soft);color:var(--danger)}.badge-danger .dot{background:var(--danger)}
+        .badge-neutral{background:var(--bg-4);color:var(--text-secondary)}.badge-neutral .dot{background:var(--fg-2)}
+
+        .tag{display:inline-flex;align-items:center;gap:6px;background:var(--surface-card);border:1px solid var(--border-default);color:var(--text-secondary);font-family:var(--font-mono);font-size:12px;padding:4px 10px;border-radius: 0;cursor:pointer;transition:border-color var(--duration-fast) var(--ease-standard),color var(--duration-fast) var(--ease-standard)}
+        .tag:hover{border-color:var(--accent);color:var(--text-primary)}
+        .tag .px{color:var(--text-disabled);font-size:10.5px;margin-left:2px}
+
+        .field{display:flex;flex-direction:column;gap:6px}
+        .field label{font-size:var(--text-sm);color:var(--text-secondary);font-weight:500}
+        .field input,.field select{background:var(--surface-raised);color:var(--text-primary);border:1px solid var(--border-default);border-radius: 0;padding:9px 12px;font-size:var(--text-base);font-family:var(--font-body);outline:none;width:100%;transition:border-color var(--duration-fast) var(--ease-standard),box-shadow var(--duration-fast) var(--ease-standard)}
+        .field input:focus,.field select:focus{border-color:var(--accent);box-shadow:var(--shadow-glow-violet)}
+        .field input.mono{font-family:var(--font-mono);font-size:13px}
+
+        code.inline{background:rgba(139,92,246,.1);padding:2px 6px;border-radius: 0;font-family:var(--font-mono);font-size:12.5px;color:var(--violet-3)}
+        pre{background:var(--bg-0);border:1px solid var(--border-subtle);border-radius: 0;padding:14px 16px;overflow-x:auto;font-family:var(--font-mono);font-size:12.5px;line-height:1.6;color:var(--text-primary);position:relative;margin:12px 0}
+        pre code{color:var(--text-primary)}
+        .tok-key{color:var(--cyan-3)}.tok-str{color:#b0e8c0}.tok-com{color:var(--text-disabled);font-style:italic}
+        .copy-btn{position:absolute;top:8px;right:8px;background:var(--bg-3);border:1px solid var(--border-default);color:var(--text-muted);border-radius: 0;padding:3px 9px;font-size:11px;cursor:pointer;font-family:var(--font-body)}
+        .copy-btn:hover{color:var(--text-primary);border-color:var(--accent-hover)}
+
+        table{width:100%;border-collapse:collapse;margin:10px 0;font-size:13.5px}
+        th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--border-subtle);vertical-align:top}
+        th{color:var(--text-muted);font-weight:600;font-size:11.5px;text-transform:uppercase;letter-spacing:.04em}
+        td code{font-family:var(--font-mono);color:var(--violet-3);font-size:12.5px}
+        .req{color:var(--danger);font-size:11px;font-weight:600}
+        .opt{color:var(--text-disabled);font-size:11px}
+        .note{background:var(--accent-soft);border-left:2px solid var(--accent);border-radius: 0;padding:10px 14px;margin:14px 0;font-size:13px;color:var(--text-secondary)}
+        .note b{color:var(--text-primary)}
+        .muted{color:var(--text-muted)}
+        h2.dh{font-family:var(--font-display);font-size:var(--text-lg);font-weight:600;margin:40px 0 6px;letter-spacing:-.01em;scroll-margin-top:24px;color:var(--text-primary)}
+        h3.dh{font-family:var(--font-body);font-size:var(--text-base);font-weight:600;margin:24px 0 8px;color:var(--violet-3)}
+        p.dp{color:var(--text-secondary);font-size:14.5px}
+        .doc-toc{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 24px}
+        .doc-toc a{background:var(--surface-card);border:1px solid var(--border-default);color:var(--text-secondary);font-size:12px;padding:5px 11px;border-radius: 0}
+        .doc-toc a:hover{color:var(--text-primary);border-color:var(--accent);text-decoration:none}
+        .bp-list{display:flex;flex-direction:column;gap:10px;margin:14px 0}
+        .bp-item{display:flex;gap:10px;align-items:flex-start;font-size:13.5px;color:var(--text-secondary)}
+        .bp-item svg{flex-shrink:0;color:var(--success);margin-top:2px}
+        details.faq{border-top:1px solid var(--border-subtle);padding:12px 0}
+        details.faq:first-of-type{border-top:none}
+        details.faq summary{color:var(--text-primary);font-weight:600;font-size:14px;list-style:none}
+        details.faq summary::-webkit-details-marker{display:none}
+        details.faq summary::before{content:"+ ";color:var(--accent)}
+        details.faq[open] summary::before{content:"– "}
+        details.faq p{margin:8px 0 0;color:var(--text-secondary);font-size:13.5px}
+
+        .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+        .stat-card .l{color:var(--text-muted);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+        .stat-card .v{color:var(--text-primary);font-size:22px;font-family:var(--font-display);font-weight:700;margin-top:6px;line-height:1.2}
+        .stat-card .v small{font-size:12.5px;color:var(--text-muted);font-weight:500}
+        .stat-card .sub{color:var(--text-disabled);font-size:11.5px;margin-top:4px}
+        .bar{height:7px;border-radius: 0;background:var(--bg-4);overflow:hidden;margin-top:9px}
+        .bar > i{display:block;height:100%;background:var(--accent);border-radius: 0;transition:width .4s var(--ease-standard)}
+        .chip-row{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
+        .signin-cta{padding:28px 24px;text-align:center}
+        .signin-cta p{color:var(--text-secondary);margin:0 0 14px}
+        .mu-head{color:var(--text-primary);font-weight:600;font-size:13.5px;margin-bottom:var(--space-3)}
+        .mu-row{display:flex;align-items:center;gap:var(--space-3);padding:var(--space-2) 0}
+        .mu-name{font-family:var(--font-mono);font-size:12px;color:var(--text-secondary);width:190px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+        .mu-bar{flex:1;height:6px;background:var(--bg-4);border-radius: 0;overflow:hidden}
+        .mu-bar>i{display:block;height:100%;background:var(--accent-2);border-radius: 0}
+        .mu-val{font-family:var(--font-mono);font-size:11.5px;color:var(--text-muted);width:64px;text-align:right;flex-shrink:0}
+
+        .key-row{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 20px;border-top:1px solid var(--border-subtle);flex-wrap:wrap}
+        .key-row:first-child{border-top:none}
+        .key-row .name{color:var(--text-primary);font-weight:600;font-size:14px}
+        .key-row .meta{color:var(--text-muted);font-size:12px;margin-top:2px}
+        .key-empty{padding:28px 20px;text-align:center;color:var(--text-muted);font-size:13.5px}
+        .new-key-banner{display:flex;align-items:center;gap:10px;background:var(--success-soft);border:1px solid rgba(52,211,153,.35);border-radius: 0;padding:12px 14px;margin-bottom:16px}
+        .new-key-banner code{flex:1;color:var(--text-primary);font-size:13px;word-break:break-all}
+        .new-key-banner .label{color:var(--success);font-size:11.5px;font-weight:600;text-transform:uppercase;letter-spacing:.03em;display:block;margin-bottom:4px}
+        .reveal-box{flex:1 0 100%;display:flex;align-items:center;gap:var(--space-2);background:var(--bg-0);border:1px solid var(--border-default);border-radius: 0;padding:var(--space-2) var(--space-3);margin-top:var(--space-2)}
+        .reveal-box code{flex:1;color:var(--text-primary);font-size:12.5px;word-break:break-all}
+
+        .model-group{margin-bottom:16px}
+        .model-group-h{color:var(--text-primary);font-weight:600;font-size:13.5px;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+        .model-row{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 18px;border-top:1px solid var(--border-subtle);flex-wrap:wrap}
+        .model-row:first-child{border-top:none}
+        .model-row .m-id{font-family:var(--font-mono);font-size:13px;color:var(--text-primary);cursor:pointer}
+        .model-row .m-id:hover{color:var(--accent-hover)}
+        .model-row .m-label{color:var(--text-muted);font-size:12px;margin-left:8px}
+        .model-row .m-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+        .m-price{color:var(--text-disabled);font-size:11.5px;font-family:var(--font-mono)}
+
+        .pg-shell{display:flex;flex-direction:column;height:calc(100vh - 140px);min-height:420px}
+        .pg-config{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+        .pg-config .field{flex:1;min-width:180px}
+        .pg-thread{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding:18px;margin-bottom:14px}
+        .pg-msg{max-width:78%;padding:10px 14px;border-radius: 0;font-size:14px;line-height:1.5;white-space:pre-wrap}
+        .pg-msg.user{align-self:flex-end;background:var(--accent-soft);color:var(--text-primary)}
+        .pg-msg.assistant{align-self:flex-start;background:var(--bg-3);color:var(--text-primary)}
+        .pg-msg.err{align-self:flex-start;background:var(--danger-soft);color:var(--danger);font-family:var(--font-mono);font-size:12.5px}
+        .pg-empty{margin:auto;text-align:center;color:var(--text-disabled);font-size:13.5px}
+        .pg-row{display:flex;gap:10px}
+        .pg-row .field{flex:1}
+        .pg-gate{padding:32px 24px;text-align:center}
+
+        .log-row{display:flex;align-items:center;gap:var(--space-3);padding:var(--space-3) var(--space-4);border-top:1px solid var(--border-subtle);font-size:12.5px;flex-wrap:wrap}
+        .log-row:first-child{border-top:none}
+        .log-model{font-family:var(--font-mono);color:var(--text-primary)}
+        .log-time{margin-left:auto;color:var(--text-muted)}
+        .log-right{color:var(--text-muted);font-family:var(--font-mono);font-size:11.5px;min-width:110px;text-align:right}
+
+        .status-hero{display:flex;align-items:center;gap:var(--space-4);padding:var(--space-6);flex-wrap:wrap}
+        .status-meta{color:var(--text-muted);font-size:13px;font-family:var(--font-mono)}
+        .status-strip{display:flex;gap:2px;align-items:flex-end;flex-wrap:wrap}
+        .status-day{width:8px;height:28px;border-radius: 0;background:var(--bg-4)}
+        .status-day.status-success{background:var(--success)}
+        .status-day.status-warning{background:var(--warning)}
+        .status-day.status-danger{background:var(--danger)}
+
+        .dlg-scrim{position:fixed;inset:0;background:rgba(5,6,10,0.94);display:none;align-items:center;justify-content:center;z-index:100}
+        .dlg-scrim.open{display:flex}
+        .dlg{background:var(--surface-raised);border:1px solid var(--border-default);border-radius: 0;box-shadow:var(--shadow-lg);width:380px;max-width:calc(100vw - 32px);padding:24px}
+        .dlg-title{color:var(--text-primary);font-family:var(--font-display);font-weight:600;font-size:var(--text-lg);margin-bottom:14px}
+        .dlg-foot{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}
+
+        .toast-wrap{position:fixed;top:var(--space-5);right:var(--space-5);z-index:800;display:flex;flex-direction:column;gap:var(--space-3);pointer-events:none}
+        .toast{pointer-events:auto;position:relative;overflow:hidden;display:flex;align-items:flex-start;gap:var(--space-3);background:var(--surface-raised);border:1px solid var(--border-default);border-left:4px solid var(--accent-2);border-radius: 0;padding:var(--space-4) var(--space-5);box-shadow:var(--shadow-lg);min-width:280px;max-width:380px;transform:translateX(130%) scale(.96);opacity:0;transition:transform .5s cubic-bezier(.16,1,.3,1),opacity .4s cubic-bezier(.16,1,.3,1)}
+        .toast.in{transform:translateX(0) scale(1);opacity:1}
+        .toast-success{border-left-color:var(--success)}
+        .toast-danger{border-left-color:var(--danger)}
+        .toast-info{border-left-color:var(--accent-2)}
+        .toast-title{color:var(--text-primary);font-weight:600;font-size:14.5px}
+        .toast-msg{color:var(--text-secondary);font-size:13px;margin-top:3px}
+        .toast-x{margin-left:auto;background:transparent;border:none;color:var(--text-muted);cursor:pointer;font-size:16px;line-height:1;flex-shrink:0}
+        .toast-bar{position:absolute;left:0;bottom:0;height:3px;width:100%;background:var(--accent-2);transform-origin:left;animation:toastShrink linear forwards}
+        .toast-success .toast-bar{background:var(--success)}
+        .toast-danger .toast-bar{background:var(--danger)}
+        @keyframes toastShrink{from{transform:scaleX(1)}to{transform:scaleX(0)}}
+
+        .tt-bubble{position:fixed;z-index:900;background:var(--bg-4);color:var(--text-primary);font-size:var(--text-xs);padding:var(--space-2) var(--space-3);border-radius: 0;border:1px solid var(--border-default);box-shadow:var(--shadow-md);pointer-events:none;white-space:nowrap;opacity:0;transition:opacity var(--duration-fast) var(--ease-standard)}
+        .tt-bubble.show{opacity:1}
+
+        .assist-launcher{position:fixed;bottom:var(--space-6);right:var(--space-6);z-index:400;display:flex;align-items:center;gap:8px;background:var(--accent);color:var(--text-on-accent);border:none;border-radius: 0;padding:12px 18px;font-weight:600;font-size:13px;cursor:pointer;box-shadow:var(--shadow-lg);transition:background var(--duration-normal) var(--ease-standard),transform var(--duration-fast) var(--ease-standard)}
+        .assist-launcher:hover{background:var(--accent-hover)}
+        .assist-launcher:active{transform:scale(.97)}
+        .assist-panel{position:fixed;bottom:var(--space-6);right:var(--space-6);z-index:410;width:360px;max-width:calc(100vw - 32px);height:480px;max-height:calc(100vh - 100px);background:var(--surface-raised);border:1px solid var(--border-default);border-radius: 0;box-shadow:var(--shadow-lg);display:none;flex-direction:column;overflow:hidden}
+        .assist-panel.open{display:flex}
+        .assist-head{display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid var(--border-subtle);font-weight:600;font-size:13.5px;color:var(--text-primary)}
+        .assist-count{margin-left:auto;color:var(--text-muted);font-size:11.5px;font-weight:500}
+        .assist-close{background:transparent;border:none;color:var(--text-muted);cursor:pointer;font-size:16px}
+        .assist-thread{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding:14px}
+
+        footer.gw-foot{color:var(--text-disabled);font-size:12.5px;margin-top:56px;border-top:1px solid var(--border-subtle);padding-top:20px}
+
+        @media (max-width: 860px){
+            .gw{flex-direction:column}
+            .gw-side{position:sticky;top:0;width:100%;height:auto;flex-direction:row;overflow-x:auto;overflow-y:visible;border-right:none;border-bottom:1px solid var(--border-subtle);padding:10px 12px;z-index:5;background:var(--surface-app)}
+            .gw-brand{padding:4px 10px;flex-shrink:0}
+            .gw-nav{flex-direction:row}
+            .gw-nav-btn{white-space:nowrap}
+            .gw-side-foot{margin-top:0;padding-top:0;border-top:none;flex-direction:row;margin-left:auto;flex-shrink:0}
+            .gw-version{display:none}
+            .gw-main{height:auto}
+            .gw-pane{padding:28px 18px 64px}
+            .stat-grid{grid-template-columns:repeat(2,1fr)}
+            .pg-shell{height:auto;min-height:540px}
+            .assist-panel{right:12px;left:12px;width:auto;bottom:80px}
+            .assist-launcher{right:12px;bottom:12px}
+        }
+    </style>
+</head>
+<body>
+
+<div class="gw-intro" id="gwIntro"><canvas id="introCanvas"></canvas></div>
+<div class="toast-wrap" id="toastWrap"></div>
+<div class="tt-bubble" id="ttBubble"></div>
+
+<div class="gw">
+    <aside class="gw-side">
+        <div class="gw-brand"><b>nocturne</b><span>api</span></div>
+        <nav class="gw-nav" id="gwNav">
+            <button class="gw-nav-btn" data-pane="overview" type="button">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>
+                Overview
+            </button>
+            <button class="gw-nav-btn" data-pane="keys" type="button">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="4.5"/><path d="M10.6 12.4 20 3l2 2-2 2-1.5-1.5L17 7l1.5 1.5-2.5 2.5"/></svg>
+                API keys
+            </button>
+            <button class="gw-nav-btn" data-pane="models" type="button">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 4v16M4 9h16"/></svg>
+                Models
+            </button>
+            <button class="gw-nav-btn" data-pane="playground" type="button">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                Playground
+            </button>
+            <button class="gw-nav-btn" data-pane="logs" type="button">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                Logs
+            </button>
+            <button class="gw-nav-btn" data-pane="status" type="button">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                Status
+            </button>
+            <button class="gw-nav-btn" data-pane="docs" type="button">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 2-3 4"/><path d="M12 17h.01"/></svg>
+                Docs
+            </button>
+            <button class="gw-nav-btn" data-pane="linkcheck" type="button">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                Link Checker
+            </button>
+        </nav>
+        <div class="gw-side-foot">
+            <a class="gw-back" href="/">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+                Back to Nocturne
+            </a>
+            <div class="gw-version">v2.0.0</div>
+        </div>
+    </aside>
+
+    <main class="gw-main">
+
+        <section class="gw-pane" data-pane="overview">
+            <div class="gw-head">
+                <div><h1>Overview</h1><p>Your Nocturne AI access — quota, usage, and the models your account can call.</p></div>
+            </div>
+            <div id="ovBody"><div class="card muted" style="font-size:13px">Loading…</div></div>
+        </section>
+
+        <section class="gw-pane" data-pane="keys">
+            <div class="gw-head">
+                <div><h1>API keys</h1><p>Scoped <code class="inline">noct_…</code> keys for calling the gateway from your own apps. Keep them server-side.</p></div>
+                <button class="btn btn-primary btn-sm" id="newKeyBtn" type="button">New key</button>
+            </div>
+            <div id="keysBody"><div class="card muted" style="font-size:13px">Loading…</div></div>
+        </section>
+
+        <section class="gw-pane" data-pane="models">
+            <div class="gw-head">
+                <div><h1>Models</h1><p>One endpoint routes to every model your account can use. Click an id to copy it.</p></div>
+            </div>
+            <div id="modelsBody"><div class="card muted" style="font-size:13px">Loading…</div></div>
+        </section>
+
+        <section class="gw-pane" data-pane="playground">
+            <div class="gw-head">
+                <div><h1>Playground</h1><p>Test a prompt against <code class="inline">POST /api/ai</code> with a real key — nothing here is simulated.</p></div>
+            </div>
+            <div id="pgBody"></div>
+        </section>
+
+        <section class="gw-pane" data-pane="logs">
+            <div class="gw-head">
+                <div><h1>Logs</h1><p>Recent requests to <code class="inline">POST /api/ai</code> across all your keys.</p></div>
+            </div>
+            <div id="logsBody"><div class="card muted" style="font-size:13px">Loading…</div></div>
+        </section>
+
+        <section class="gw-pane" data-pane="status">
+            <div class="gw-head">
+                <div><h1>Status</h1><p>Live health of the underlying AI provider — pinged every 10 minutes, 90 days of history.</p></div>
+            </div>
+            <div id="statusBody"><div class="card muted" style="font-size:13px">Loading…</div></div>
+        </section>
+
+        <section class="gw-pane" data-pane="docs">
+            <div class="gw-head">
+                <div><h1>Documentation</h1><p>Call Nocturne AI — and the school/content-filter checker — from your own apps. Authenticated, quota-fair, OpenAI-style JSON.</p></div>
+            </div>
+
+            <div class="doc-toc">
+                <a href="#auth">Authentication</a><a href="#chat">Chat / completion</a><a href="#sdk">SDK examples</a>
+                <a href="#bestpractices">Best practices</a><a href="#account">Account endpoints</a><a href="#linkcheck">Link-Check</a><a href="#faq">FAQ</a>
+            </div>
+
+            <div class="card flush" style="margin-bottom:24px">
+                <div class="key-row" style="border-top:none"><span class="badge badge-accent"><span class="dot"></span>POST</span><span><b>/api/ai</b></span><span class="muted" style="margin-left:auto;font-size:12.5px">Chat / completion (streaming optional)</span></div>
+                <div class="key-row"><span class="badge badge-info"><span class="dot"></span>GET</span><span><b>/api/ai</b></span><span class="muted" style="margin-left:auto;font-size:12.5px">Machine-readable docs (JSON)</span></div>
+                <div class="key-row"><span class="badge badge-info"><span class="dot"></span>GET</span><span><b>/api/ai/usage</b></span><span class="muted" style="margin-left:auto;font-size:12.5px">Your token usage (session)</span></div>
+                <div class="key-row"><span class="badge badge-info"><span class="dot"></span>GET</span><span><b>/api/ai/credits</b></span><span class="muted" style="margin-left:auto;font-size:12.5px">Your daily quota + credit balance (session)</span></div>
+                <div class="key-row"><span class="badge badge-info"><span class="dot"></span>GET</span><span><b>/api/ai/config</b></span><span class="muted" style="margin-left:auto;font-size:12.5px">Your available models (session)</span></div>
+                <div class="key-row"><span class="badge badge-info"><span class="dot"></span>GET</span><span><b>/api/status</b></span><span class="muted" style="margin-left:auto;font-size:12.5px">Provider liveness (public)</span></div>
+                <div class="key-row"><span class="badge badge-info"><span class="dot"></span>GET</span><span><b>/api/v1/linkcheck</b></span><span class="muted" style="margin-left:auto;font-size:12.5px">Is a URL blocked by common filters? — see <a href="#" data-nav="linkcheck">Link Checker</a> tab</span></div>
+            </div>
+
+            <h2 class="dh" id="auth">Authentication</h2>
+            <p class="dp">The <code class="inline">POST /api/ai</code> endpoint accepts either of two auth methods:</p>
+            <ul class="dp">
+                <li><b style="color:var(--text-primary)">API key (recommended).</b> Send <code class="inline">Authorization: Bearer noct_…</code> (or header <code class="inline">X-API-Key: noct_…</code>). Create + manage keys on the <a href="#" data-nav="keys">API keys</a> tab. Keep keys server-side — never ship them in client code.</li>
+                <li><b style="color:var(--text-primary)">Account credentials.</b> Include <code class="inline">account</code> + <code class="inline">password</code> in the JSON body. Convenient for quick tests; prefer keys for anything real.</li>
+            </ul>
+            <p class="dp">The account endpoints (<code class="inline">/api/ai/usage</code>, <code class="inline">/credits</code>, <code class="inline">/config</code>) are <b>session-based</b> — they read your signed-in cookie and power the <a href="#" data-nav="overview">Overview</a> tab. For programmatic quota tracking, read the <code class="inline">quota</code> object returned by every <code class="inline">/api/ai</code> call.</p>
+
+            <h2 class="dh" id="chat">Chat / completion — <span class="badge badge-accent" style="vertical-align:1px"><span class="dot"></span>POST</span> /api/ai</h2>
+            <p class="dp">Send a prompt or a message list, get a completion. Every call counts against your account's <b>daily token quota</b> and is rate-limited to <b id="rpm">60</b> requests/minute.</p>
+
+            <h3 class="dh">Request body</h3>
+            <div class="card flush" style="overflow-x:auto">
+            <table style="margin:0">
+                <tr><th style="padding-left:18px">Field</th><th>Type</th><th style="padding-right:18px">Description</th></tr>
+                <tr><td style="padding-left:18px"><code>model</code></td><td>string <span class="req">required</span></td><td style="padding-right:18px">A model id you have access to. Your ids are listed on the <a href="#" data-nav="models">Models</a> tab (or via <code>GET /api/ai/config</code>).</td></tr>
+                <tr><td style="padding-left:18px"><code>prompt</code></td><td>string</td><td style="padding-right:18px">A single user prompt. Use this <i>or</i> <code>messages</code>.</td></tr>
+                <tr><td style="padding-left:18px"><code>messages</code></td><td>array</td><td style="padding-right:18px"><code>[{ "role": "user", "content": "…" }]</code> — 1–50 items. <code>content</code> is a string, or an array of parts to send <b style="color:var(--text-primary)">images</b> (see below). Roles: <code>system</code>, <code>user</code>, <code>assistant</code>.</td></tr>
+                <tr><td style="padding-left:18px"><code>system</code></td><td>string <span class="opt">optional</span></td><td style="padding-right:18px">System prompt (prepended when using <code>prompt</code>).</td></tr>
+                <tr><td style="padding-left:18px"><code>temperature</code></td><td>number <span class="opt">optional</span></td><td style="padding-right:18px">0–2. Sampling temperature.</td></tr>
+                <tr><td style="padding-left:18px"><code>top_p</code></td><td>number <span class="opt">optional</span></td><td style="padding-right:18px">0–1. Nucleus sampling.</td></tr>
+                <tr><td style="padding-left:18px"><code>max_tokens</code></td><td>number <span class="opt">optional</span></td><td style="padding-right:18px">Cap on reply length (also accepts <code>max_completion_tokens</code>). Auto-clamped to your remaining quota.</td></tr>
+                <tr><td style="padding-left:18px"><code>level</code></td><td>string <span class="opt">optional</span></td><td style="padding-right:18px"><b style="color:var(--text-primary)">Thinking level</b> — the same control as the AI page: <code>off</code> · <code>normal</code> · <code>extended</code>. Higher = the model reasons more before answering.</td></tr>
+                <tr><td style="padding-left:18px"><code>reasoning_effort</code></td><td>string <span class="opt">optional</span></td><td style="padding-right:18px">Fine-grained effort for reasoning models: <code>low</code> · <code>medium</code> · <code>high</code> (<code>level</code> maps to this for you).</td></tr>
+                <tr><td style="padding-left:18px"><code>stream</code></td><td>boolean <span class="opt">optional</span></td><td style="padding-right:18px">If <code>true</code>, returns Server-Sent Events instead of one JSON body.</td></tr>
+            </table>
+            </div>
+
+            <h3 class="dh">Example — API key</h3>
+            <pre><button class="copy-btn">Copy</button><code>curl -s <span class="ex-origin">https://nocturne.lol</span>/api/ai \
+  -H "Authorization: Bearer noct_your_api_key" \
+  -H "Content-Type: application/json" \
+  -d '{"model":"&lt;model-id&gt;","prompt":"Explain CSS grid in 2 sentences."}'</code></pre>
+
+            <div class="note"><b>Thinking level.</b> Add <code class="inline">"level":"extended"</code> for deeper reasoning before the answer (same as the AI page's Extended mode); <code class="inline">"off"</code> is fastest, <code class="inline">"normal"</code> is the default. Applies to reasoning-capable models.</div>
+
+            <h3 class="dh">Example — multi-turn + account auth</h3>
+            <pre><button class="copy-btn">Copy</button><code>curl -s <span class="ex-origin">https://nocturne.lol</span>/api/ai \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model":"&lt;model-id&gt;",
+    "account":"your-username","password":"YOUR_PASSWORD",
+    "system":"You are concise.",
+    "messages":[{"role":"user","content":"Name three primary colors."}],
+    "temperature":0.5,"max_tokens":200
+  }'</code></pre>
+
+            <h3 class="dh">Response</h3>
+            <pre><code>{
+  <span class="tok-key">"ok"</span>: true,
+  <span class="tok-key">"model"</span>: <span class="tok-str">"&lt;model-id&gt;"</span>,
+  <span class="tok-key">"response"</span>: <span class="tok-str">"Red, green, and blue."</span>,
+  <span class="tok-key">"usage"</span>: { <span class="tok-key">"inputTokens"</span>: 18, <span class="tok-key">"outputTokens"</span>: 7, <span class="tok-key">"totalTokens"</span>: 25 },
+  <span class="tok-key">"quota"</span>: { <span class="tok-key">"used"</span>: 25, <span class="tok-key">"cap"</span>: 50000, <span class="tok-key">"remaining"</span>: 49975 }
+}</code></pre>
+            <p class="muted" style="font-size:13px">Reasoning models may also include a <code class="inline">reasoning</code> field. Owner accounts get <code class="inline">"quota": { "unlimited": true }</code>.</p>
+
+            <h3 class="dh">Streaming (<code class="inline">"stream": true</code>)</h3>
+            <p class="dp">Responds with <code class="inline">text/event-stream</code>. Each event is a <code class="inline">data:</code> line of JSON:</p>
+            <pre><code><span class="tok-com"># incremental text</span>
+data: {<span class="tok-key">"type"</span>:<span class="tok-str">"delta"</span>,<span class="tok-key">"text"</span>:<span class="tok-str">"Red"</span>}
+data: {<span class="tok-key">"type"</span>:<span class="tok-str">"delta"</span>,<span class="tok-key">"text"</span>:<span class="tok-str">", green"</span>}
+<span class="tok-com"># final totals, then end</span>
+data: {<span class="tok-key">"type"</span>:<span class="tok-str">"done"</span>,<span class="tok-key">"usage"</span>:{...},<span class="tok-key">"quota"</span>:{...}}
+data: [DONE]</code></pre>
+
+            <h3 class="dh">Images (vision)</h3>
+            <p class="dp">Send images to a <b style="color:var(--text-primary)">vision model</b> (marked 👁 on the <a href="#" data-nav="models">Models</a> tab). Use an array <code>content</code> with <code>image_url</code> parts (OpenAI format); the URL can be a public <code>https</code> link or a base64 <code>data:</code> URL.</p>
+            <pre><button class="copy-btn">Copy</button><code>curl -s <span class="ex-origin">https://nocturne.lol</span>/api/ai \
+  -H "Authorization: Bearer noct_your_api_key" -H "Content-Type: application/json" \
+  -d '{
+    "model":"&lt;vision-model-id&gt;",
+    "messages":[{"role":"user","content":[
+      {"type":"text","text":"What is in this image?"},
+      {"type":"image_url","image_url":{"url":"https://example.com/cat.jpg"}}
+    ]}]
+  }'</code></pre>
+            <p class="muted" style="font-size:13px">Up to 8 images per request, ≤6 MB each. A data URL looks like <code class="inline">data:image/png;base64,iVBORw0KGgo…</code>. Non-vision models reject images with a <code class="inline">400</code>.</p>
+
+            <h3 class="dh">Errors</h3>
+            <div class="card flush" style="overflow-x:auto">
+            <table style="margin:0">
+                <tr><th style="padding-left:18px">Code</th><th style="padding-right:18px">Meaning</th></tr>
+                <tr><td style="padding-left:18px"><code>400</code></td><td style="padding-right:18px">Bad request — missing/invalid <code>model</code>, no <code>prompt</code>/<code>messages</code>, or a message too long.</td></tr>
+                <tr><td style="padding-left:18px"><code>401</code></td><td style="padding-right:18px">Missing or invalid auth (bad key / wrong account+password).</td></tr>
+                <tr><td style="padding-left:18px"><code>403</code></td><td style="padding-right:18px">Account suspended.</td></tr>
+                <tr><td style="padding-left:18px"><code>429</code></td><td style="padding-right:18px">Rate limit, or daily quota reached — body includes your <code>quota</code>.</td></tr>
+                <tr><td style="padding-left:18px"><code>502</code></td><td style="padding-right:18px">Upstream AI temporarily unavailable — retry shortly.</td></tr>
+            </table>
+            </div>
+            <div class="note"><b>Quotas.</b> Tokens (input + output) count toward your daily limit, which resets every 24h. The exact <code class="inline">used</code> / <code class="inline">cap</code> / <code class="inline">remaining</code> ride along on every response and are shown live on the <a href="#" data-nav="overview">Overview</a> tab.</div>
+
+            <h2 class="dh" id="sdk">SDK examples</h2>
+            <p class="dp">No official client library yet — the API is plain JSON over HTTP, so any HTTP client works. Two common ones:</p>
+            <h3 class="dh">JavaScript (fetch)</h3>
+            <pre><button class="copy-btn">Copy</button><code><span class="tok-com">// non-streaming</span>
+const r = await fetch("<span class="ex-origin">https://nocturne.lol</span>/api/ai", {
+  method: "POST",
+  headers: { Authorization: "Bearer noct_your_api_key", "Content-Type": "application/json" },
+  body: JSON.stringify({ model: "&lt;model-id&gt;", prompt: "Say hi in 5 words." })
+});
+const data = await r.json();
+console.log(data.response);</code></pre>
+            <pre><button class="copy-btn">Copy</button><code><span class="tok-com">// streaming</span>
+const r = await fetch("<span class="ex-origin">https://nocturne.lol</span>/api/ai", {
+  method: "POST",
+  headers: { Authorization: "Bearer noct_your_api_key", "Content-Type": "application/json" },
+  body: JSON.stringify({ model: "&lt;model-id&gt;", prompt: "Count to 5.", stream: true })
+});
+const reader = r.body.getReader();
+const decoder = new TextDecoder();
+let buf = "";
+while (true) {
+  const { value, done } = await reader.read();
+  if (done) break;
+  buf += decoder.decode(value, { stream: true });
+  for (const line of buf.split("\n")) {
+    if (!line.startsWith("data:") || line.includes("[DONE]")) continue;
+    const evt = JSON.parse(line.slice(5));
+    if (evt.type === "delta") process.stdout.write(evt.text);
+  }
+  buf = "";
+}</code></pre>
+            <h3 class="dh">Python (requests)</h3>
+            <pre><button class="copy-btn">Copy</button><code>import requests
+
+r = requests.post(
+    "<span class="ex-origin">https://nocturne.lol</span>/api/ai",
+    headers={"Authorization": "Bearer noct_your_api_key"},
+    json={"model": "&lt;model-id&gt;", "prompt": "Say hi in 5 words."},
+)
+print(r.json()["response"])</code></pre>
+            <pre><button class="copy-btn">Copy</button><code><span class="tok-com"># streaming</span>
+import json, requests
+
+with requests.post(
+    "<span class="ex-origin">https://nocturne.lol</span>/api/ai",
+    headers={"Authorization": "Bearer noct_your_api_key"},
+    json={"model": "&lt;model-id&gt;", "prompt": "Count to 5.", "stream": True},
+    stream=True,
+) as r:
+    for line in r.iter_lines(decode_unicode=True):
+        if not line or not line.startswith("data:") or "[DONE]" in line:
+            continue
+        evt = json.loads(line[5:])
+        if evt.get("type") == "delta":
+            print(evt["text"], end="", flush=True)</code></pre>
+
+            <h2 class="dh" id="bestpractices">Best practices</h2>
+            <div class="bp-list">
+                <div class="bp-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span><b style="color:var(--text-primary)">Keep keys server-side.</b> Never embed a real key in client-side JS, mobile app bundles, or a public repo — anyone who reads it can spend your quota.</span></div>
+                <div class="bp-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span><b style="color:var(--text-primary)">Use one key per app.</b> Makes it trivial to revoke a single integration without touching the others — see the <a href="#" data-nav="keys">API keys</a> tab.</span></div>
+                <div class="bp-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span><b style="color:var(--text-primary)">Stream long responses.</b> <code class="inline">stream:true</code> gets text to your UI as it's generated instead of one blocking wait.</span></div>
+                <div class="bp-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span><b style="color:var(--text-primary)">Read the <code class="inline">quota</code> object.</b> Every response carries your live <code class="inline">used</code>/<code class="inline">cap</code>/<code class="inline">remaining</code> — check it instead of polling <code class="inline">/api/ai/credits</code> on every call.</span></div>
+                <div class="bp-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span><b style="color:var(--text-primary)">Back off on 429s.</b> Rate limits and quota exhaustion both return <code class="inline">429</code> — retry after a short delay rather than immediately hammering the endpoint.</span></div>
+                <div class="bp-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span><b style="color:var(--text-primary)">Cache the model list.</b> <code class="inline">GET /api/ai/config</code> doesn't change often — refetch on an interval (e.g. hourly), not per request.</span></div>
+            </div>
+
+            <h2 class="dh" id="account">Account &amp; usage endpoints</h2>
+            <p class="dp">Session-authenticated (your signed-in cookie). These power the <a href="#" data-nav="overview">Overview</a> and <a href="#" data-nav="logs">Logs</a> tabs.</p>
+            <h3 class="dh"><span class="badge badge-info" style="vertical-align:1px"><span class="dot"></span>GET</span> /api/ai/usage</h3>
+            <pre><code>{ <span class="tok-key">"authenticated"</span>: true, <span class="tok-key">"weekTokens"</span>: 12840, <span class="tok-key">"weekCost"</span>: 0.04, <span class="tok-key">"allTokens"</span>: 91120, <span class="tok-key">"allCost"</span>: 0.31 }</code></pre>
+            <h3 class="dh"><span class="badge badge-info" style="vertical-align:1px"><span class="dot"></span>GET</span> /api/ai/credits</h3>
+            <pre><code>{ <span class="tok-key">"authenticated"</span>: true, <span class="tok-key">"dollars"</span>: 2.84,
+  <span class="tok-key">"daily"</span>: { <span class="tok-key">"used"</span>: 1320, <span class="tok-key">"cap"</span>: 50000, <span class="tok-key">"resetAt"</span>: 1750000000000 } }</code></pre>
+            <h3 class="dh"><span class="badge badge-info" style="vertical-align:1px"><span class="dot"></span>GET</span> /api/ai/config</h3>
+            <p class="dp">Lists the models <i>your</i> account can use (id, label, pricing, flags) plus your credit balance — the source for the <a href="#" data-nav="models">Models</a> tab.</p>
+            <h3 class="dh"><span class="badge badge-info" style="vertical-align:1px"><span class="dot"></span>GET</span> /api/ai/logs · /api/ai/usage/by-model</h3>
+            <p class="dp"><code class="inline">/logs</code> returns your last 50 requests plus today's rollup (the <a href="#" data-nav="logs">Logs</a> tab). <code class="inline">/usage/by-model</code> returns a 30-day per-model breakdown (tokens, requests, avg latency — the hover stats on <a href="#" data-nav="overview">Overview</a>).</p>
+
+            <h3 class="dh"><span class="badge badge-accent" style="vertical-align:1px"><span class="dot"></span>POST</span> /api/ai/apikeys · <span class="badge badge-info" style="vertical-align:1px"><span class="dot"></span>GET</span> /api/ai/apikeys · <span class="badge badge-danger" style="vertical-align:1px"><span class="dot"></span>DELETE</span> /api/ai/apikeys/:id</h3>
+            <p class="dp">Create, list, and revoke your own keys programmatically — the same calls the <a href="#" data-nav="keys">API keys</a> tab makes. <code class="inline">POST</code> accepts <code class="inline">{ "label": "my-app" }</code> and returns the raw key. Unlike most providers, you can also re-fetch it later with <code class="inline">GET /api/ai/apikeys/:id/reveal</code> — useful if you lose it, though a fresh key is just as easy to create.</p>
+
+            <h2 class="dh" id="linkcheck">Link Checker API</h2>
+            <p class="dp">Check whether a URL is blocked by common school/content filters (GoGuardian, Securly, Lightspeed, and more). This has its own dedicated docs now — see the <a href="#" data-nav="linkcheck">Link Checker</a> tab for the full reference (auth, rate limits, all 16 filters, examples, error codes). Note: the <a href="#" data-nav="playground">AI assistant</a> can't help with Link Checker questions — the docs there are self-contained.</p>
+
+            <h2 class="dh" id="faq">FAQ</h2>
+            <details class="faq">
+                <summary>Which model should I use?</summary>
+                <p>Check the <a href="#" data-nav="models">Models</a> tab — it's grouped by provider and shows live pricing + vision support for exactly what your account can call. For most text tasks, start with a cheaper "mini"-tier model and only reach for a pricier one if quality falls short.</p>
+            </details>
+            <details class="faq">
+                <summary>Is there a free tier?</summary>
+                <p>Every signed-in account gets a daily token quota at no cost (see your cap on the <a href="#" data-nav="overview">Overview</a> tab). It resets every 24 hours.</p>
+            </details>
+            <details class="faq">
+                <summary>Can I call this straight from browser JS?</summary>
+                <p>Yes — <code class="inline">/api/ai</code> is CORS-enabled for all origins. But never embed a real key in client-side code; anyone can read it from page source. For a public-facing app, proxy the call through your own backend instead.</p>
+            </details>
+            <details class="faq">
+                <summary>Do you store my prompts?</summary>
+                <p>No. The public API logs only aggregate metadata for your own dashboards — model, status, latency, and token counts (that's what powers the <a href="#" data-nav="logs">Logs</a> tab). Prompt and response text is never persisted by this endpoint.</p>
+            </details>
+            <details class="faq">
+                <summary>What happens if I run out of quota mid-stream?</summary>
+                <p>The request is rejected with <code class="inline">429</code> before any tokens are generated if you're already over budget — you're never billed for a partial response you can't use.</p>
+            </details>
+
+            <footer class="gw-foot">
+                Need a key? Head to the <a href="#" data-nav="keys">API keys</a> tab. Questions: <a href="mailto:hello@midtsy.xyz">hello@midtsy.xyz</a>.
+            </footer>
+        </section>
+
+        <section class="gw-pane" data-pane="linkcheck">
+            <div class="gw-head">
+                <div><h1>Link Checker API</h1><p>Check whether a URL is blocked by common school/content filters. A separate, self-contained API — not part of the AI gateway, and not something the AI assistant can help with.</p></div>
+            </div>
+
+            <div class="note"><b>Heads up.</b> This is a fully independent API — different auth, different rate limits, no relation to your <code class="inline">noct_…</code> AI keys. The <a href="#" data-nav="playground">AI assistant</a> is intentionally unable to answer questions about it; everything you need is on this page.</div>
+
+            <div class="card flush" style="margin:20px 0 24px">
+                <div class="key-row" style="border-top:none"><span class="badge badge-info"><span class="dot"></span>GET</span><span><b>/api/v1</b></span><span class="muted" style="margin-left:auto;font-size:12.5px">Machine-readable docs (JSON)</span></div>
+                <div class="key-row"><span class="badge badge-info"><span class="dot"></span>GET</span><span><b>/api/v1/filters</b></span><span class="muted" style="margin-left:auto;font-size:12.5px">List all available filters</span></div>
+                <div class="key-row"><span class="badge badge-info"><span class="dot"></span>GET</span><span><b>/api/v1/linkcheck</b></span><span class="muted" style="margin-left:auto;font-size:12.5px">Check a URL (query params)</span></div>
+                <div class="key-row"><span class="badge badge-accent"><span class="dot"></span>POST</span><span><b>/api/v1/linkcheck</b></span><span class="muted" style="margin-left:auto;font-size:12.5px">Check a URL (JSON body)</span></div>
+            </div>
+
+            <h2 class="dh">Authentication &amp; rate limits</h2>
+            <p class="dp">No account or sign-in required. Every request is rate-limited <b style="color:var(--text-primary)">per IP address</b>:</p>
+            <div class="card flush" style="overflow-x:auto">
+            <table style="margin:0">
+                <tr><th style="padding-left:18px">Tier</th><th>Limit</th><th style="padding-right:18px">How</th></tr>
+                <tr><td style="padding-left:18px">Anonymous</td><td>30 requests / minute</td><td style="padding-right:18px">Default — no header needed.</td></tr>
+                <tr><td style="padding-left:18px">With a key</td><td>300 requests / minute</td><td style="padding-right:18px">Send <code>X-API-Key: your-linkcheck-key</code> (or <code>?key=</code>). These are provisioned by the site owner, separate from your <code class="inline">noct_…</code> AI key — email <a href="mailto:hello@midtsy.xyz">hello@midtsy.xyz</a> for one.</td></tr>
+            </table>
+            </div>
+            <div class="note">Exceeding the limit returns <code class="inline">429</code> with a <code class="inline">Retry-After: 60</code> header.</div>
+
+            <h2 class="dh">Check a URL — <span class="badge badge-info" style="vertical-align:1px"><span class="dot"></span>GET</span> / <span class="badge badge-accent" style="vertical-align:1px"><span class="dot"></span>POST</span> /api/v1/linkcheck</h2>
+            <p class="dp">Runs the URL against every vendor's own public classification check. <b style="color:var(--text-primary)">Your URL is only ever sent to each vendor as data</b> — Nocturne never fetches, loads, or renders it. There's no SSRF surface on this endpoint.</p>
+
+            <h3 class="dh">Parameters</h3>
+            <div class="card flush" style="overflow-x:auto">
+            <table style="margin:0">
+                <tr><th style="padding-left:18px">Field</th><th>Type</th><th style="padding-right:18px">Description</th></tr>
+                <tr><td style="padding-left:18px"><code>url</code></td><td>string <span class="req">required</span></td><td style="padding-right:18px">Query param or JSON body field. A bare domain (<code>discord.com</code>) or a full URL. Max 2048 characters.</td></tr>
+                <tr><td style="padding-left:18px"><code>filters</code></td><td>string / array <span class="opt">optional</span></td><td style="padding-right:18px"><code>all</code> (default) to check every filter, or a comma-separated list / JSON array of filter ids (see below).</td></tr>
+            </table>
+            </div>
+
+            <h3 class="dh">Example — GET</h3>
+            <pre><button class="copy-btn">Copy</button><code>curl -s "<span class="ex-origin">https://nocturne.lol</span>/api/v1/linkcheck?url=discord.com&amp;filters=all"</code></pre>
+
+            <h3 class="dh">Example — POST</h3>
+            <pre><button class="copy-btn">Copy</button><code>curl -s <span class="ex-origin">https://nocturne.lol</span>/api/v1/linkcheck \
+  -H "Content-Type: application/json" \
+  -d '{"url":"discord.com","filters":["securly","goguardian"]}'</code></pre>
+
+            <h3 class="dh">Example — with a key (higher limit)</h3>
+            <pre><button class="copy-btn">Copy</button><code>curl -s "<span class="ex-origin">https://nocturne.lol</span>/api/v1/linkcheck?url=discord.com" \
+  -H "X-API-Key: your-linkcheck-key"</code></pre>
+
+            <h3 class="dh">Response</h3>
+            <pre><code>{
+  <span class="tok-key">"url"</span>: <span class="tok-str">"http://discord.com/"</span>,
+  <span class="tok-key">"checkedAt"</span>: <span class="tok-str">"2026-07-20T12:00:00.000Z"</span>,
+  <span class="tok-key">"summary"</span>: { <span class="tok-key">"total"</span>: 16, <span class="tok-key">"blocked"</span>: 3, <span class="tok-key">"allowed"</span>: 12, <span class="tok-key">"errors"</span>: 1 },
+  <span class="tok-key">"results"</span>: [
+    { <span class="tok-key">"id"</span>: <span class="tok-str">"securly"</span>, <span class="tok-key">"label"</span>: <span class="tok-str">"Securly"</span>, <span class="tok-key">"category"</span>: <span class="tok-str">"Social Media"</span>, <span class="tok-key">"blocked"</span>: true, <span class="tok-key">"ms"</span>: 240 },
+    { <span class="tok-key">"id"</span>: <span class="tok-str">"fortiguard"</span>, <span class="tok-key">"label"</span>: <span class="tok-str">"FortiGuard"</span>, <span class="tok-key">"category"</span>: <span class="tok-str">"Technology"</span>, <span class="tok-key">"blocked"</span>: false, <span class="tok-key">"ms"</span>: 180 }
+  ]
+}</code></pre>
+            <p class="dp">Each result has <code class="inline">blocked</code>: <code class="inline">true</code>/<code class="inline">false</code>/<code class="inline">null</code> (null = the vendor's check errored or timed out — see <code class="inline">error</code>), <code class="inline">category</code> as reported by that vendor, and <code class="inline">ms</code> = how long that single check took. Each vendor is checked concurrently with a 12s timeout, so one slow vendor never blocks the rest.</p>
+
+            <h3 class="dh">Available filters — <span class="badge badge-info" style="vertical-align:1px"><span class="dot"></span>GET</span> /api/v1/filters</h3>
+            <div class="card flush" style="overflow-x:auto">
+            <table style="margin:0" id="lcFilterTable">
+                <tr><th style="padding-left:18px">id</th><th style="padding-right:18px">Label</th></tr>
+                <tr><td style="padding-left:18px"><code>aristotle</code></td><td style="padding-right:18px">Aristotle</td></tr>
+                <tr><td style="padding-left:18px"><code>barracuda</code></td><td style="padding-right:18px">Barracuda</td></tr>
+                <tr><td style="padding-left:18px"><code>blocksi</code></td><td style="padding-right:18px">Blocksi</td></tr>
+                <tr><td style="padding-left:18px"><code>cisco</code></td><td style="padding-right:18px">Cisco Umbrella</td></tr>
+                <tr><td style="padding-left:18px"><code>deledao</code></td><td style="padding-right:18px">Deledao</td></tr>
+                <tr><td style="padding-left:18px"><code>fortiguard</code></td><td style="padding-right:18px">FortiGuard</td></tr>
+                <tr><td style="padding-left:18px"><code>goguardian</code></td><td style="padding-right:18px">GoGuardian</td></tr>
+                <tr><td style="padding-left:18px"><code>iboss</code></td><td style="padding-right:18px">iBoss</td></tr>
+                <tr><td style="padding-left:18px"><code>lanschool</code></td><td style="padding-right:18px">LanSchool</td></tr>
+                <tr><td style="padding-left:18px"><code>lightspeed</code></td><td style="padding-right:18px">Lightspeed</td></tr>
+                <tr><td style="padding-left:18px"><code>linewize</code></td><td style="padding-right:18px">Linewize</td></tr>
+                <tr><td style="padding-left:18px"><code>paloalto</code></td><td style="padding-right:18px">Palo Alto</td></tr>
+                <tr><td style="padding-left:18px"><code>qustodio</code></td><td style="padding-right:18px">Qustodio</td></tr>
+                <tr><td style="padding-left:18px"><code>securly</code></td><td style="padding-right:18px">Securly</td></tr>
+                <tr><td style="padding-left:18px"><code>senso</code></td><td style="padding-right:18px">Senso</td></tr>
+                <tr><td style="padding-left:18px"><code>sophos</code></td><td style="padding-right:18px">Sophos</td></tr>
+            </table>
+            </div>
+
+            <h3 class="dh">Errors</h3>
+            <div class="card flush" style="overflow-x:auto">
+            <table style="margin:0">
+                <tr><th style="padding-left:18px">Code</th><th style="padding-right:18px">Meaning</th></tr>
+                <tr><td style="padding-left:18px"><code>400</code></td><td style="padding-right:18px">Missing <code>url</code>, URL too long (&gt;2048 chars), invalid URL, or no valid <code>filters</code> selected.</td></tr>
+                <tr><td style="padding-left:18px"><code>429</code></td><td style="padding-right:18px">Rate limit exceeded for your tier — see <code class="inline">Retry-After</code>.</td></tr>
+            </table>
+            </div>
+
+            <h2 class="dh">JavaScript example</h2>
+            <pre><button class="copy-btn">Copy</button><code>const r = await fetch("<span class="ex-origin">https://nocturne.lol</span>/api/v1/linkcheck?url=discord.com&amp;filters=all");
+const data = await r.json();
+console.log(data.summary);   // { total: 16, blocked: 3, allowed: 12, errors: 1 }</code></pre>
+
+            <h2 class="dh">Python example</h2>
+            <pre><button class="copy-btn">Copy</button><code>import requests
+
+r = requests.get("<span class="ex-origin">https://nocturne.lol</span>/api/v1/linkcheck", params={"url": "discord.com", "filters": "all"})
+print(r.json()["summary"])</code></pre>
+
+            <footer class="gw-foot">
+                Full machine-readable docs: <a href="/api/v1">/api/v1</a>. Questions: <a href="mailto:hello@midtsy.xyz">hello@midtsy.xyz</a>.
+            </footer>
+        </section>
+
+    </main>
+</div>
+
+<div class="dlg-scrim" id="newKeyScrim">
+    <div class="dlg">
+        <div class="dlg-title">Create API key</div>
+        <div class="field">
+            <label for="newKeyLabel">Key name</label>
+            <input id="newKeyLabel" type="text" placeholder="e.g. production-server" maxlength="60">
+        </div>
+        <div class="dlg-foot">
+            <button class="btn btn-ghost btn-sm" id="newKeyCancel" type="button">Cancel</button>
+            <button class="btn btn-primary btn-sm" id="newKeyConfirm" type="button">Create key</button>
+        </div>
+    </div>
+</div>
+
+<button class="assist-launcher" id="assistLauncher" type="button" hidden>
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.7 5.3L19 10l-5.3 1.7L12 17l-1.7-5.3L5 10l5.3-1.7z"/></svg>
+    Ask AI
+</button>
+<div class="assist-panel" id="assistPanel">
+    <div class="assist-head">
+        <span>API assistant</span>
+        <span class="assist-count" id="assistCount"></span>
+        <button class="assist-close" id="assistClose" type="button" aria-label="Close">×</button>
+    </div>
+    <div class="assist-thread" id="assistThread"><div class="pg-empty">Ask about auth, quotas, models, errors — anything on this page. 10 messages/hour.</div></div>
+    <div class="pg-row" style="padding:12px">
+        <div class="field"><input id="assistInput" type="text" placeholder="Ask a question…" autocomplete="off"></div>
+        <button class="btn btn-primary btn-sm" id="assistSend" type="button">Send</button>
+    </div>
+</div>
+
+<script>
+(function () {
+    "use strict";
+    var ORIGIN = "https://nocturne.lol";
+    document.querySelectorAll(".ex-origin").forEach(function (e) { e.textContent = ORIGIN; });
+
+    function $(id) { return document.getElementById(id); }
+    function nf(n) { return (n == null ? 0 : n).toLocaleString(); }
+    function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+    function fmtReset(ms) {
+        if (!ms) return "";
+        var s = Math.max(0, Math.floor((ms - Date.now()) / 1000));
+        var h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60);
+        return h > 0 ? ("resets in " + h + "h " + m + "m") : ("resets in " + m + "m");
+    }
+    function fmtRel(ts) {
+        if (!ts) return "never used";
+        var s = Math.max(0, Math.floor((Date.now() - ts) / 1000));
+        if (s < 60) return "just now";
+        if (s < 3600) return Math.floor(s / 60) + "m ago";
+        if (s < 86400) return Math.floor(s / 3600) + "h ago";
+        var d = Math.floor(s / 86400);
+        return d === 1 ? "1 day ago" : d + " days ago";
+    }
+
+    function makeThinkFilter() {
+        var inThink = false, buf = "";
+        var OPEN = /<think(?:ing)?>/i, CLOSE = /<\/think(?:ing)?>/i;
+        var OPEN_TAGS = ["<think>", "<thinking>"];
+        function partialOpenTailLen(s) {
+            var max = Math.min(s.length, 10);
+            for (var i = max; i > 0; i--) {
+                var tail = s.slice(-i).toLowerCase();
+                for (var j = 0; j < OPEN_TAGS.length; j++) if (OPEN_TAGS[j].indexOf(tail) === 0) return i;
+            }
+            return 0;
+        }
+        return function (delta) {
+            buf += delta;
+            var out = "";
+            for (;;) {
+                if (!inThink) {
+                    var m = OPEN.exec(buf);
+                    if (!m) {
+                        var hold = partialOpenTailLen(buf);
+                        out += buf.slice(0, buf.length - hold);
+                        buf = buf.slice(buf.length - hold);
+                        break;
+                    }
+                    out += buf.slice(0, m.index);
+                    buf = buf.slice(m.index + m[0].length);
+                    inThink = true;
+                } else {
+                    var m2 = CLOSE.exec(buf);
+                    if (!m2) { buf = ""; break; }
+                    buf = buf.slice(m2.index + m2[0].length);
+                    inThink = false;
+                }
+            }
+            return out;
+        };
+    }
+    function api(path, opts) {
+        opts = opts || {};
+        var headers = { "Accept": "application/json" };
+        var body = opts.body;
+        if (body && typeof body !== "string") { headers["Content-Type"] = "application/json"; body = JSON.stringify(body); }
+        return fetch(path, { credentials: "same-origin", method: opts.method || "GET", headers: headers, body: body })
+            .then(function (r) {
+                return r.json().catch(function () { return {}; }).then(function (d) {
+                    if (!r.ok) { var e = new Error(d.error || ("HTTP " + r.status)); e.status = r.status; e.body = d; throw e; }
+                    return d;
+                });
+            });
+    }
+    function gj(p) { return fetch(p, { credentials: "same-origin", cache: "no-store" }).then(function (r) { return r.json(); }).catch(function () { return {}; }); }
+
+    function showToast(tone, title, message) {
+        var wrap = $("toastWrap");
+        var el = document.createElement("div");
+        el.className = "toast toast-" + tone;
+        var duration = 3000;
+        el.innerHTML = '<div style="flex:1"><div class="toast-title">' + esc(title) + '</div>' +
+            (message ? '<div class="toast-msg">' + esc(message) + '</div>' : "") + '</div>' +
+            '<button class="toast-x" type="button" aria-label="Dismiss">×</button>' +
+            '<div class="toast-bar" style="animation-duration:' + duration + 'ms"></div>';
+        wrap.appendChild(el);
+        requestAnimationFrame(function () { el.classList.add("in"); });
+        var removed = false;
+        function remove() {
+            if (removed) return; removed = true;
+            el.classList.remove("in");
+            setTimeout(function () { el.remove(); }, 400);
+        }
+        el.querySelector(".toast-x").addEventListener("click", remove);
+        setTimeout(remove, duration);
+    }
+
+    var tt = $("ttBubble");
+    document.body.addEventListener("mouseover", function (e) {
+        var el = e.target.closest("[data-tip]");
+        if (!el) return;
+        tt.textContent = el.dataset.tip;
+        tt.classList.add("show");
+    });
+    document.body.addEventListener("mouseout", function (e) {
+        var el = e.target.closest("[data-tip]");
+        if (!el) return;
+        tt.classList.remove("show");
+    });
+    document.body.addEventListener("mousemove", function (e) {
+        if (!tt.classList.contains("show")) return;
+        var x = e.clientX + 14, y = e.clientY + 16;
+        if (x + 260 > window.innerWidth) x = e.clientX - 264;
+        tt.style.left = x + "px"; tt.style.top = y + "px";
+    });
+
+    var PANES = ["overview", "keys", "models", "playground", "logs", "status", "docs", "linkcheck"];
+    var DOC_ANCHORS = { auth: "docs", chat: "docs", sdk: "docs", bestpractices: "docs", account: "docs", faq: "docs" };
+    var laneLoaded = {};
+
+    function showPane(name, anchor) {
+        if (PANES.indexOf(name) === -1) name = "overview";
+        document.querySelectorAll(".gw-pane").forEach(function (p) { p.classList.toggle("active", p.dataset.pane === name); });
+        document.querySelectorAll(".gw-nav-btn").forEach(function (b) { b.classList.toggle("active", b.dataset.pane === name); });
+        if (name === "logs" && !laneLoaded.logs) { laneLoaded.logs = true; loadLogs(); }
+        if (name === "status" && !laneLoaded.status) { laneLoaded.status = true; loadStatus(); }
+        if (anchor) {
+            requestAnimationFrame(function () {
+                var el = document.getElementById(anchor);
+                if (el) el.scrollIntoView({ block: "start" });
+            });
+        } else {
+            document.querySelector(".gw-main").scrollTop = 0;
+        }
+    }
+    function routeFromHash() {
+        var h = (location.hash || "").replace(/^#/, "");
+        if (!h) { showPane("overview"); return; }
+        if (PANES.indexOf(h) !== -1) { showPane(h); return; }
+        if (DOC_ANCHORS[h]) { showPane(DOC_ANCHORS[h], h); return; }
+        showPane("overview");
+    }
+    document.getElementById("gwNav").addEventListener("click", function (e) {
+        var btn = e.target.closest(".gw-nav-btn");
+        if (!btn) return;
+        location.hash = btn.dataset.pane;
+    });
+    document.body.addEventListener("click", function (e) {
+        var a = e.target.closest("[data-nav]");
+        if (!a) return;
+        e.preventDefault();
+        location.hash = a.dataset.nav;
+    });
+    window.addEventListener("hashchange", routeFromHash);
+
+    document.querySelectorAll(".copy-btn").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+            var code = btn.parentElement.querySelector("code");
+            navigator.clipboard && navigator.clipboard.writeText(code.innerText).then(function () {
+                btn.textContent = "Copied"; setTimeout(function () { btn.textContent = "Copy"; }, 1400);
+                showToast("success", "Copied to clipboard");
+            });
+        });
+    });
+
+    var state = { credits: null, usage: null, config: null, keys: [], lastCreatedKey: "" };
+
+    function renderOverview() {
+        var el = $("ovBody");
+        var cr = state.credits, us = state.usage, cf = state.config;
+        if (!cr || !cr.authenticated) {
+            el.innerHTML = '<div class="card signin-cta"><p>Sign in to see your daily quota, token usage, and the model ids your account can call.</p><a class="btn btn-primary btn-sm" href="/">Sign in →</a></div>';
+            renderPublicModels(cf);
+            return;
+        }
+        var d = cr.daily, owner = cr.unlimited && !d;
+        var quotaCard;
+        if (owner) {
+            quotaCard = '<div class="stat-card card"><div class="l">Daily quota</div><div class="v">∞ <small>owner</small></div></div>';
+        } else if (d) {
+            var pct = d.cap > 0 ? Math.min(100, Math.round(d.used / d.cap * 100)) : 0;
+            quotaCard = '<div class="stat-card card"><div class="l">Daily quota</div><div class="v">' + nf(d.used) + ' <small>/ ' + nf(d.cap) + '</small></div>' +
+                '<div class="bar"><i style="width:' + pct + '%"></i></div><div class="sub">' + fmtReset(d.resetAt) + '</div></div>';
+        } else {
+            quotaCard = '<div class="stat-card card"><div class="l">Daily quota</div><div class="v">—</div></div>';
+        }
+        var weekCard = '<div class="stat-card card"><div class="l">Tokens · 7 days</div><div class="v">' + nf(us.weekTokens) + '</div><div class="sub">est. $' + (us.weekCost || 0).toFixed(2) + '</div></div>';
+        var allCard = '<div class="stat-card card"><div class="l">Tokens · all-time</div><div class="v">' + nf(us.allTokens) + '</div><div class="sub">est. $' + (us.allCost || 0).toFixed(2) + '</div></div>';
+        var credCard = (cr.dollars != null && !owner)
+            ? '<div class="stat-card card"><div class="l">Agent credits</div><div class="v">$' + cr.dollars.toFixed(2) + '</div></div>'
+            : '<div class="stat-card card"><div class="l">Agent credits</div><div class="v muted" style="font-size:14px;font-family:var(--font-body)">unlimited</div></div>';
+
+        var models = ((cf && cf.models) || []).filter(function (m) { return m.audience === "all"; });
+        var chips = models.length
+            ? '<div class="chip-row">' + models.map(function (m) {
+                var px = (m.pricing && m.pricing.inPerToken != null) ? '<span class="px">$' + m.pricing.inPerToken + '/$' + m.pricing.outPerToken + '·1M</span>' : "";
+                return '<span class="tag" data-copy="' + esc(m.id) + '" title="' + esc(m.label || m.id) + (m.vision ? " · vision" : "") + '">' + esc(m.id) + (m.vision ? " 👁" : "") + px + '</span>';
+            }).join("") + '</div>'
+            : '<p class="muted" style="font-size:13px;margin:8px 0 0">No models available on your account yet.</p>';
+
+        el.innerHTML =
+            '<div class="stat-grid">' + quotaCard + weekCard + allCard + credCard + '</div>' +
+            '<div class="card"><div style="color:var(--text-primary);font-weight:600;font-size:13.5px">Models you can use <span class="muted" style="font-weight:500">(' + models.length + ')</span></div>' + chips + '</div>' +
+            '<div id="ovUsageByModel"></div>';
+
+        wireCopyChips(el);
+        loadUsageByModel();
+    }
+    function renderPublicModels(cf) {
+        var models = ((cf && cf.models) || []).filter(function (m) { return m.audience === "all"; });
+        if (!models.length) return;
+        var chips = '<div class="chip-row">' + models.map(function (m) {
+            return '<span class="tag" data-copy="' + esc(m.id) + '" title="' + esc(m.label || m.id) + '">' + esc(m.id) + (m.vision ? " 👁" : "") + '</span>';
+        }).join("") + '</div>';
+        var el = $("ovBody");
+        el.innerHTML += '<div class="card" style="margin-top:16px"><div style="color:var(--text-primary);font-weight:600;font-size:13.5px">Public models</div>' + chips + '</div>';
+        wireCopyChips(el);
+    }
+    function wireCopyChips(root) {
+        root.querySelectorAll("[data-copy]").forEach(function (c) {
+            c.addEventListener("click", function () {
+                navigator.clipboard && navigator.clipboard.writeText(c.dataset.copy);
+                var o = c.innerHTML; c.textContent = "copied ✓";
+                setTimeout(function () { c.innerHTML = o; }, 1100);
+                showToast("success", "Copied", c.dataset.copy);
+            });
+        });
+    }
+
+    function loadUsageByModel() {
+        var host = $("ovUsageByModel");
+        if (!host) return;
+        gj("/api/ai/usage/by-model").then(function (d) {
+            var models = (d && d.models) || [];
+            if (!models.length) { host.innerHTML = ""; return; }
+            var max = Math.max.apply(null, models.map(function (m) { return m.tokens; })) || 1;
+            var rows = models.slice(0, 10).map(function (m) {
+                var pct = Math.max(2, Math.round(m.tokens / max * 100));
+                var tip = nf(m.tokens) + " tokens · " + m.requests + " request" + (m.requests === 1 ? "" : "s") + " · " + m.avgLatencyMs + "ms avg · last used " + fmtRel(m.lastUsed);
+                return '<div class="mu-row" data-tip="' + esc(tip) + '"><span class="mu-name">' + esc(m.model) + '</span><div class="mu-bar"><i style="width:' + pct + '%"></i></div><span class="mu-val">' + nf(m.tokens) + '</span></div>';
+            }).join("");
+            host.innerHTML = '<div class="card" style="margin-top:var(--space-4)"><div class="mu-head">Usage by model <span class="muted" style="font-weight:500">· last 30 days, hover a row for details</span></div>' + rows + '</div>';
+        }).catch(function () {});
+    }
+
+    function renderKeysGate() {
+        $("keysBody").innerHTML = '<div class="card signin-cta"><p>Sign in to create and manage API keys.</p><a class="btn btn-primary btn-sm" href="/">Sign in →</a></div>';
+        $("newKeyBtn").disabled = true;
+    }
+    function loadKeys() {
+        return api("/api/ai/apikeys").then(function (d) {
+            state.keys = d.keys || [];
+            renderKeys();
+        }).catch(function () { state.keys = []; renderKeys(); });
+    }
+    function renderKeys() {
+        var el = $("keysBody");
+        var banner = state.lastCreatedKey
+            ? '<div class="new-key-banner"><div style="flex:1"><span class="label">New key created</span><code>' + esc(state.lastCreatedKey) + '</code></div><button class="btn btn-secondary btn-sm" id="copyNewKey" type="button">Copy</button></div>'
+            : "";
+        var rows = state.keys.length
+            ? '<div class="card flush">' + state.keys.map(function (k) {
+                return '<div class="key-row" data-key-row="' + k.id + '"><div><div class="name">' + esc(k.label || "key") + '</div><div class="meta">created ' + fmtRel(k.createdAt) + ' · ' + fmtRel(k.lastUsed) + '</div></div>' +
+                    '<div style="display:flex;gap:8px"><button class="btn btn-secondary btn-sm" data-reveal="' + k.id + '" type="button">Reveal</button>' +
+                    '<button class="btn btn-danger btn-sm" data-revoke="' + k.id + '" type="button">Revoke</button></div></div>';
+            }).join("") + '</div>'
+            : '<div class="card"><div class="key-empty">No API keys yet — create one to call the gateway from your own apps.</div></div>';
+        el.innerHTML = banner + rows;
+
+        var copyBtn = $("copyNewKey");
+        if (copyBtn) copyBtn.addEventListener("click", function () {
+            navigator.clipboard && navigator.clipboard.writeText(state.lastCreatedKey);
+            copyBtn.textContent = "Copied";
+            showToast("success", "Copied to clipboard");
+        });
+        el.querySelectorAll("[data-revoke]").forEach(function (b) {
+            b.addEventListener("click", function () {
+                if (!confirm("Revoke this API key? Apps using it will stop working.")) return;
+                b.disabled = true;
+                api("/api/ai/apikeys/" + b.dataset.revoke, { method: "DELETE" }).then(function () {
+                    showToast("info", "Key revoked");
+                    return loadKeys();
+                }).catch(function (e) { alert(e.message); b.disabled = false; });
+            });
+        });
+        el.querySelectorAll("[data-reveal]").forEach(function (b) {
+            b.addEventListener("click", function () {
+                var row = b.closest(".key-row");
+                var existing = row.querySelector(".reveal-box");
+                if (existing) { existing.remove(); return; }
+                b.disabled = true;
+                api("/api/ai/apikeys/" + b.dataset.reveal + "/reveal").then(function (d) {
+                    var box = document.createElement("div");
+                    box.className = "reveal-box";
+                    box.innerHTML = '<code>' + esc(d.key) + '</code><button class="btn btn-secondary btn-sm" type="button">Copy</button>';
+                    box.querySelector("button").addEventListener("click", function () {
+                        navigator.clipboard && navigator.clipboard.writeText(d.key);
+                        showToast("success", "Copied to clipboard");
+                    });
+                    row.appendChild(box);
+                }).catch(function (e) { alert(e.message); }).then(function () { b.disabled = false; });
+            });
+        });
+    }
+    $("newKeyBtn").addEventListener("click", function () {
+        if ($("newKeyBtn").disabled) return;
+        $("newKeyLabel").value = "";
+        $("newKeyScrim").classList.add("open");
+        $("newKeyLabel").focus();
+    });
+    $("newKeyCancel").addEventListener("click", function () { $("newKeyScrim").classList.remove("open"); });
+    $("newKeyScrim").addEventListener("click", function (e) { if (e.target === $("newKeyScrim")) $("newKeyScrim").classList.remove("open"); });
+    $("newKeyConfirm").addEventListener("click", function () {
+        var btn = $("newKeyConfirm");
+        btn.disabled = true;
+        var original = btn.textContent;
+        btn.innerHTML = '<span class="spinner"></span> Creating…';
+        api("/api/ai/apikeys", { method: "POST", body: { label: $("newKeyLabel").value.trim() } })
+            .then(function (d) {
+                state.lastCreatedKey = d.key;
+                if ($("pgKey")) $("pgKey").value = d.key;
+                $("newKeyScrim").classList.remove("open");
+                showToast("success", "Key created");
+                return loadKeys();
+            })
+            .catch(function (e) { alert(e.message); })
+            .then(function () { btn.disabled = false; btn.textContent = original; });
+    });
+
+    function renderModels() {
+        var cf = state.config;
+        var models = (cf && cf.models) || [];
+        var el = $("modelsBody");
+        if (!models.length) { el.innerHTML = '<div class="card muted" style="font-size:13px">No models available yet.</div>'; return; }
+        var groups = {};
+        models.forEach(function (m) { var k = m.company || "Other"; (groups[k] = groups[k] || []).push(m); });
+        var html = Object.keys(groups).sort().map(function (g) {
+            var rows = groups[g].map(function (m) {
+                var px = (m.pricing && m.pricing.inPerToken != null) ? '<span class="m-price">$' + m.pricing.inPerToken + ' in / $' + m.pricing.outPerToken + ' out · 1M</span>' : "";
+                var badges = (m.vision ? '<span class="badge badge-info"><span class="dot"></span>vision</span>' : "") +
+                    (m.premium ? '<span class="badge badge-accent"><span class="dot"></span>premium</span>' : "") +
+                    (m.audience !== "all" ? '<span class="badge badge-neutral"><span class="dot"></span>granted</span>' : "");
+                return '<div class="model-row"><div><span class="m-id" data-copy="' + esc(m.id) + '">' + esc(m.id) + '</span><span class="m-label">' + esc(m.label || "") + '</span></div><div class="m-right">' + px + badges + '</div></div>';
+            }).join("");
+            return '<div class="model-group"><div class="model-group-h">' + esc(g) + '</div><div class="card flush">' + rows + '</div></div>';
+        }).join("");
+        el.innerHTML = html;
+        el.querySelectorAll("[data-copy]").forEach(function (c) {
+            c.addEventListener("click", function () {
+                navigator.clipboard && navigator.clipboard.writeText(c.dataset.copy);
+                var o = c.textContent; c.textContent = "copied ✓";
+                setTimeout(function () { c.textContent = o; }, 1100);
+                showToast("success", "Copied", c.dataset.copy);
+            });
+        });
+    }
+
+    var pgMsgs = [];
+    function renderPlaygroundGate() {
+        $("pgBody").innerHTML = '<div class="card pg-gate"><p class="muted">Sign in, then create an API key on the <a href="#" data-nav="keys">API keys</a> tab to use the playground.</p><a class="btn btn-primary btn-sm" href="/">Sign in →</a></div>';
+    }
+    function renderPlaygroundShell() {
+        var cf = state.config;
+        var models = ((cf && cf.models) || []).filter(function (m) { return m.audience === "all"; });
+        var opts = models.map(function (m) { return '<option value="' + esc(m.id) + '">' + esc(m.label || m.id) + '</option>'; }).join("");
+        $("pgBody").innerHTML =
+            '<div class="pg-shell">' +
+            '<div class="pg-config">' +
+            '<div class="field"><label>Model</label><select id="pgModel">' + (opts || '<option value="">No models available</option>') + '</select></div>' +
+            '<div class="field" style="flex:1.4"><label>API key</label><input id="pgKey" class="mono" type="text" placeholder="noct_…" value="' + esc(state.lastCreatedKey) + '"></div>' +
+            '</div>' +
+            '<div class="card pg-thread" id="pgThread"><div class="pg-empty">Send a message to test your key against a real model.</div></div>' +
+            '<div class="pg-row"><div class="field"><input id="pgInput" type="text" placeholder="Ask something…" autocomplete="off"></div><button class="btn btn-primary" id="pgSend" type="button">Send</button></div>' +
+            '</div>';
+        $("pgSend").addEventListener("click", sendPlaygroundMessage);
+        $("pgInput").addEventListener("keydown", function (e) { if (e.key === "Enter") sendPlaygroundMessage(); });
+    }
+    function pgAppend(role, text) {
+        var thread = $("pgThread");
+        var empty = thread.querySelector(".pg-empty");
+        if (empty) empty.remove();
+        var div = document.createElement("div");
+        div.className = "pg-msg " + role;
+        div.textContent = text;
+        thread.appendChild(div);
+        thread.scrollTop = thread.scrollHeight;
+        return div;
+    }
+    function sendPlaygroundMessage() {
+        var input = $("pgInput"), key = $("pgKey").value.trim(), model = $("pgModel").value;
+        var val = input.value.trim();
+        if (!val) return;
+        if (!key) { pgAppend("err", "Paste an API key above first (create one on the API keys tab)."); return; }
+        if (!model) { pgAppend("err", "No model selected."); return; }
+        input.value = "";
+        pgMsgs.push({ role: "user", content: val });
+        pgAppend("user", val);
+        $("pgSend").disabled = true;
+        var replyEl = pgAppend("assistant", "");
+        var body = JSON.stringify({ model: model, key: key, messages: pgMsgs, stream: true });
+        fetch("/api/ai", { method: "POST", headers: { "Content-Type": "application/json", "Authorization": "Bearer " + key }, body: body })
+            .then(function (r) {
+                if (!r.ok || !r.body) return r.json().then(function (d) { var e = new Error(d.error || ("HTTP " + r.status)); e.status = r.status; throw e; });
+                var reader = r.body.getReader(), decoder = new TextDecoder(), buf = "", full = "", streamErr = null;
+                var thinkFilter = makeThinkFilter();
+                function pump() {
+                    return reader.read().then(function (res) {
+                        if (res.done) return;
+                        buf += decoder.decode(res.value, { stream: true });
+                        var lines = buf.split("\n"); buf = lines.pop();
+                        lines.forEach(function (line) {
+                            line = line.trim();
+                            if (!line.startsWith("data:")) return;
+                            var payload = line.slice(5).trim();
+                            if (payload === "[DONE]") return;
+                            var evt;
+                            try { evt = JSON.parse(payload); } catch (parseErr) { return;  }
+                            if (evt.type === "delta" && evt.text) { full += thinkFilter(evt.text); replyEl.textContent = full; $("pgThread").scrollTop = $("pgThread").scrollHeight; }
+                            else if (evt.type === "error") { streamErr = new Error(evt.error || "stream error"); }
+                            else if (evt.type === "done" && evt.quota) { state.credits && (state.credits.daily ? (state.credits.daily.used = evt.quota.used, state.credits.daily.cap = evt.quota.cap) : 0); }
+                        });
+                        if (streamErr) throw streamErr;
+                        return pump();
+                    });
+                }
+                return pump().then(function () { pgMsgs.push({ role: "assistant", content: full || "" }); });
+            })
+            .catch(function (e) {
+                replyEl.className = "pg-msg err"; replyEl.textContent = "Error: " + e.message;
+                pgMsgs.pop();
+                if (e.status === 429) showToast("danger", "Budget exceeded", e.message);
+            })
+            .then(function () { $("pgSend").disabled = false; });
+    }
+
+    function renderLogsGate() {
+        $("logsBody").innerHTML = '<div class="card signin-cta"><p>Sign in to see your request logs.</p><a class="btn btn-primary btn-sm" href="/">Sign in →</a></div>';
+    }
+    function loadLogs() {
+        if (!(state.credits && state.credits.authenticated)) { renderLogsGate(); return; }
+        api("/api/ai/logs").then(function (d) {
+            var stat = '<div class="stat-grid">' +
+                '<div class="stat-card card"><div class="l">Requests today</div><div class="v">' + nf(d.today.requests) + '</div></div>' +
+                '<div class="stat-card card"><div class="l">Tokens today</div><div class="v">' + nf(d.today.tokens) + '</div></div>' +
+                '<div class="stat-card card"><div class="l">Avg latency</div><div class="v">' + nf(d.today.avgLatencyMs) + '<small>ms</small></div></div>' +
+                '<div class="stat-card card"><div class="l">Spend this month</div><div class="v">$' + ((d.monthCostMicro || 0) / 1e6).toFixed(2) + '</div></div>' +
+                '</div>';
+            var rows = d.requests.length
+                ? '<div class="card flush">' + d.requests.map(function (r) {
+                    return '<div class="log-row"><span class="badge ' + (r.ok ? "badge-success" : "badge-danger") + '"><span class="dot"></span>' + r.statusCode + '</span>' +
+                        '<span class="log-model">' + esc(r.model) + '</span>' +
+                        '<span class="log-time">' + fmtRel(r.createdAt) + '</span>' +
+                        '<span class="log-right">' + nf(r.tokens) + ' tok · ' + r.latencyMs + 'ms</span></div>';
+                }).join("") + '</div>'
+                : '<div class="card"><div class="key-empty">No requests yet — try the Playground, or call POST /api/ai with a key.</div></div>';
+            $("logsBody").innerHTML = stat + '<div class="mu-head" style="margin:var(--space-5) 0 var(--space-3)">Recent requests</div>' + rows;
+        }).catch(function () { $("logsBody").innerHTML = '<div class="card muted">Couldn\'t load logs.</div>'; });
+    }
+
+    var STATUS_LABEL = { operational: "Operational", degraded: "Degraded", outage: "Outage" };
+    var STATUS_TONE = { operational: "success", degraded: "warning", outage: "danger" };
+    function loadStatus() {
+        gj("/api/status").then(function (d) {
+            var el = $("statusBody");
+            if (!d.configured) { el.innerHTML = '<div class="card muted">Provider not configured.</div>'; return; }
+            var cur = d.current;
+            var status = cur ? cur.status : null;
+            var tone = STATUS_TONE[status] || "neutral";
+            var hero = '<div class="card status-hero">' +
+                '<span class="badge badge-' + tone + '" style="font-size:13px;padding:6px 14px"><span class="dot"></span>' + (STATUS_LABEL[status] || "Unknown") + '</span>' +
+                (cur ? '<span class="status-meta">' + cur.latencyMs + 'ms · checked ' + fmtRel(cur.checkedAt) + (cur.attempts > 1 ? " · " + cur.attempts + " attempts" : "") + '</span>' : '<span class="status-meta">No checks yet</span>') +
+                '</div>';
+            var days = d.days || [];
+            var bars = days.map(function (dd) {
+                var tone2 = STATUS_TONE[dd.status] || "neutral";
+                var date = new Date(dd.day * 86400000).toLocaleDateString(undefined, { month: "short", day: "numeric" });
+                var tip = date + " — " + (STATUS_LABEL[dd.status] || "Unknown") + " · " + Math.round(dd.avgLatencyMs) + "ms avg · " + dd.checks + " check" + (dd.checks === 1 ? "" : "s");
+                return '<div class="status-day status-' + tone2 + '" data-tip="' + esc(tip) + '"></div>';
+            }).join("");
+            var strip = days.length
+                ? '<div class="card" style="margin-top:var(--space-4)"><div class="mu-head">Last ' + days.length + ' days</div><div class="status-strip">' + bars + '</div></div>'
+                : "";
+            el.innerHTML = hero + strip;
+        }).catch(function () { $("statusBody").innerHTML = '<div class="card muted">Couldn\'t load status.</div>'; });
+    }
+
+    var assistHistory = [];
+    function assistToggle(open) { $("assistPanel").classList.toggle("open", open); }
+    $("assistLauncher").addEventListener("click", function () { assistToggle(true); $("assistInput").focus(); });
+    $("assistClose").addEventListener("click", function () { assistToggle(false); });
+    function assistAppend(role, text) {
+        var thread = $("assistThread");
+        var empty = thread.querySelector(".pg-empty");
+        if (empty) empty.remove();
+        var div = document.createElement("div");
+        div.className = "pg-msg " + role;
+        div.textContent = text;
+        thread.appendChild(div);
+        thread.scrollTop = thread.scrollHeight;
+        return div;
+    }
+    function assistSetCount(remaining, resetAt) {
+        if (remaining == null) return;
+        $("assistCount").textContent = remaining + " left" + (remaining <= 0 ? " · " + fmtReset(resetAt) : "");
+    }
+    function sendAssistMessage() {
+        var input = $("assistInput");
+        var val = input.value.trim();
+        if (!val) return;
+        input.value = "";
+        assistAppend("user", val);
+        var replyEl = assistAppend("assistant", "…");
+        $("assistSend").disabled = true;
+        api("/api/ai/assist", { method: "POST", body: { message: val, history: assistHistory } })
+            .then(function (d) {
+                replyEl.textContent = d.response;
+                assistHistory.push({ role: "user", content: val }, { role: "assistant", content: d.response });
+                assistSetCount(d.remaining, d.resetAt);
+            })
+            .catch(function (e) {
+                replyEl.className = "pg-msg err";
+                replyEl.textContent = "Error: " + e.message;
+                if (e.status === 429) { showToast("danger", "Assistant limit reached", e.message); assistSetCount(0, e.body && e.body.resetAt); }
+            })
+            .then(function () { $("assistSend").disabled = false; });
+    }
+    $("assistSend").addEventListener("click", sendAssistMessage);
+    $("assistInput").addEventListener("keydown", function (e) { if (e.key === "Enter") sendAssistMessage(); });
+
+    Promise.all([gj("/api/ai/credits"), gj("/api/ai/usage"), gj("/api/ai/config")]).then(function (r) {
+        state.credits = r[0] || {}; state.usage = r[1] || {}; state.config = r[2] || {};
+        renderOverview();
+        renderModels();
+        if (state.credits.authenticated) {
+            loadKeys(); renderPlaygroundShell();
+            $("assistLauncher").hidden = false;
+        } else {
+            renderKeysGate(); renderPlaygroundGate(); renderLogsGate();
+        }
+        routeFromHash();
+    }).catch(function () {
+        renderOverview(); renderKeysGate(); renderModels(); renderPlaygroundGate(); renderLogsGate(); routeFromHash();
+    });
+})();
+
+(function () {
+    "use strict";
+    var overlay = document.getElementById("gwIntro");
+    if (!overlay) return;
+    var reduced = false;
+    try { reduced = matchMedia("(prefers-reduced-motion: reduce)").matches; } catch (e) {}
+    if (reduced) { overlay.remove(); return; }
+    var canvas = document.getElementById("introCanvas");
+    var ctx = canvas && canvas.getContext && canvas.getContext("2d");
+    if (!ctx) { overlay.remove(); return; }
+
+    var dpr = Math.max(1, Math.min(window.devicePixelRatio || 1, 2));
+    function sizeCanvas() {
+        canvas.width = Math.round(innerWidth * dpr);
+        canvas.height = Math.round(innerHeight * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    sizeCanvas();
+
+    function buildParticles() {
+        var text = "nocturne";
+        var fontPx = Math.max(28, Math.min(72, innerWidth * 0.09));
+        var font = "700 " + fontPx + "px 'Space Grotesk', ui-sans-serif, sans-serif";
+        var off = document.createElement("canvas");
+        var octx = off.getContext("2d");
+        if (!octx) return [];
+        octx.font = font;
+        var m = octx.measureText(text);
+        var tw = Math.ceil(m.width) + 8, th = Math.ceil(fontPx * 1.3);
+        off.width = Math.round(tw * dpr); off.height = Math.round(th * dpr);
+        octx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        octx.font = font; octx.fillStyle = "#fff"; octx.textBaseline = "middle";
+        octx.fillText(text, 4, th / 2);
+        var data;
+        try { data = octx.getImageData(0, 0, off.width, off.height).data; } catch (e) { return []; }
+        var step = Math.max(3, Math.round(fontPx / 13));
+        var cx = innerWidth / 2 - tw / 2, cy = innerHeight / 2 - th / 2;
+        var pts = [];
+        for (var y = 0; y < th; y += step) {
+            for (var x = 0; x < tw; x += step) {
+                var di = (Math.round(y * dpr) * off.width + Math.round(x * dpr)) * 4;
+                if (data[di + 3] > 130) pts.push({ x: cx + x, y: cy + y, ang: Math.random() * Math.PI * 2, spd: 1.6 + Math.random() * 4.5 });
+            }
+        }
+        return pts;
+    }
+
+    var particles = buildParticles();
+    if (!particles.length) { overlay.remove(); return; }
+
+    var start = null, HOLD = 1200, DURATION = 1500, done = false;
+    function finish() {
+        if (done) return;
+        done = true;
+        if (!overlay.parentNode) return;
+        overlay.style.transition = "opacity .16s linear";
+        overlay.style.opacity = "0";
+        setTimeout(function () { overlay.remove(); }, 170);
+    }
+    function drawStill() {
+        ctx.clearRect(0, 0, innerWidth, innerHeight);
+        ctx.fillStyle = "#ededf0";
+        ctx.globalAlpha = 1;
+        for (var i = 0; i < particles.length; i++) {
+            var p = particles[i];
+            ctx.beginPath(); ctx.arc(p.x, p.y, 1.6, 0, 6.2832); ctx.fill();
+        }
+    }
+    function frame(ts) {
+        if (done) return;
+        if (!start) start = ts;
+        var elapsed = ts - start;
+        if (elapsed < HOLD) {
+
+            drawStill();
+            requestAnimationFrame(frame);
+            return;
+        }
+        var t = Math.min(1, (elapsed - HOLD) / DURATION);
+        var ease = 1 - Math.pow(1 - t, 3);
+        ctx.clearRect(0, 0, innerWidth, innerHeight);
+        ctx.fillStyle = "#ededf0";
+        for (var i = 0; i < particles.length; i++) {
+            var p = particles[i];
+            var dist = ease * p.spd * 42;
+            var x = p.x + Math.cos(p.ang) * dist, y = p.y + Math.sin(p.ang) * dist;
+            var alpha = 1 - ease;
+            if (alpha <= 0.02) continue;
+            ctx.globalAlpha = alpha;
+            ctx.beginPath(); ctx.arc(x, y, 1.6, 0, 6.2832); ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+        if (t < 1) requestAnimationFrame(frame);
+        else finish();
+    }
+    requestAnimationFrame(frame);
+
+    setTimeout(finish, HOLD + DURATION + 1200);
+})();
+</script>
+<script src="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.0/src/js/pu3927.js?v=20260929-2" defer></script>
+</body>
+</html>

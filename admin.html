@@ -1,0 +1,1261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="dark">
+<title>Nocturne - Admin</title>
+
+<style>
+:root{
+  --bg:#060509;--card:rgba(255, 255, 255, .04);--line:rgba(255, 255, 255, .13);--line2:rgba(255, 255, 255, .22);
+  --fg:#ededf0;--fg2:#a8a7b0;--fg3:#85848e;--accent:#a898e8;--danger:#ff8f8f;--ok:#8ad6a0;--gold:#e6c976;
+  --ease:cubic-bezier(.22,1,.36,1);
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--fg);font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+body{background:radial-gradient(820px 460px at 82% -14%,rgba(168, 152, 232, 0.032),transparent 62%),var(--bg);min-height:100vh}
+.gate{display:flex;align-items:center;justify-content:center;min-height:100vh;text-align:center;padding:20px}
+.gate h2{font-weight:600;margin:0 0 6px}
+.gate p{color:var(--fg3);font-size:14px;line-height:1.5;margin:0 0 14px}
+.gate a{color:var(--accent);text-decoration:none}
+.spin{width:26px;height:26px;border:3px solid var(--line2);border-top-color:var(--accent);border-radius:50%;animation:sp .8s linear infinite;margin:0 auto 14px}
+@keyframes sp{to{transform:rotate(360deg)}}
+.head{display:flex;align-items:center;gap:16px;padding:16px 22px;border-bottom:1px solid var(--line);background:rgba(10, 9, 13, 0.94);position:sticky;top:0;z-index:5;flex-wrap:wrap}
+.brand{font-size:16px;font-weight:600}.brand b{color:var(--accent)}
+.stats{display:flex;gap:12px;font-size:11.5px;color:var(--fg3)}
+.stats span{background:var(--card);border:1px solid var(--line);padding:4px 10px;border-radius: 0}
+.sp{flex:1}
+.owner{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11px;color:var(--gold);background:rgba(230,201,118,.1);border:1px solid rgba(230,201,118,.26);padding:4px 11px;border-radius: 0;font-weight:600;letter-spacing:.02em}
+.tabs{display:flex;gap:4px;padding:14px 22px 0;flex-wrap:wrap}
+.tab{padding:8px 16px;border:1px solid transparent;background:none;color:var(--fg3);font:inherit;font-size:13px;cursor:pointer;border-radius: 0}
+.tab:hover{color:var(--fg)}
+.tab.on{color:var(--fg);background:var(--card);border-color:var(--line);border-bottom-color:transparent}
+main{padding:18px 22px 60px;max-width:1000px}
+.panel{display:none}.panel.on{display:block;animation:in .2s var(--ease)}
+@keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.row{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center}
+.form{background:var(--card);border:1px solid var(--line);padding:12px;border-radius: 0}
+.in{background:rgba(0,0,0,.25);border:1px solid var(--line2);border-radius: 0;padding:9px 12px;color:var(--fg);font:inherit;font-size:13px;outline:none}
+.in:focus{border-color:var(--accent)}
+.in.sm{padding:6px 9px;font-size:12px}
+select.in{cursor:pointer}
+.grow{flex:1;min-width:160px}
+.btn{background:rgba(168, 152, 232, 0.084);border:1px solid var(--line2);color:var(--fg);font:inherit;font-size:12.5px;padding:8px 14px;border-radius: 0;cursor:pointer;white-space:nowrap}
+.btn:hover{background:rgba(168, 152, 232, 0.154);border-color:var(--accent)}
+.btn.sm{padding:6px 9px;font-size:11.5px}
+.btn.dang{background:rgba(255,120,120,.1);border-color:rgba(255,120,120,.3);color:var(--danger)}
+.btn.dang:hover{background:rgba(255,120,120,.2)}
+.btn.go{background:rgba(138,214,160,.16);border-color:rgba(138,214,160,.4);color:var(--ok)}
+.btn.go:hover{background:rgba(138,214,160,.26)}
+.modal-bg{position:fixed;inset:0;background:rgba(3,4,10,0.94);display:flex;align-items:center;justify-content:center;z-index:50;padding:20px}
+.modal-bg[hidden]{display:none}
+.modal{background:#0a090d;border:1px solid var(--line2);border-radius: 0;padding:22px;width:100%;max-width:460px;box-shadow:0 24px 70px rgba(0,0,0,.55)}
+.modal-h{font-size:16px;font-weight:600;margin-bottom:2px}.modal-h span{color:var(--accent)}
+.rm-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:8px 0 4px}
+.rm-grid label{display:flex;flex-direction:column;gap:5px;font-size:11px;color:var(--fg3);text-transform:uppercase;letter-spacing:.03em}
+.rm-grid .in{width:100%}
+.rm-toggles{display:flex;flex-direction:column;gap:11px;margin:14px 0 2px}
+.rm-tg{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--fg);cursor:pointer}
+.rm-tg input{width:16px;height:16px;accent-color:var(--accent)}
+.rm-tg small{color:var(--fg3)}
+.modal-acts{display:flex;align-items:center;gap:8px;margin-top:20px}
+.list{display:flex;flex-direction:column;gap:8px}
+.empty{color:var(--fg3);font-size:13px;padding:30px;text-align:center}
+.hint{color:var(--fg3);font-size:12px;line-height:1.5;margin:0 0 14px}.hint b{color:var(--fg2)}
+.c{display:flex;align-items:center;gap:14px;background:var(--card);border:1px solid var(--line);border-radius: 0;padding:12px 14px}
+.c:hover{border-color:var(--line2)}.c.done{opacity:.55}
+.cm{flex:1;min-width:0}
+.ct{font-size:13.5px;font-weight:500;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.cid{color:var(--fg3);font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11px;font-weight:400}
+.cs{font-size:11.5px;color:var(--fg3);margin-top:3px}
+.cb{font-size:12.5px;color:var(--fg2);margin:6px 0;white-space:pre-wrap;word-break:break-word;max-height:160px;overflow:auto}
+.ca{display:flex;gap:6px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end}
+.tag{font-size:9.5px;text-transform:uppercase;letter-spacing:.05em;font-weight:600;background:var(--fg3);color:var(--bg);padding:2px 7px;border-radius: 0}
+.tag.ok{background:var(--ok)}.tag.prem{background:rgba(230,201,118,.16);color:var(--gold)}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:rgba(12,13,22,.96);border:1px solid var(--line2);color:var(--fg);padding:10px 18px;border-radius: 0;font-size:13px;box-shadow:0 10px 36px rgba(0,0,0,.5);z-index:50;display:none}
+.toast.bad{border-color:rgba(255,120,120,.4);color:var(--danger)}
+@media(max-width:640px){.c{flex-direction:column;align-items:stretch}.ca{justify-content:flex-start}.stats{display:none}}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:16px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius: 0;padding:14px 16px}
+.stat .n{font-size:26px;font-weight:600;letter-spacing:-.02em}
+.stat .l{font-size:11px;color:var(--fg3);text-transform:uppercase;letter-spacing:.06em;margin-top:2px}
+.stat .n.gold{color:var(--gold)}
+.sec-h{font-size:12px;color:var(--fg3);text-transform:uppercase;letter-spacing:.07em;margin:18px 0 10px;font-weight:600}
+
+:root{--fg-2:var(--fg2);--fg-3:var(--fg3);--line-2:var(--line2)}
+.noc-select{position:relative;display:inline-flex;vertical-align:middle;max-width:100%}
+.noc-select-native{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;border:0!important;opacity:0!important;pointer-events:none!important}
+.noc-select-trigger{display:inline-flex;align-items:center;gap:6px;cursor:pointer;text-align:left;line-height:1.2;box-sizing:border-box;user-select:none;background-image:none!important}
+.noc-select-trigger:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.noc-select-label{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.noc-select-caret{width:14px;height:14px;flex-shrink:0;opacity:.75;transition:transform .18s var(--ease),opacity .15s var(--ease)}
+.noc-select-trigger:hover .noc-select-caret{opacity:1}
+.noc-select.open .noc-select-caret{transform:rotate(180deg)}
+.noc-select-menu{position:fixed;left:0;top:0;z-index:99999;min-width:160px;max-width:min(360px,92vw);max-height:320px;overflow-y:auto;overscroll-behavior:contain;padding:5px;background:rgba(13,14,24,.98);border:1px solid var(--line2);border-radius: 0;box-shadow:0 18px 52px rgba(0,0,0,.6),0 0 0 1px rgba(0,0,0,.2);opacity:0;transform:translateY(-6px) scale(.98);transform-origin:top center;pointer-events:none;transition:opacity .16s var(--ease),transform .16s var(--ease)}
+.noc-select-menu.open{opacity:1;transform:translateY(0) scale(1);pointer-events:auto}
+.noc-select-menu::-webkit-scrollbar{width:6px}.noc-select-menu::-webkit-scrollbar-thumb{background:rgba(255, 255, 255, .14);border-radius: 0}
+.noc-select-opt{position:relative;padding:8px 12px 8px 11px;border-radius: 0;font-size:12.5px;color:var(--fg2);cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border:1px solid transparent;transition:background .12s var(--ease),color .12s var(--ease),border-color .12s var(--ease)}
+.noc-select-opt:hover,.noc-select-opt.active{background:rgba(168, 152, 232, 0.084);color:var(--fg);border-color:rgba(168, 152, 232, 0.112)}
+.noc-select-opt.selected{color:var(--accent);font-weight:500;padding-right:26px}
+.noc-select-opt.selected::after{content:"";position:absolute;right:11px;top:50%;width:9px;height:5px;margin-top:-4px;border-left:1.6px solid var(--accent);border-bottom:1.6px solid var(--accent);transform:rotate(-45deg)}
+.noc-select-opt.disabled{opacity:.4;cursor:default}
+/* ── stratus cloud gaming ───────────────────────────────────────────────── */
+@keyframes sterm-in{from{opacity:0;transform:translateX(-6px)}to{opacity:1;transform:none}}
+@keyframes spulse{0%,100%{opacity:1}50%{opacity:.45}}
+@keyframes sflash{0%{background:rgba(138,214,160,.18)}100%{background:transparent}}
+@keyframes sspin{to{transform:rotate(360deg)}}
+.sbtn-spin::before{content:"";display:inline-block;width:10px;height:10px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:sspin .7s linear infinite;margin-right:6px;vertical-align:-.1em;opacity:.7}
+.sterm-line{display:flex;gap:8px;flex-shrink:0;animation:sterm-in .18s ease both}
+.spool-card{display:flex;align-items:center;gap:10px;background:rgba(138,214,160,.05);border:1px solid rgba(138,214,160,.18);border-radius: 0;padding:10px 14px;animation:sterm-in .22s ease both}
+.spool-card .sp-dot{width:8px;height:8px;border-radius:50%;background:var(--ok);flex-shrink:0;animation:spulse 2.4s ease infinite}
+.spool-card .sp-sn{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;color:var(--ok);flex:1}
+.spool-card .sp-meta{font-size:11px;color:var(--fg3);text-align:right}
+.spool-empty{color:var(--fg3);font-size:12.5px;padding:16px;text-align:center;background:var(--card);border:1px solid var(--line);border-radius: 0}
+.sproxy-chip{display:inline-flex;align-items:center;gap:5px;background:rgba(138,214,160,.07);border:1px solid rgba(138,214,160,.2);border-radius: 0;padding:5px 9px;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11px;color:var(--ok)}
+.sproxy-chip .pc-dot{width:6px;height:6px;border-radius:50%;background:var(--ok);flex-shrink:0}
+.sproxy-none{color:var(--fg3);font-size:12px;font-style:italic}
+.sstat-flash{animation:sflash .6s ease}
+.screating{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ok);padding:10px 14px;background:rgba(138,214,160,.07);border:1px solid rgba(138,214,160,.2);border-radius: 0;margin-top:6px}
+.screating .sc-spin{width:14px;height:14px;border:2px solid rgba(138,214,160,.3);border-top-color:var(--ok);border-radius:50%;animation:sspin .9s linear infinite;flex-shrink:0}
+/* Google Material spinner */
+@keyframes sgoog-rotate{100%{transform:rotate(360deg)}}
+@keyframes sgoog-dash{0%{stroke-dasharray:1,113;stroke-dashoffset:0}50%{stroke-dasharray:90,113;stroke-dashoffset:-35}100%{stroke-dasharray:90,113;stroke-dashoffset:-113}}
+.sgoog-spin{animation:sgoog-rotate 1.4s linear infinite;flex-shrink:0;transform-box:fill-box;transform-origin:center}
+.sgoog-arc{stroke:var(--ok);stroke-dasharray:1,113;stroke-linecap:round;animation:sgoog-dash 1.4s ease-in-out infinite}
+/* Indeterminate progress bar */
+@keyframes sprogbar-slide{0%{left:-45%;width:45%}100%{left:100%;width:45%}}
+.sprogbar{height:3px;background:rgba(138,214,160,.12);border-radius: 0;overflow:hidden;position:relative;margin-top:8px}
+.sprogbar-inner{position:absolute;height:100%;background:var(--ok);border-radius: 0;animation:sprogbar-slide 1.4s ease-in-out infinite}
+/* Status banner */
+.sbnr{display:flex;align-items:center;gap:14px;background:rgba(138,214,160,.06);border:1px solid rgba(138,214,160,.22);border-radius: 0;padding:14px 16px;margin-bottom:14px;animation:sterm-in .2s ease both}
+.sbnr-txt{font-size:13px;color:var(--ok);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.sbnr-cnt{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;color:var(--fg3);flex-shrink:0}
+/* Add-accounts modal */
+.sadd-modal{max-width:340px}
+.sadd-count{display:flex;align-items:center;gap:10px;margin:16px 0}
+.sadd-count label{font-size:13px;color:var(--fg2)}
+.sadd-count input{width:72px}
+/* ── analytics ─────────────────────────────────────────────────────────── */
+.an-bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:10px 12px;margin-bottom:16px;background:var(--card);border:1px solid var(--line);border-radius: 0}
+.an-sp{flex:1}
+.an-chips{display:flex;gap:2px;background:rgba(0,0,0,.28);border:1px solid var(--line);border-radius: 0;padding:3px}
+.an-chip{background:none;border:none;color:var(--fg3);font:inherit;font-size:12px;padding:5px 11px;border-radius: 0;cursor:pointer;letter-spacing:.02em}
+.an-chip:hover{color:var(--fg)}
+.an-chip.on{background:rgba(168, 152, 232, 0.126);color:var(--fg);box-shadow:inset 0 0 0 1px rgba(168, 152, 232, 0.238)}
+.an-ctl{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--fg3)}
+.an-ctl input[type=checkbox]{width:15px;height:15px;accent-color:#9085e9;margin:0}
+.an-live{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--fg3);text-transform:uppercase;letter-spacing:.08em}
+.an-live i{width:7px;height:7px;border-radius:50%;background:#0ca30c;animation:anpulse 1.8s ease-in-out infinite}
+.an-live.off i{background:var(--fg3);animation:none}
+@keyframes anpulse{50%{opacity:.25}}
+
+.an-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:12px;margin-bottom:8px;align-items:stretch}
+.an-c{background:var(--card);border:1px solid var(--line);border-radius: 0;padding:14px 16px;min-width:0}
+.an-c.is-hero{grid-column:span 2;background: rgba(168, 152, 232, 0.084);border-color:rgba(168, 152, 232, 0.196)}
+.an-c-hero{font-size:46px;font-weight:650;letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums}
+.an-c-n{font-size:24px;font-weight:650;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.an-c-l{font-size:10.5px;color:var(--fg3);text-transform:uppercase;letter-spacing:.07em;margin-top:6px}
+.an-c-s{font-size:11px;color:var(--fg3);margin-top:4px;line-height:1.35}
+
+.an-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-bottom:18px;align-items:stretch}
+.an-tile{position:relative;text-align:left;background:var(--card);border:1px solid var(--line);border-radius: 0;padding:12px 14px 8px;color:var(--fg);font:inherit;cursor:pointer;overflow:hidden;min-width:0;transition:border-color .2s ease, background .2s ease, transform .2s ease}
+.an-tile:hover{border-color:var(--line2);transform:translateY(-1px)}
+.an-tile.on{border-color:rgba(168, 152, 232, 0.35);background:rgba(168, 152, 232, 0.049)}
+.an-t-l{font-size:10.5px;color:var(--fg3);text-transform:uppercase;letter-spacing:.07em}
+.an-t-v{display:flex;align-items:baseline;gap:6px;margin-top:4px}
+.an-t-v b{font-size:22px;font-weight:600;letter-spacing:-.02em}
+.an-t-v span{font-size:10.5px;color:var(--fg3)}
+.an-t-d{font-size:10.5px;margin-top:3px;color:var(--fg3)}
+.an-t-d.up{color:#8ad6a0}.an-t-d.down{color:#ff9d9d}
+.an-t-s{margin:6px -13px -8px;line-height:0;opacity:.9}
+.an-t-s svg{width:100%;height:26px;display:block}
+
+.an-card{background:var(--card);border:1px solid var(--line);border-radius: 0;padding:14px 16px 10px;margin-bottom:16px}
+.an-head{display:flex;align-items:center;gap:12px;margin-bottom:8px;flex-wrap:wrap}
+.an-title{font-size:14px;font-weight:650}
+.an-legend{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.an-leg{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--fg3)}
+.an-key{width:14px;height:2px;border-radius: 0;background:#9085e9;flex:none}
+.an-key.is-prev{background:#6f6a8c}
+
+.an-plot{position:relative;width:100%}
+.an-svg{display:block;width:100%;height:auto;touch-action:none;outline:none;overflow:visible}
+.an-svg:focus-visible{outline:2px solid rgba(168, 152, 232, 0.49);outline-offset:2px;border-radius: 0}
+.an-grid{stroke:rgba(255, 255, 255, .09);stroke-width:1}
+.an-axis{stroke:rgba(255, 255, 255, .22);stroke-width:1}
+.an-line{fill:none;stroke:#9085e9;stroke-width:2.25;stroke-linejoin:round;stroke-linecap:round;transition:d .55s cubic-bezier(.22,1,.36,1)}
+.an-fill{transition:d .55s cubic-bezier(.22,1,.36,1)}
+.an-prev{fill:none;stroke:#6f6a8c;stroke-width:1.75;stroke-linejoin:round;stroke-linecap:round;opacity:.8;transition:d .55s cubic-bezier(.22,1,.36,1)}
+.an-cross{stroke:rgba(255, 255, 255, .32);stroke-width:1}
+.an-end{fill:#9085e9;stroke:#0a090d;stroke-width:2;transition:cx .35s ease, cy .35s ease}
+.an-end-prev{fill:#6f6a8c;stroke:#0a090d;stroke-width:2}
+.an-ytick,.an-xtick{fill:var(--fg3);font-size:11px;font-variant-numeric:tabular-nums}
+.an-ytick{text-anchor:end}
+.an-xtick{text-anchor:middle}
+.an-endlabel{fill:var(--fg2);font-size:12px;font-weight:650}
+.an-hit{cursor:crosshair}
+
+.an-tip{position:absolute;top:6px;pointer-events:none;background:rgba(10, 9, 13, .97);border:1px solid var(--line2);border-radius: 0;padding:8px 11px;font-size:12px;box-shadow:0 10px 30px rgba(0,0,0,.5);white-space:nowrap;z-index:2}
+.an-tip[hidden]{display:none}
+.an-tip-when{font-size:10.5px;color:var(--fg3);margin-bottom:5px;font-variant-numeric:tabular-nums}
+.an-tip-row{display:flex;align-items:center;gap:7px;margin-top:2px}
+.an-tip-row b{font-weight:600;font-variant-numeric:tabular-nums}
+.an-tip-name{color:var(--fg3);font-size:11px}
+
+.an-table{max-height:300px;overflow:auto;margin-top:10px;border-top:1px solid var(--line)}
+.an-table[hidden]{display:none}
+.an-table table{width:100%;border-collapse:collapse;font-size:12px}
+.an-table th{position:sticky;top:0;background:#0a090d;text-align:left;color:var(--fg3);font-weight:500;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;padding:7px 10px;border-bottom:1px solid var(--line)}
+.an-table td{padding:5px 10px;border-bottom:1px solid rgba(255, 255, 255, .06);color:var(--fg2)}
+.an-table td.num{font-variant-numeric:tabular-nums;text-align:right}
+
+.an-split{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.an-rank{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.an-rank-row{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto;column-gap:12px;row-gap:4px;align-items:center}
+.an-rank-name{font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.an-rank-v{font-size:12px;color:var(--fg2);text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.an-rank-bar{grid-column:1;height:5px;border-radius: 0;background:rgba(255, 255, 255, .08);overflow:hidden}
+.an-rank-bar i{display:block;height:100%;border-radius: 0;background:#9085e9;transition:width .45s cubic-bezier(.22,1,.36,1)}
+.an-rank-s{grid-column:2;font-size:10.5px;color:var(--fg3);text-align:right;white-space:nowrap}
+
+.an-loading,.is-loading .an-cards,.is-loading .an-tiles,.is-loading .an-card{opacity:.55;transition:opacity .15s}
+@media(max-width:820px){.an-split{grid-template-columns:1fr}.an-c.is-hero{grid-column:span 2}}
+@media(prefers-reduced-motion:reduce){.an-live i,.an-tile{animation:none;transform:none}.an-line,.an-prev,.an-fill,.an-end,.an-rank-bar i{transition:none}}
+
+</style>
+</head>
+<body>
+
+<div id="gate" class="gate"><div><div class="spin"></div><div style="color:var(--fg3);font-size:13px;letter-spacing:.04em">loading admin…</div></div></div>
+
+<div id="app" style="display:none">
+  <header class="head">
+    <div class="brand">Nocturne <b>Admin</b></div>
+    <div class="stats" id="stats"></div>
+    <div class="sp"></div>
+    <span class="owner" id="owner"></span>
+  </header>
+  <nav class="tabs">
+    <button class="tab on" data-t="overview">Overview</button>
+    <button class="tab" data-t="analytics">Analytics</button>
+    <button class="tab" data-t="users">Users</button>
+    <button class="tab" data-t="bans">Bans</button>
+    <button class="tab" data-t="userlogs">User Logs</button>
+    <button class="tab" data-t="quotas">Quotas</button>
+    <button class="tab" data-t="flagged">Flagged</button>
+    <button class="tab" data-t="support">Support</button>
+    <button class="tab" data-t="applications">Applications</button>
+    <button class="tab" data-t="models">Models</button>
+    <button class="tab" data-t="containers">Containers</button>
+    <button class="tab" data-t="datacenter">Datacenter</button>
+    <button class="tab" data-t="stratus">Cloud Gaming</button>
+  </nav>
+  <main>
+    <section class="panel on" data-p="overview">
+      <div class="grid" id="ovGrid"></div>
+      <div class="sec-h">AI usage</div>
+      <div class="grid" id="ovAi"></div>
+      <div class="sec-h">Navy key pool</div>
+      <p class="hint">The <b>reserved</b> key serves Opus/Sonnet (exclusively), the <b>owner</b> (always, first choice), and <b>paid</b> users (as fallback when the general pool is spent). Free users only touch the general pool.</p>
+      <div id="ovKeys" class="list"></div>
+      <div class="sec-h">Console</div>
+      <p class="hint">Owner-only live terminal on the app server. Opens in a new tab.</p>
+      <div class="row" style="margin-top:6px"><a class="btn" href="/console.html" target="_blank" rel="noopener">🖥️ Open server terminal</a></div>
+
+      <div class="sec-h">Ads</div>
+      <p class="hint">Master switch for site-wide ads. When <b>off</b>, no visitor sees ads. Paid users and the owner never see ads either way.</p>
+      <div class="row" style="margin-top:6px;align-items:center;gap:12px">
+        <button id="adsToggle" class="btn" title="Turn all ads on or off for the whole site">Ads: …</button>
+        <span id="adsState" class="hint" style="margin:0"></span>
+      </div>
+      <div class="row" style="margin-top:14px"><button id="ovRefresh" class="btn">Refresh</button></div>
+    </section>
+    <section class="panel" data-p="analytics"><div id="analytics"></div></section>
+    <section class="panel" data-p="users">
+      <div class="row"><input id="uSearch" class="in grow" placeholder="Search username…" spellcheck="false"><button id="uRefresh" class="btn">Refresh</button><button id="rKillAll" class="btn dang" title="Stop every running backend app">Stop all apps</button></div>
+      <p class="hint">Hover any button for what it does. <b>make paid</b> gives the user the reserved fallback AI key when the general pool is rate-limited; <b>access</b> grants premium models; <b>quota</b>/<b>credits</b> control daily token and $ allowances.</p>
+      <div id="users" class="list"></div>
+    </section>
+    <section class="panel" data-p="bans">
+      <div class="row form">
+        <select id="bKind" class="in sm"><option value="user">user</option><option value="ip">ip</option><option value="device">device</option></select>
+        <input id="bTarget" class="in grow" placeholder="username, IP, or device fingerprint (noct_fp)" spellcheck="false">
+        <input id="bReason" class="in grow" placeholder="reason (optional)" spellcheck="false">
+        <input id="bDays" class="in sm" type="number" placeholder="days" min="0" style="width:90px">
+        <button id="bAdd" class="btn dang">Ban</button>
+      </div>
+      <div id="bans" class="list"></div>
+    </section>
+    <section class="panel" data-p="userlogs">
+      <p class="hint">IP addresses, browser fingerprints, and user agents logged on signup, login, and every 30 min during active sessions. Search by username, IP, or fingerprint.</p>
+      <div class="row form">
+        <input id="ulSearch" class="in grow" placeholder="Search by username, IP, or fingerprint..." spellcheck="false">
+        <button id="ulGo" class="btn">Search</button>
+      </div>
+      <div id="userLogs" class="list"></div>
+    </section>
+    <section class="panel" data-p="quotas">
+      <p class="hint">Daily AI token limit. <b id="qDef">default 50,000/day</b>. Raise for <b>everyone</b> or one user, optionally for N days (blank = forever). Tokens blank/0 removes an override.</p>
+      <div class="row form">
+        <select id="qScope" class="in sm"><option value="global">all users</option><option value="user">specific user</option></select>
+        <input id="qUser" class="in grow" placeholder="username" spellcheck="false" style="display:none">
+        <input id="qTok" class="in sm" type="number" placeholder="tokens/day" min="0" style="width:120px">
+        <input id="qDays" class="in sm" type="number" placeholder="days (∞)" min="0" style="width:100px">
+        <button id="qApply" class="btn">Apply</button>
+      </div>
+      <div id="quotas" class="list"></div>
+    </section>
+    <section class="panel" data-p="flagged">
+      <p class="hint">Messages auto-blocked by the profanity + AI safety filters (never posted). Newest first.</p>
+      <div id="flagged" class="list"></div>
+    </section>
+    <section class="panel" data-p="support"><div id="support" class="list"></div></section>
+    <section class="panel" data-p="applications">
+      <p class="hint">Staff / role applications from <b>/application</b>. Applicants must be in <b>discord.gg/lanschool</b>; reach them at the Discord username shown. Newest first.</p>
+      <div id="applications" class="list"></div>
+    </section>
+    <section class="panel" data-p="models">
+      <p class="hint"><b>all</b> = everyone · <b>owner</b> = god only · <b>off</b> = disabled. Premium models default to owner-only.</p>
+      <div id="models" class="list"></div>
+    </section>
+    <section class="panel" data-p="containers">
+      <p class="hint">Live backend-runner stats — refreshes every 3s while open. Per-user specs live on the <b>Users</b> tab (the “runner” button).</p>
+      <div class="row"><button id="cRefresh" class="btn">Refresh</button><button id="cKillAll" class="btn dang">Stop all apps</button><span id="cMeta" class="hint" style="margin-left:auto"></span></div>
+      <div id="cStats" class="grid" style="margin:10px 0"></div>
+      <div class="sec-h">Containers</div>
+      <div id="cContainers" class="list"></div>
+      <div class="sec-h">Running apps</div>
+      <div id="cApps" class="list"></div>
+    </section>
+    <section class="panel" data-p="datacenter">
+      <p class="hint">Allocate the box pool to specific users &mdash; isolated Ubuntu 26.04 headless containers they connect to in-browser. RAM &amp; CPU are enforced; disk is pool-accounting only. Auto-refreshes while open.</p>
+      <div id="dcStats" class="grid" style="margin:10px 0"></div>
+      <div class="sec-h">Provision a box</div>
+      <div class="row form">
+        <input id="dcUser" class="in grow" placeholder="username" spellcheck="false">
+        <input id="dcName" class="in sm" placeholder="name" style="width:110px">
+        <input id="dcCpus" class="in sm" type="number" step="0.25" min="0.25" placeholder="cores" style="width:84px">
+        <input id="dcMem" class="in sm" type="number" step="256" min="256" placeholder="RAM MB" style="width:100px">
+        <input id="dcDisk" class="in sm" type="number" step="512" min="512" placeholder="disk MB" style="width:100px">
+        <button id="dcCreate" class="btn">Provision</button>
+      </div>
+      <div class="sec-h">Boxes</div>
+      <div id="dcBoxes" class="list"></div>
+    </section>
+    <section class="panel" data-p="stratus">
+      <div class="sec-h" style="margin-top:0">Pool</div>
+
+      <!-- Stats -->
+      <div class="grid" style="margin-bottom:12px">
+        <div class="stat"><div class="n" id="stratusPoolCount">—</div><div class="l">Ready</div></div>
+        <div class="stat"><div class="n" id="stratusPoolTarget">—</div><div class="l">Target</div></div>
+        <div class="stat"><div class="n" id="stratusActiveSessions">—</div><div class="l">Active sessions</div></div>
+      </div>
+
+      <!-- Actions -->
+      <div class="row" style="margin-bottom:10px;gap:6px">
+        <button class="btn go" id="stratusAddBtn" onclick="stratusAddAccount()">+ Add account</button>
+        <button class="btn" id="stratusFillBtn" onclick="stratusFillPool()">Fill to target</button>
+        <button class="btn dang" id="stratusClearBtn" onclick="stratusClearPool()">Clear pool</button>
+        <button class="btn" onclick="stratusRefreshAll()">↺ Refresh</button>
+        <span id="stratusPoolMsg" style="font-size:11.5px;color:var(--fg3);align-self:center"></span>
+      </div>
+
+      <!-- Status banner (shown while creating) -->
+      <div id="stratusBanner" class="sbnr" hidden>
+        <svg class="sgoog-spin" width="28" height="28" viewBox="0 0 42 42">
+          <circle cx="21" cy="21" r="18" fill="none" stroke="rgba(138,214,160,.18)" stroke-width="3.5"/>
+          <circle class="sgoog-arc" cx="21" cy="21" r="18" fill="none" stroke-width="3.5"/>
+        </svg>
+        <div style="flex:1;min-width:0">
+          <div id="stratusBannerText" class="sbnr-txt">Working…</div>
+          <div class="sprogbar"><div class="sprogbar-inner"></div></div>
+        </div>
+        <div id="stratusBannerCount" class="sbnr-cnt"></div>
+      </div>
+
+      <!-- Account cards (first 5) -->
+      <div id="stratusAccountList" style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px"></div>
+      <div id="stratusAccountSeeMore" style="display:none;margin-bottom:18px">
+        <button class="btn" style="font-size:12px;padding:5px 14px" onclick="stratusOpenAllAccounts()">See <span id="stratusAccountMoreCount">0</span> more →</button>
+      </div>
+
+      <!-- Live terminal (moved above settings for visibility) -->
+      <div class="sec-h" style="margin-bottom:6px">Terminal</div>
+      <div style="background:#080a0f;border:1px solid #1e2028;border-radius: 0;overflow:hidden;margin-bottom:20px">
+        <div style="background:#0e1016;border-bottom:1px solid #1e2028;padding:7px 14px;display:flex;align-items:center;gap:6px">
+          <span style="width:9px;height:9px;border-radius: 0;background:#ff5f57;display:inline-block;flex-shrink:0"></span>
+          <span style="width:9px;height:9px;border-radius: 0;background:#febc2e;display:inline-block;flex-shrink:0"></span>
+          <span style="width:9px;height:9px;border-radius: 0;background:#28c840;display:inline-block;flex-shrink:0"></span>
+          <span style="font-size:11px;color:#444;margin-left:4px;text-transform:uppercase;letter-spacing:.07em;flex:1;font-weight:600">creation log</span>
+          <span id="stratusTermStatus" style="font-size:11px;color:#3a5a3a;margin-right:8px"></span>
+          <button onclick="stratusTermClear()" style="background:none;border:none;color:#444;font-size:11.5px;cursor:pointer;padding:0;letter-spacing:.04em;transition:color .15s" onmouseover="this.style.color='#888'" onmouseout="this.style.color='#444'">clear</button>
+        </div>
+        <div id="stratusTermBody" style="font-family:'SF Mono','Fira Mono','Fira Code','Cascadia Code',ui-monospace,monospace;font-size:11.5px;color:#9acd9a;padding:12px 14px;height:240px;overflow-y:auto;display:flex;flex-direction:column;gap:2px;box-sizing:border-box"></div>
+      </div>
+
+      <!-- Settings -->
+      <div class="sec-h">Settings</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px;margin-bottom:12px">
+        <label style="display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--fg2)">
+          Pool target
+          <input class="in sm" id="sCfgPoolTarget" type="number" min="0" max="500" step="1" placeholder="100" style="width:72px">
+        </label>
+        <label style="display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--fg2)">
+          Session limit (min)
+          <input class="in sm" id="sCfgSessionMins" type="number" min="1" max="60" step="1" placeholder="19" style="width:72px">
+        </label>
+        <label style="display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--fg2)">
+          Email timeout (sec)
+          <input class="in sm" id="sCfgVerifyTimeout" type="number" min="15" max="300" step="5" placeholder="120" style="width:72px">
+        </label>
+        <div style="display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--fg2)">
+          Email providers
+          <div style="display:flex;flex-direction:column;gap:5px;margin-top:1px">
+            <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--fg);cursor:pointer">
+              <input type="checkbox" id="sCfgGuerrilla" style="accent-color:var(--ok)">
+              <span>
+                <span style="font-weight:500">Guerrilla Mail</span>
+                <span style="font-size:10px;color:var(--fg3);margin-left:4px">no-reg · fast</span>
+              </span>
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--fg);cursor:pointer">
+              <input type="checkbox" id="sCfg1secmail" style="accent-color:var(--ok)">
+              <span>
+                <span style="font-weight:500">1secmail</span>
+                <span style="font-size:10px;color:var(--fg3);margin-left:4px">no-reg</span>
+              </span>
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--fg);cursor:pointer">
+              <input type="checkbox" id="sCfgMailTm" style="accent-color:var(--ok)">
+              <span>
+                <span style="font-weight:500">mail.tm</span>
+                <span style="font-size:10px;color:var(--fg3);margin-left:4px">registration</span>
+              </span>
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--fg);cursor:pointer">
+              <input type="checkbox" id="sCfgMailGw" style="accent-color:var(--ok)">
+              <span>
+                <span style="font-weight:500">mail.gw</span>
+                <span style="font-size:10px;color:var(--fg3);margin-left:4px">registration · fallback</span>
+              </span>
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="row" style="margin-bottom:20px;gap:8px">
+        <button class="btn go" id="stratusSaveBtn" onclick="stratusSaveConfig()">Save settings</button>
+        <button class="btn" onclick="stratusLoadConfig()">Reset from server</button>
+        <span id="stratusCfgMsg" style="font-size:11.5px;color:var(--fg3);align-self:center"></span>
+      </div>
+
+      <!-- Proxy status -->
+      <div class="sec-h">Proxies <span id="stratusProxyCount" style="font-size:11px;color:var(--fg3);font-weight:400;margin-left:4px"></span></div>
+      <div id="stratusProxyList" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px">
+        <div style="color:var(--fg3);font-size:12px;padding:4px 0">Loading…</div>
+      </div>
+      <div class="row" style="margin-bottom:18px;gap:6px">
+        <button class="btn" id="stratusProxyRefreshBtn" onclick="stratusRefreshProxies()">↺ Refresh proxies</button>
+        <span id="stratusProxyMsg" style="font-size:11.5px;color:var(--fg3);align-self:center"></span>
+      </div>
+
+    </section>
+  </main>
+  <div id="toast" class="toast"></div>
+  <!-- All accounts panel -->
+  <div id="stratusAllAccountsModal" class="modal-bg" hidden>
+    <div class="modal" style="max-width:520px;max-height:80vh;display:flex;flex-direction:column">
+      <div class="modal-h" style="display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+        <span>All Pool Accounts (<span id="stratusAllAccountsCount">0</span>)</span>
+        <button class="btn" style="font-size:11px;padding:3px 10px" onclick="stratusCloseAllAccounts()">Close</button>
+      </div>
+      <div id="stratusAllAccountsList" style="overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:6px;padding:2px 0 4px"></div>
+    </div>
+  </div>
+
+  <!-- Add accounts modal -->
+  <div id="stratusAddModal" class="modal-bg" hidden>
+    <div class="modal sadd-modal">
+      <div class="modal-h">Add to Pool</div>
+      <p style="font-size:13px;color:var(--fg3);margin:6px 0 4px">Create and pre-register Raccoon accounts. Each account takes ~10s via mail.tm.</p>
+      <div class="sadd-count">
+        <label>How many?</label>
+        <input id="stratusAddCount" class="in sm" type="number" min="1" max="50" value="1">
+        <span id="stratusAddModalInfo" style="font-size:12px;color:var(--fg3)"></span>
+      </div>
+      <div class="modal-acts">
+        <button class="btn" id="stratusAddModalCancel" onclick="stratusCloseAddModal()">Cancel</button>
+        <button class="btn go" onclick="stratusConfirmAdd()">Create accounts</button>
+      </div>
+    </div>
+  </div>
+  <div id="rmBg" class="modal-bg" hidden>
+    <div class="modal" role="dialog" aria-modal="true">
+      <div class="modal-h">Backend runner · <span id="rmUser"></span></div>
+      <p class="hint" id="rmHint" style="margin:6px 0 10px"></p>
+      <div class="rm-grid">
+        <label>CPU cores<input id="rmCpus" class="in" type="number" min="0.25" max="8" step="0.25"></label>
+        <label>Memory MB<input id="rmMem" class="in" type="number" min="256" max="16384" step="256"></label>
+        <label>Disk MB<input id="rmDisk" class="in" type="number" min="128" max="20480" step="128"></label>
+      </div>
+      <div class="rm-toggles">
+        <label class="rm-tg"><input id="rmDed" type="checkbox"><span>Dedicated container <small>— its own box instead of the shared one</small></span></label>
+        <label class="rm-tg"><input id="rmEn" type="checkbox"><span>Backend runner enabled for this user</span></label>
+      </div>
+      <div class="modal-acts">
+        <button id="rmReset" class="btn">Reset to default</button>
+        <span style="flex:1"></span>
+        <button id="rmCancel" class="btn">Cancel</button>
+        <button id="rmSave" class="btn go">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  if(window.__nocSelectInit)return; window.__nocSelectInit=true;
+  var CARET='<svg class="noc-select-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>';
+  var openRec=null;
+  function closeOpen(){if(!openRec)return;openRec.wrap.classList.remove("open");openRec.menu.classList.remove("open");openRec.trigger.setAttribute("aria-expanded","false");window.removeEventListener("scroll",onScroll,true);window.removeEventListener("resize",onResize);openRec=null}
+  function onScroll(e){if(!openRec)return;var m=openRec.menu;if(e&&e.target&&e.target.nodeType===1&&(e.target===m||m.contains(e.target)))return;var r=openRec.trigger.getBoundingClientRect();if(r.bottom<=0||r.top>=window.innerHeight){closeOpen();return}if(openRec.place)openRec.place()}
+  function onResize(){if(openRec&&openRec.place)openRec.place()}
+  document.addEventListener("mousedown",function(e){if(openRec&&!openRec.wrap.contains(e.target)&&!openRec.menu.contains(e.target))closeOpen()});
+  document.addEventListener("keydown",function(e){if(e.key==="Escape"&&openRec){var t=openRec.trigger;closeOpen();t.focus()}});
+  function buildMenu(select,menu){menu.innerHTML="";var frag=document.createDocumentFragment();function add(opt,c){var it=document.createElement("div");it.className="noc-select-opt";it.setAttribute("role","option");it.dataset.value=opt.value;it.textContent=opt.textContent;if(opt.disabled)it.classList.add("disabled");if(opt.selected){it.classList.add("selected");it.setAttribute("aria-selected","true")}c.appendChild(it)}for(var i=0;i<select.children.length;i++){var node=select.children[i];if(node.tagName==="OPTGROUP"){var g=document.createElement("div");g.className="noc-select-group";var l=document.createElement("div");l.className="noc-select-grouplabel";l.textContent=node.label||"";g.appendChild(l);for(var j=0;j<node.children.length;j++)if(node.children[j].tagName==="OPTION")add(node.children[j],g);frag.appendChild(g)}else if(node.tagName==="OPTION")add(node,frag)}menu.appendChild(frag)}
+  function syncLabel(select,label){var opt=select.options[select.selectedIndex];label.textContent=opt?opt.textContent:""}
+  function enhance(select){if(!select||select._nocEnhanced||select.multiple||select.hasAttribute("data-noc-skip"))return;select._nocEnhanced=true;
+    var wrap=document.createElement("div");wrap.className="noc-select";
+    var trigger=document.createElement("div");trigger.className="noc-select-trigger"+(select.className?" "+select.className:"");trigger.setAttribute("role","button");trigger.tabIndex=select.disabled?-1:0;trigger.setAttribute("aria-haspopup","listbox");trigger.setAttribute("aria-expanded","false");if(select.title)trigger.title=select.title;
+    var label=document.createElement("span");label.className="noc-select-label";trigger.appendChild(label);trigger.insertAdjacentHTML("beforeend",CARET);
+    var menu=document.createElement("div");menu.className="noc-select-menu";menu.setAttribute("role","listbox");
+    select.parentNode.insertBefore(wrap,select);wrap.appendChild(trigger);wrap.appendChild(select);select.classList.add("noc-select-native");document.body.appendChild(menu);
+    buildMenu(select,menu);syncLabel(select,label);
+    select._nocRefresh=function(){buildMenu(select,menu);syncLabel(select,label)};
+    new MutationObserver(select._nocRefresh).observe(select,{childList:true,subtree:true});
+    select.addEventListener("change",function(){syncLabel(select,label)});
+    function place(){if(!trigger.isConnected){closeOpen();return}var r=trigger.getBoundingClientRect();menu.style.minWidth=r.width+"px";var mw=menu.offsetWidth,mh=menu.offsetHeight,left=r.left;if(left+mw>window.innerWidth-8)left=Math.max(8,window.innerWidth-8-mw);var top=r.bottom+6;if(top+mh>window.innerHeight-8&&r.top-6-mh>8)top=r.top-6-mh;menu.style.left=left+"px";menu.style.top=top+"px"}
+    function openIt(){if(openRec&&openRec.wrap!==wrap)closeOpen();wrap.classList.add("open");menu.classList.add("open");trigger.setAttribute("aria-expanded","true");place();openRec={wrap:wrap,trigger:trigger,menu:menu,place:place};window.addEventListener("scroll",onScroll,true);window.addEventListener("resize",onResize);var sel=menu.querySelector(".noc-select-opt.selected");if(sel){sel.classList.add("active");sel.scrollIntoView({block:"nearest"})}}
+    trigger.addEventListener("click",function(e){e.stopPropagation();if(wrap.classList.contains("open"))closeOpen();else openIt()});
+    menu.addEventListener("click",function(e){var item=e.target.closest(".noc-select-opt");if(!item||item.classList.contains("disabled"))return;var val=item.dataset.value;if(select.value!==val){select.value=val;select.dispatchEvent(new Event("input",{bubbles:true}));select.dispatchEvent(new Event("change",{bubbles:true}))}var s=menu.querySelectorAll(".noc-select-opt.selected");for(var i=0;i<s.length;i++){s[i].classList.remove("selected");s[i].removeAttribute("aria-selected")}item.classList.add("selected");item.setAttribute("aria-selected","true");syncLabel(select,label);closeOpen();trigger.focus()})}
+  function enhanceAll(root){(root||document).querySelectorAll("select:not(.noc-select-native)").forEach(enhance)}
+  function init(){enhanceAll(document);new MutationObserver(function(muts){for(var i=0;i<muts.length;i++){var an=muts[i].addedNodes;for(var k=0;k<an.length;k++){var n=an[k];if(n.nodeType!==1)continue;if(n.tagName==="SELECT")enhance(n);else if(n.querySelectorAll)n.querySelectorAll("select:not(.noc-select-native)").forEach(enhance)}}}).observe(document.body,{childList:true,subtree:true})}
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
+})();
+</script>
+
+<script>
+(function(){
+  "use strict";
+  var $=function(s){return document.querySelector(s)};
+  var gate=$("#gate"), app=$("#app");
+  var esc=function(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})};
+  var money=function(m){return m==null?"—":"$"+(m/1e6).toLocaleString(undefined,{maximumFractionDigits:2})};
+  var dt=function(ms){return ms?new Date(ms).toLocaleString():"—"};
+  var tk=function(n){return n==null?"—":Number(n).toLocaleString()+" tok/day"};
+  var toastTimer;
+  function toast(m,bad){var t=$("#toast");t.textContent=m;t.className="toast"+(bad?" bad":"");t.style.display="block";clearTimeout(toastTimer);toastTimer=setTimeout(function(){t.style.display="none"},2800)}
+
+  function api(path,method,body){
+    var opt={method:method||"GET",credentials:"same-origin",cache:"no-store",headers:{}};
+    if(body!==undefined){opt.headers["Content-Type"]="application/json";opt.body=JSON.stringify(body)}
+    var ctl=new AbortController(); var timer=setTimeout(function(){ctl.abort()},12000); opt.signal=ctl.signal;
+    return fetch("/api/admin"+path,opt).then(function(r){
+      clearTimeout(timer);
+      return r.json().catch(function(){return null}).then(function(d){
+        if(!r.ok) throw new Error((d&&d.error)||("HTTP "+r.status));
+        return d;
+      });
+    }).catch(function(e){clearTimeout(timer); if(ctl.signal.aborted) throw new Error("Request timed out."); throw e});
+  }
+
+  function loadUsers(){
+    var q=$("#uSearch").value.trim();
+    return api("/users?limit=100&q="+encodeURIComponent(q)).then(function(d){
+      var el=$("#users"), us=d.users||[];
+      if(!us.length){el.innerHTML='<div class="empty">no users</div>';return}
+      el.innerHTML=us.map(function(u){
+        var gm=(u.grantedModels&&u.grantedModels.length)?' · +'+u.grantedModels.length+' model'+(u.grantedModels.length>1?'s':''):'';
+        var pb=u.paid?' <span class="tag" title="Paid customer — gets the reserved fallback key when the general pool is spent" style="background:rgba(230,201,118,.18);color:#e6c976;border-color:rgba(230,201,118,.4)">PAID · fallback key</span>':'';
+        return '<div class="c" data-id="'+u.id+'" data-name="'+esc(u.username)+'" data-paid="'+(u.paid?1:0)+'">'+
+        '<div class="cm"><div class="ct">'+esc(u.username)+' <span class="cid">#'+u.id+'</span>'+gm+pb+'</div>'+
+        '<div class="cs">credits '+money(u.creditsMicro)+' · allowance $'+(u.allowanceDollars!=null?u.allowanceDollars:3)+'/day · joined '+dt(u.createdAt)+'</div></div>'+
+        '<div class="ca">'+
+        '<button class="btn sm" data-a="credits" title="Set daily agent-credit allowance ($/day)">credits/day</button>'+
+        '<button class="btn sm" data-a="access" title="Grant/revoke premium model access">access</button>'+
+        '<button class="btn sm" data-a="paid" title="Paid users fall back to the reserved navy key when the general pool is rate-limited">'+(u.paid?'unpaid':'make paid')+'</button>'+
+        '<button class="btn sm" data-a="quota" title="Override daily token limit">quota</button>'+
+        '<button class="btn sm" data-a="runner" title="Backend-runner CPU/RAM/disk specs">runner</button>'+
+        '<button class="btn sm" data-a="role" title="Chat permission level, role label, name color">role</button>'+
+        '<button class="btn sm" data-a="login" title="Log in as this user">log in as</button>'+
+        '<button class="btn sm" data-a="pw" title="Reset password">reset pw</button>'+
+        '<button class="btn sm dang" data-a="ban" title="Ban this user">ban</button>'+
+        '<button class="btn sm dang" data-a="del" title="Delete this user and all their data">delete</button>'+
+        '</div></div>'}).join("");
+    });
+  }
+  function userAction(a,id,name){
+    if(a==="credits"){var v=prompt('Daily credit allowance for "'+name+'" in $/day (default 3, e.g. 20):',"3");if(v==null)return;
+      var dollars=parseFloat(v);if(!isFinite(dollars)||dollars<0)return toast("invalid amount",1);
+      return api("/credit-allowance","POST",{userId:id,dollars:dollars}).then(function(r){toast(name+": $"+r.dollars+"/day");loadUsers()})}
+    if(a==="paid"){var card=document.querySelector('.c[data-id="'+id+'"]');var cur=!!(card&&card.dataset.paid==="1");return api("/paid","POST",{userId:id,paid:!cur}).then(function(r){toast(name+(r.paid?" → PAID ✓":" → free"));loadUsers()})}
+    if(a==="access"){return api("/premium-models").then(function(pm){
+      var models=pm.models||[]; if(!models.length)return toast("no premium models",1);
+      var list=models.map(function(m,i){return (i+1)+") "+m.label}).join("\n");
+      var input=prompt('Grant premium model access to "'+name+'".\nEnter numbers comma-separated (e.g. 1,3); blank = revoke all:\n'+list,"");
+      if(input==null)return;
+      var ids=input.split(",").map(function(s){return parseInt(s.trim(),10)-1}).filter(function(i){return i>=0&&i<models.length}).map(function(i){return models[i].id});
+      return api("/model-grant","POST",{userId:id,models:ids}).then(function(){toast(ids.length?("granted "+ids.length+" model(s) to "+name):("revoked access for "+name));loadUsers()});
+    })}
+    if(a==="quota"){var v2=prompt('Daily token limit for "'+name+'" (blank to remove):',"");if(v2==null)return;
+      var tok=v2.trim()===""?null:parseInt(v2.replace(/[^0-9]/g,""),10);var days=0;
+      if(tok!=null){var dd=prompt("For how many days? (blank = forever)","");if(dd==null)return;days=parseInt(dd,10)||0}
+      return api("/quota","POST",{scope:"user",userId:id,dailyTokens:tok,days:days}).then(function(){toast(tok==null?"override removed":name+": "+tok.toLocaleString()+" tok/day")})}
+    if(a==="role"){var perm=prompt('Chat permission for "'+name+'": member, mod, or admin',"member");if(perm==null)return;
+      var role=prompt("Custom role label (e.g. VIP) — blank for none:","");if(role==null)return;
+      var color=prompt("Name color hex (e.g. #e6c976) — blank for default:","");if(color==null)return;
+      return api("/chat-role","POST",{userId:id,perm:perm.trim().toLowerCase(),role:role.trim(),color:color.trim()}).then(function(){toast("role updated for "+name)})}
+    if(a==="login"){if(!confirm('Log in as "'+name+'"? You become this user. Sign out + back in as owner to return.'))return;
+      return api("/impersonate","POST",{userId:id}).then(function(){toast("logged in as "+name+" — opening site…");setTimeout(function(){location.href="/"},900)})}
+    if(a==="pw"){var pw=prompt('New password for "'+name+'" (8-256 chars):',"");if(pw==null)return;
+      return api("/password","POST",{userId:id,password:pw}).then(function(){toast("password reset for "+name)})}
+    if(a==="ban"){var rs=prompt('Ban "'+name+'". Reason (optional):',"");if(rs==null)return;
+      return api("/ban","POST",{kind:"user",target:name,reason:rs}).then(function(){toast("banned "+name);loadBans()})}
+    if(a==="del"){if(!confirm('Permanently DELETE "'+name+'" and all their data?'))return;
+      return api("/delete-user","POST",{userId:id}).then(function(){toast("deleted "+name);loadUsers()})}
+    if(a==="runner"){
+      return fetch("/api/runner/admin/spec/"+id,{credentials:"same-origin",cache:"no-store"}).then(function(r){return r.json()}).then(function(c){
+        openRunnerModal(id,name,c.spec||{},c.explicit);
+      });
+    }
+  }
+  function loadBans(){return api("/bans").then(function(d){
+    var el=$("#bans"),bs=d.bans||[];
+    if(!bs.length){el.innerHTML='<div class="empty">no active bans</div>';return}
+    el.innerHTML=bs.map(function(b){return '<div class="c"><div class="cm"><div class="ct"><span class="tag">'+b.target_kind+'</span> '+esc(b.target)+'</div>'+
+      '<div class="cs">'+(esc(b.reason)||"no reason")+' · '+(b.expires_at?"until "+dt(b.expires_at):"permanent")+' · by '+esc(b.banned_by)+'</div></div>'+
+      '<div class="ca"><button class="btn sm" data-unban="'+b.id+'">unban</button></div></div>'}).join("");
+  })}
+  function loadUserLogs(q){
+    var query=q||$("#ulSearch").value.trim();
+    var url=query?"/user-logs?q="+encodeURIComponent(query)+"&limit=200":"/user-logs?limit=200";
+    return api(url).then(function(d){
+      var el=$("#userLogs"),ls=d.logs||[];
+      if(!ls.length){el.innerHTML='<div class="empty">'+(query?"no results for \""+esc(query)+"\"":"no logs yet - users will be logged on their next visit")+'</div>';return}
+      el.innerHTML='<table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr><th style="text-align:left;padding:6px 8px;border-bottom:1px solid var(--line);color:var(--fg3)">User</th><th style="text-align:left;padding:6px 8px;border-bottom:1px solid var(--line);color:var(--fg3)">IP</th><th style="text-align:left;padding:6px 8px;border-bottom:1px solid var(--line);color:var(--fg3)">Fingerprint</th><th style="text-align:left;padding:6px 8px;border-bottom:1px solid var(--line);color:var(--fg3)">Event</th><th style="text-align:left;padding:6px 8px;border-bottom:1px solid var(--line);color:var(--fg3)">Time</th><th style="padding:6px 8px;border-bottom:1px solid var(--line);color:var(--fg3)">Actions</th></tr></thead><tbody>'+
+      ls.map(function(l){
+        var ipLink=l.ip?'<a href="#" class="ul-ip" data-ip="'+esc(l.ip)+'" style="color:var(--accent);text-decoration:none" title="Find all accounts using this IP">'+esc(l.ip)+'</a>':'—';
+        var fpLink=l.fingerprint?'<a href="#" class="ul-fp" data-fp="'+esc(l.fingerprint)+'" style="color:var(--accent);text-decoration:none" title="Find all accounts using this fingerprint">'+esc(l.fingerprint).slice(0,12)+'…</a>':'—';
+        var evColor=l.event==="signup"?"#4ade80":l.event==="login"?"#60a5fa":"#94a3b8";
+        return '<tr><td style="padding:5px 8px;border-bottom:1px solid rgba(255, 255, 255, .06)"><b>'+esc(l.username)+'</b> <span style="color:var(--fg3);font-size:11px">#'+(l.user_id||"")+'</span></td><td style="padding:5px 8px;border-bottom:1px solid rgba(255, 255, 255, .06)">'+ipLink+'</td><td style="padding:5px 8px;border-bottom:1px solid rgba(255, 255, 255, .06);font-family:monospace;font-size:11px">'+fpLink+'</td><td style="padding:5px 8px;border-bottom:1px solid rgba(255, 255, 255, .06)"><span style="color:'+evColor+';font-weight:600;font-size:11px;text-transform:uppercase">'+esc(l.event)+'</span></td><td style="padding:5px 8px;border-bottom:1px solid rgba(255, 255, 255, .06);color:var(--fg3);font-size:11px;white-space:nowrap">'+dt(l.created_at)+'</td><td style="padding:5px 8px;border-bottom:1px solid rgba(255, 255, 255, .06);text-align:center">'+(l.ip?'<button class="btn sm dang" data-banip="'+esc(l.ip)+'" title="Ban this IP" style="font-size:10px;padding:2px 6px">Ban IP</button> ':'')+(l.fingerprint?'<button class="btn sm dang" data-banfp="'+esc(l.fingerprint)+'" title="Ban this device" style="font-size:10px;padding:2px 6px">Ban FP</button>':'')+'</td></tr>';
+      }).join("")+'</tbody></table>';
+    });
+  }
+  function loadQuotas(){return api("/quota").then(function(q){
+    $("#qDef").textContent="default "+Number(q.defaultDaily).toLocaleString()+"/day";
+    var rows=[]; var g=q.global;
+    rows.push('<div class="c"><div class="cm"><div class="ct">All users (global)</div><div class="cs">'+(g?tk(g.daily)+(g.until?" · until "+dt(g.until):" · forever"):"using default "+Number(q.defaultDaily).toLocaleString())+'</div></div>'+(g?'<div class="ca"><button class="btn sm" data-qc="global">remove</button></div>':"")+'</div>');
+    (q.users||[]).forEach(function(u){rows.push('<div class="c"><div class="cm"><div class="ct">'+esc(u.username)+' <span class="cid">#'+u.userId+'</span></div><div class="cs">'+tk(u.daily)+(u.until?" · until "+dt(u.until):" · forever")+' · used today '+Number(u.usedToday).toLocaleString()+'</div></div><div class="ca"><button class="btn sm" data-qc="user" data-uid="'+u.userId+'">remove</button></div></div>')});
+    $("#quotas").innerHTML=rows.join("");
+  })}
+  function loadSupport(){return api("/support?limit=150").then(function(d){
+    var el=$("#support"),ms=d.messages||[];
+    if(!ms.length){el.innerHTML='<div class="empty">no support messages</div>';return}
+    el.innerHTML=ms.map(function(m){return '<div class="c '+(m.resolved?"done":"")+'"><div class="cm"><div class="ct">'+(esc(m.subject)||"(no subject)")+(m.resolved?' <span class="tag ok">resolved</span>':"")+'</div><div class="cb">'+esc(m.body)+'</div><div class="cs">'+(esc(m.username)||"anonymous")+' · '+dt(m.created_at)+'</div></div>'+
+      '<div class="ca"><button class="btn sm" data-sup="'+m.id+'" data-sa="'+(m.resolved?"unresolve":"resolve")+'">'+(m.resolved?"reopen":"resolve")+'</button><button class="btn sm dang" data-sup="'+m.id+'" data-sa="delete">delete</button></div></div>'}).join("");
+  })}
+  function loadApplications(){return api("/applications?limit=300").then(function(d){
+    var el=$("#applications"),as=d.applications||[];
+    if(!as.length){el.innerHTML='<div class="empty">no applications yet</div>';return}
+    el.innerHTML=as.map(function(a){
+      var nl=function(s){return esc(s).replace(/\n/g,"<br>")};
+      var rev=a.status==="reviewed";
+      return '<div class="c '+(rev?"done":"")+'"><div class="cm">'+
+        '<div class="ct">'+esc(a.role)+' <span class="tag">@'+esc(a.discord)+'</span>'+(rev?' <span class="tag ok">reviewed</span>':'')+'</div>'+
+        '<div class="cb"><b>Expertise:</b> '+nl(a.expertise||"—")+'<br><br><b>Why:</b> '+nl(a.reason||"—")+'</div>'+
+        '<div class="cs">Discord <b>@'+esc(a.discord)+'</b> · age '+(a.age||"?")+(a.timezone?' · '+esc(a.timezone):'')+' · '+(a.account?('acct '+esc(a.account)):'not signed in')+' · '+dt(a.created_at)+'</div>'+
+        '</div><div class="ca"><button class="btn sm" data-app="'+a.id+'" data-aa="'+(rev?"new":"reviewed")+'">'+(rev?"mark new":"mark reviewed")+'</button><button class="btn sm dang" data-app="'+a.id+'" data-aa="delete">delete</button></div></div>';
+    }).join("");
+  })}
+  function loadModels(){return api("/models").then(function(d){
+    $("#models").innerHTML=(d.models||[]).map(function(m){return '<div class="c"><div class="cm"><div class="ct">'+esc(m.label)+(m.premium?' <span class="tag prem">premium</span>':"")+'</div><div class="cs">'+esc(m.company)+' · '+esc(m.id)+(m.routing?' · routes: <b>'+esc(m.routing)+'</b>':'')+'</div></div>'+
+      '<div class="ca"><select class="in sm" data-model="'+esc(m.id)+'"><option value="all"'+(m.audience==="all"?" selected":"")+'>all</option><option value="owner"'+(m.audience==="owner"?" selected":"")+'>owner</option><option value="off"'+(m.audience==="off"?" selected":"")+'>off</option></select></div></div>'}).join("");
+  })}
+
+  function loadOverview(){return api("/stats").then(function(d){
+    var ai=d.ai||{};
+    function card(n,l,gold){return '<div class="stat"><div class="n'+(gold?" gold":"")+'">'+n+'</div><div class="l">'+l+'</div></div>'}
+    $("#ovGrid").innerHTML=card(d.users,"users")+card(d.online,"online now")+card((d.messages||0).toLocaleString(),"chat messages")+card(d.flags||0,"flagged")+card(d.supportOpen||0,"open tickets")+card(d.bans||0,"active bans");
+    var sp=ai.spend||{};
+    var dol=function(micro){var v=(Number(micro)||0)/1e6;return v>0&&v<0.01?"<$0.01":"$"+v.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})};
+    $("#ovAi").innerHTML=
+      card(dol(sp.allCostMicro),"est. spend · all-time",1)+
+      card(dol(sp.weekCostMicro),"est. spend · 7 days",1)+
+      card((ai.tokensToday||0).toLocaleString(),"tokens today")+
+      card((sp.allTokens||0).toLocaleString(),"tokens all-time")+
+      card(ai.activeToday||0,"active users today")+
+      card((ai.globalDaily||ai.defaultDaily||0).toLocaleString(),"daily cap")+
+      card(ai.models||0,"models")+
+      card((ai.keys?ai.keys.groq:0)+" / "+(ai.keys?ai.keys.navy:0),"groq / navy keys");
+    var kp=ai.keyPool||{keys:[]};
+    $("#ovKeys").innerHTML=kp.keys.length?kp.keys.map(function(k){
+      var st=k.coolingDown?'<span class="tag" style="background:rgba(255,143,143,.18);color:#ff8f8f">cooldown '+k.cooldownSec+'s</span>':'<span class="tag ok">ready</span>';
+      var role=k.role.indexOf("reserved")===0?'<span class="tag prem">'+esc(k.role)+'</span>':'<span class="tag">'+esc(k.role)+'</span>';
+      return '<div class="c"><div class="cm"><div class="ct">key #'+(k.index<0?"dedicated":k.index)+' '+role+' '+st+'</div>'+
+        '<div class="cs">'+k.successes+' successful request'+(k.successes===1?'':'s')+' · '+k.failures+' failure'+(k.failures===1?'':'s')+' since boot</div></div></div>';
+    }).join(""):'<div class="empty">no navy keys configured</div>';
+  })}
+  function loadFlags(){return api("/flags?limit=120").then(function(d){
+    var el=$("#flagged"),fs=d.flags||[];
+    if(!fs.length){el.innerHTML='<div class="empty">no flagged messages</div>';return}
+    el.innerHTML=fs.map(function(f){return '<div class="c"><div class="cm"><div class="ct">'+(esc(f.username)||"anon")+' <span class="cid">#'+esc(f.room||"")+'</span> <span class="tag">'+esc(f.risk_category||"flagged")+' '+f.risk_score+'</span></div><div class="cb">'+esc(f.text)+'</div><div class="cs">'+(esc(f.reason)||"")+' · '+dt(f.created_at)+'</div></div><div class="ca"><button class="btn sm dang" data-flag="'+f.id+'">delete</button></div></div>'}).join("");
+  })}
+
+  function fmtAgo(ms){if(!ms)return"never";var s=Math.floor((Date.now()-ms)/1000);if(s<60)return s+"s ago";var m=Math.floor(s/60);if(m<60)return m+"m ago";return Math.floor(m/60)+"h ago"}
+  function loadContainers(){return fetch("/api/runner/admin/stats",{credentials:"same-origin",cache:"no-store"}).then(function(r){return r.json()}).then(function(d){
+    if(d.error){$("#cStats").innerHTML='<div class="empty">'+esc(d.error)+'</div>';return}
+    function stat(n,l){return '<div class="stat"><div class="n">'+n+'</div><div class="l">'+l+'</div></div>'}
+    var sg=d.storage?((d.storage.usedMb/1024).toFixed(1)+" / "+Math.round(d.storage.capMb/1024)+" GB"):"–";
+    $("#cStats").innerHTML=stat(d.counts.up+" / "+d.counts.containers,"containers up")+stat(d.counts.runningApps,"running apps")+stat(sg,"workspace storage")+stat(Math.round(d.idleMs/60000)+"m","idle reap");
+    $("#cMeta").textContent="updated "+new Date(d.ts).toLocaleTimeString();
+    $("#cContainers").innerHTML=d.containers.length?d.containers.map(function(c){return '<div class="c"><div class="cm"><div class="ct">'+esc(c.name)+' <span class="tag">'+(c.up?"up":"down")+'</span></div><div class="cs">'+(c.up?("cpu "+esc(c.cpu||"–")+" · mem "+esc(c.mem||"–")+" · pids "+esc(c.pids||"–")):esc(c.status||""))+'</div></div></div>'}).join(""):'<div class="empty">no containers</div>';
+    $("#cApps").innerHTML=d.apps.length?d.apps.map(function(a){return '<div class="c"><div class="cm"><div class="ct">'+(esc(a.username)||("user #"+a.userId))+' <span class="cid">#'+a.userId+'</span></div><div class="cs">'+esc(a.container)+' · port '+(a.port||"?")+' · active '+fmtAgo(a.lastActive)+'</div></div><div class="ca"><button class="btn sm dang" data-stopapp="'+a.userId+'">stop</button></div></div>'}).join(""):'<div class="empty">no running apps</div>';
+  })}
+  var rmId=null;
+  function openRunnerModal(id,name,s,explicit){
+    rmId=id;
+    $("#rmUser").textContent=name;
+    $("#rmCpus").value=(s.cpus!=null?s.cpus:2);
+    $("#rmMem").value=(s.memoryMb!=null?s.memoryMb:4096);
+    $("#rmDisk").value=(s.diskMb!=null?s.diskMb:1024);
+    $("#rmDed").checked=!!s.dedicated;
+    $("#rmEn").checked=(s.enabled!==0&&s.enabled!==false);
+    $("#rmHint").textContent=explicit?"Custom override for this user.":"On the default shared tier (no override yet).";
+    $("#rmBg").hidden=false;
+  }
+  function closeRunnerModal(){$("#rmBg").hidden=true;rmId=null}
+  function saveRunner(body,okMsg){
+    if(rmId==null)return;
+    fetch("/api/runner/admin/spec/"+rmId,{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}).then(function(r){return r.json().then(function(d){if(!r.ok)throw new Error(d.error||("HTTP "+r.status));return d})}).then(function(d){toast(okMsg(d.spec));closeRunnerModal()}).catch(function(e){toast(e.message,1)});
+  }
+  function loadDatacenter(){return fetch("/api/boxes/admin/datacenter",{credentials:"same-origin",cache:"no-store"}).then(function(r){return r.json()}).then(function(d){
+    if(d.error){$("#dcStats").innerHTML='<div class="empty">'+esc(d.error)+'</div>';return}
+    function stat(n,l){return '<div class="stat"><div class="n">'+n+'</div><div class="l">'+l+'</div></div>'}
+    function gb(mb){return (mb/1024).toFixed(1)}
+    var sys=d.system||{},mem=sys.mem||{};
+    $("#dcStats").innerHTML=stat(d.used.cpus+' / '+d.pool.cpus,'cores allocated')+stat(gb(d.used.memoryMb)+' / '+gb(d.pool.memoryMb)+' GB','RAM allocated')+stat(gb(d.used.diskMb)+' / '+gb(d.pool.diskMb)+' GB','disk allocated')+stat((sys.cpuTemp!=null?sys.cpuTemp+'°C':'—'),'cpu temp')+stat((mem.usedMb?gb(mem.usedMb)+'/'+gb(mem.totalMb)+'G':'—'),'host mem')+stat((sys.load&&sys.load[0]!=null?sys.load[0]:'—'),'load');
+    $("#dcBoxes").innerHTML=(d.boxes&&d.boxes.length)?d.boxes.map(function(b){return '<div class="c" data-bid="'+b.id+'"><div class="cm"><div class="ct">'+esc(b.name)+' <span class="cid">#'+b.id+'</span> <span class="tag">'+(b.up?'up':'down')+'</span></div><div class="cs">'+(esc(b.username)||('#'+b.userId))+' · '+b.cpus+'c / '+gb(b.memoryMb)+'GB / '+gb(b.diskMb)+'GB'+((b.up&&b.cpu)?(' · cpu '+esc(b.cpu)+' · mem '+esc(b.mem||'')):'')+'</div></div><div class="ca"><button class="btn sm" data-box="term">terminal</button><button class="btn sm" data-box="reset">reset</button><button class="btn sm dang" data-box="delete">delete</button></div></div>'}).join(''):'<div class="empty">no boxes yet</div>';
+  })}
+  var statTimer;
+  // Analytics runs its own refresh loop (the owner picks the interval), so it is
+  // deliberately absent from POLL below - the tab loader only mounts it once.
+  var analyticsView=null;
+  function loadAnalytics(){
+    if(!window.NocturneAnalytics) return Promise.reject(new Error("analytics script failed to load"));
+    if(!analyticsView) analyticsView=window.NocturneAnalytics.mount($("#analytics"),{api:api,toast:toast});
+    return analyticsView.refresh();
+  }
+
+  function loadStratus(){
+    stratusRefreshAll();
+    stratusLoadConfig();
+    stratusLoadProxies();
+    _stratusStartPoll();
+    _stratusTermLog('Cloud Gaming admin ready', 'dim');
+    return Promise.resolve();
+  }
+  var LOADERS={overview:loadOverview,analytics:loadAnalytics,users:loadUsers,bans:loadBans,userlogs:loadUserLogs,quotas:loadQuotas,flagged:loadFlags,support:loadSupport,applications:loadApplications,models:loadModels,containers:loadContainers,datacenter:loadDatacenter,stratus:loadStratus};
+
+  var POLL={overview:5000,flagged:5000,support:6000,bans:8000,quotas:8000,applications:8000,containers:3000,datacenter:4000};
+  function startPoll(tab){
+    clearInterval(statTimer);
+    var ms=POLL[tab], fn=LOADERS[tab];
+    if(!ms||!fn)return;
+    statTimer=setInterval(function(){ fn().catch(function(){}); },ms);
+  }
+  function wire(){
+    document.querySelectorAll(".tab").forEach(function(t){t.addEventListener("click",function(){
+      document.querySelectorAll(".tab").forEach(function(x){x.classList.remove("on")});
+      document.querySelectorAll(".panel").forEach(function(x){x.classList.remove("on")});
+      if (t.dataset.t !== 'stratus') _stratusStopPoll();
+      t.classList.add("on"); $('.panel[data-p="'+t.dataset.t+'"]').classList.add("on");
+      clearInterval(statTimer);
+      (LOADERS[t.dataset.t]||function(){return Promise.resolve()})().catch(function(e){toast(e.message,1)});
+      startPoll(t.dataset.t);
+    })});
+    $("#uRefresh").addEventListener("click",function(){loadUsers().catch(function(e){toast(e.message,1)})});
+    $("#rKillAll").addEventListener("click",function(){if(!confirm("Stop ALL running backend apps for every user?"))return;fetch("/api/runner/admin/killall",{method:"POST",credentials:"same-origin"}).then(function(r){return r.json()}).then(function(d){toast("stopped "+(d.stopped||0)+" app(s)")}).catch(function(e){toast(e.message,1)})});
+    $("#cRefresh").addEventListener("click",function(){loadContainers().catch(function(e){toast(e.message,1)})});
+    $("#cKillAll").addEventListener("click",function(){if(!confirm("Stop ALL running backend apps?"))return;fetch("/api/runner/admin/killall",{method:"POST",credentials:"same-origin"}).then(function(r){return r.json()}).then(function(d){toast("stopped "+(d.stopped||0)+" app(s)");loadContainers()}).catch(function(e){toast(e.message,1)})});
+    $("#cApps").addEventListener("click",function(e){var b=e.target.closest("[data-stopapp]");if(!b)return;fetch("/api/runner/admin/stop/"+b.dataset.stopapp,{method:"POST",credentials:"same-origin"}).then(function(r){return r.json()}).then(function(){toast("stopped");loadContainers()}).catch(function(er){toast(er.message,1)})});
+    $("#rmCancel").addEventListener("click",closeRunnerModal);
+    $("#rmBg").addEventListener("click",function(e){if(e.target===$("#rmBg"))closeRunnerModal()});
+    document.addEventListener("keydown",function(e){
+      if(e.key==="Escape"){
+        if(!$("#rmBg").hidden) closeRunnerModal();
+        var am=document.getElementById("stratusAddModal");
+        if(am&&!am.hidden) stratusCloseAddModal();
+        var aam=document.getElementById("stratusAllAccountsModal");
+        if(aam&&!aam.hidden) stratusCloseAllAccounts();
+      }
+    });
+    var am=document.getElementById("stratusAddModal");
+    if(am) am.addEventListener("click",function(e){ if(e.target===am) stratusCloseAddModal(); });
+    var aam=document.getElementById("stratusAllAccountsModal");
+    if(aam) aam.addEventListener("click",function(e){ if(e.target===aam) stratusCloseAllAccounts(); });
+    var addCountInput=document.getElementById("stratusAddCount");
+    if(addCountInput) addCountInput.addEventListener("keydown",function(e){ if(e.key==="Enter") stratusConfirmAdd(); });
+    $("#rmSave").addEventListener("click",function(){saveRunner({cpus:parseFloat($("#rmCpus").value),memoryMb:parseInt($("#rmMem").value,10),diskMb:parseInt($("#rmDisk").value,10),dedicated:$("#rmDed").checked,enabled:$("#rmEn").checked},function(sp){return "saved · "+sp.cpus+"c / "+sp.memoryMb+"MB"+(sp.dedicated?" · dedicated":"")+(sp.enabled?"":" · DISABLED")})});
+    $("#rmReset").addEventListener("click",function(){saveRunner({reset:true},function(){return "reset to default tier"})});
+    $("#dcCreate").addEventListener("click",function(){var body={username:$("#dcUser").value.trim(),name:$("#dcName").value.trim()||"box",cpus:parseFloat($("#dcCpus").value)||1,memoryMb:parseInt($("#dcMem").value,10)||1024,diskMb:parseInt($("#dcDisk").value,10)||5120};if(!body.username)return toast("enter a username",1);fetch("/api/boxes/admin/create",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}).then(function(r){return r.json().then(function(d){if(!r.ok)throw new Error(d.error||("HTTP "+r.status));return d})}).then(function(d){toast("provisioned box #"+d.box.id+" to "+(d.box.username||body.username));$("#dcUser").value="";loadDatacenter()}).catch(function(e){toast(e.message,1)})});
+    $("#dcBoxes").addEventListener("click",function(e){var b=e.target.closest("[data-box]");if(!b)return;var id=b.closest("[data-bid]").dataset.bid;var act=b.dataset.box;if(act==="term"){window.open("/box-term.html?id="+id,"_blank");return}if(act==="reset"){if(!confirm("Reset box #"+id+"? Wipes everything inside it."))return;fetch("/api/boxes/admin/reset/"+id,{method:"POST",credentials:"same-origin"}).then(function(){toast("reset #"+id);loadDatacenter()}).catch(function(er){toast(er.message,1)});return}if(act==="delete"){if(!confirm("Delete box #"+id+" permanently?"))return;fetch("/api/boxes/admin/delete/"+id,{method:"POST",credentials:"same-origin"}).then(function(){toast("deleted #"+id);loadDatacenter()}).catch(function(er){toast(er.message,1)})}});
+    var st; $("#uSearch").addEventListener("input",function(){clearTimeout(st);st=setTimeout(function(){loadUsers().catch(function(){})},250)});
+    $("#users").addEventListener("click",function(e){var b=e.target.closest("[data-a]");if(!b)return;var c=b.closest(".c");var p=userAction(b.dataset.a,Number(c.dataset.id),c.dataset.name);if(p&&p.catch)p.catch(function(er){toast(er.message,1)})});
+    $("#bans").addEventListener("click",function(e){var b=e.target.closest("[data-unban]");if(!b)return;api("/unban","POST",{id:Number(b.dataset.unban)}).then(function(){toast("unbanned");loadBans()}).catch(function(er){toast(er.message,1)})});
+    $("#bAdd").addEventListener("click",function(){var k=$("#bKind").value,t=$("#bTarget").value.trim();if(!t)return toast("enter a target",1);api("/ban","POST",{kind:k,target:t,reason:$("#bReason").value.trim(),days:parseFloat($("#bDays").value)||0}).then(function(){toast("banned "+t);$("#bTarget").value="";$("#bReason").value="";loadBans()}).catch(function(er){toast(er.message,1)})});
+    $("#ulGo").addEventListener("click",function(){loadUserLogs().catch(function(er){toast(er.message,1)})});
+    $("#ulSearch").addEventListener("keydown",function(e){if(e.key==="Enter")loadUserLogs().catch(function(er){toast(er.message,1)})});
+    $("#userLogs").addEventListener("click",function(e){
+      var ipBtn=e.target.closest("[data-banip]");
+      if(ipBtn){var ip=ipBtn.dataset.banip;if(confirm("Ban IP "+ip+"?")){api("/ban","POST",{kind:"ip",target:ip,reason:"Banned via user logs"}).then(function(){toast("IP banned: "+ip);loadUserLogs()}).catch(function(er){toast(er.message,1)})}return}
+      var fpBtn=e.target.closest("[data-banfp]");
+      if(fpBtn){var fp=fpBtn.dataset.banfp;if(confirm("Ban device "+fp.slice(0,12)+"...?")){api("/ban","POST",{kind:"device",target:fp,reason:"Banned via user logs"}).then(function(){toast("Device banned");loadUserLogs()}).catch(function(er){toast(er.message,1)})}return}
+      var ipLink=e.target.closest(".ul-ip");
+      if(ipLink){e.preventDefault();$("#ulSearch").value=ipLink.dataset.ip;loadUserLogs().catch(function(){});return}
+      var fpLink=e.target.closest(".ul-fp");
+      if(fpLink){e.preventDefault();$("#ulSearch").value=fpLink.dataset.fp;loadUserLogs().catch(function(){});return}
+    });
+    $("#support").addEventListener("click",function(e){var b=e.target.closest("[data-sup]");if(!b)return;api("/support/"+b.dataset.sup,"POST",{action:b.dataset.sa}).then(function(){loadSupport()}).catch(function(er){toast(er.message,1)})});
+    $("#applications").addEventListener("click",function(e){var b=e.target.closest("[data-app]");if(!b)return;if(b.dataset.aa==="delete"&&!confirm("Delete this application?"))return;api("/applications/"+b.dataset.app,"POST",{action:b.dataset.aa}).then(function(){loadApplications()}).catch(function(er){toast(er.message,1)})});
+    $("#models").addEventListener("change",function(e){var s=e.target.closest("[data-model]");if(!s)return;api("/models","POST",{id:s.dataset.model,audience:s.value}).then(function(){toast("updated")}).catch(function(er){toast(er.message,1)})});
+    $("#qScope").addEventListener("change",function(){$("#qUser").style.display=$("#qScope").value==="user"?"":"none"});
+    $("#qApply").addEventListener("click",function(){var sc=$("#qScope").value,body={scope:sc,dailyTokens:$("#qTok").value,days:parseFloat($("#qDays").value)||0};if(sc==="user"){var u=$("#qUser").value.trim();if(!u)return toast("enter a username",1);body.username=u}api("/quota","POST",body).then(function(){toast("quota updated");$("#qTok").value="";$("#qDays").value="";loadQuotas()}).catch(function(er){toast(er.message,1)})});
+    $("#quotas").addEventListener("click",function(e){var b=e.target.closest("[data-qc]");if(!b)return;var body={scope:b.dataset.qc,dailyTokens:null};if(b.dataset.qc==="user")body.userId=Number(b.dataset.uid);api("/quota","POST",body).then(function(){toast("removed");loadQuotas()}).catch(function(er){toast(er.message,1)})});
+    $("#ovRefresh").addEventListener("click",function(){loadOverview().catch(function(e){toast(e.message,1)})});
+    $("#flagged").addEventListener("click",function(e){var b=e.target.closest("[data-flag]");if(!b)return;api("/flags/"+b.dataset.flag,"POST",{action:"delete"}).then(function(){toast("deleted");loadFlags()}).catch(function(er){toast(er.message,1)})});
+  }
+
+  function setAdsBtn(off){
+    var b=$("#adsToggle"), s=$("#adsState"); if(!b)return;
+    b.dataset.off=off?1:0;
+    b.textContent=off?"Turn ads ON":"Turn ads OFF";
+    b.className="btn"+(off?"":" dang");
+    if(s){s.textContent=off?"Ads are OFF site-wide.":"Ads are ON.";s.style.color=off?"var(--gold)":"var(--fg3)"}
+  }
+  // ── Stratus admin ─────────────────────────────────────────────────────────────
+  var _stratusActive = false;
+  var _stratusPollTimer = null;
+  var _stratusCreating = false;
+
+  function _sreltime(ms) {
+    if (!ms) return '';
+    var ago = Math.round((Date.now() - ms) / 1000);
+    if (ago < 5) return 'just now';
+    if (ago < 60) return ago + 's ago';
+    if (ago < 3600) return Math.floor(ago/60) + 'm ago';
+    return Math.floor(ago/3600) + 'h ago';
+  }
+
+  function _stratusTermLog(msg, cls) {
+    var body = document.getElementById('stratusTermBody');
+    if (!body) return;
+    var line = document.createElement('div');
+    line.className = 'sterm-line';
+    var d = new Date();
+    var ts = ('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2)+':'+('0'+d.getSeconds()).slice(-2);
+    var color = cls==='error' ? '#f87171' : cls==='warn' ? '#fbbf24' : cls==='dim' ? '#4a7a4a' : '#9acd9a';
+    line.innerHTML = '<span style="color:#2e3038;user-select:none;flex-shrink:0;font-size:10.5px">'+esc(ts)+'</span>'
+      + '<span style="color:'+color+';word-break:break-all;line-height:1.45">'+esc(msg)+'</span>';
+    body.appendChild(line);
+    body.scrollTop = body.scrollHeight;
+    // keep at most 300 lines
+    while (body.children.length > 300) body.removeChild(body.firstChild);
+  }
+
+  function _stratusSetTermStatus(txt, color) {
+    var el = document.getElementById('stratusTermStatus');
+    if (el) { el.textContent = txt; el.style.color = color || '#3a5a3a'; }
+  }
+
+  function stratusTermClear() {
+    var body = document.getElementById('stratusTermBody');
+    if (body) body.innerHTML = '';
+  }
+
+  function _stratusFlashStat(id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.classList.remove('sstat-flash');
+    void el.offsetWidth;
+    el.classList.add('sstat-flash');
+    setTimeout(function(){ el.classList.remove('sstat-flash'); }, 700);
+  }
+
+  var _stratusAllAccounts = [];
+
+  function _makeAccountCard(a) {
+    var card = document.createElement('div');
+    card.className = 'spool-card';
+    var src = a.source === 'manual' ? '↑ manual' : a.source === 'fill' ? '↑ fill' : '↑ auto';
+    var srcColor = a.source === 'manual' ? 'var(--accent)' : '#5a8a5a';
+    card.innerHTML = '<div class="sp-dot"></div>'
+      + '<div class="sp-sn">'+esc(a.sn_prefix || '?')+'…</div>'
+      + '<div class="sp-meta"><span style="color:'+srcColor+';font-size:10px">'+esc(src)+'</span><br>'
+      + (a.added_at ? '<span>'+_sreltime(a.added_at)+'</span>' : '') + '</div>';
+    return card;
+  }
+
+  function _stratusRenderAccounts(accounts) {
+    _stratusAllAccounts = accounts || [];
+    var list = document.getElementById('stratusAccountList');
+    var seeMore = document.getElementById('stratusAccountSeeMore');
+    var moreCount = document.getElementById('stratusAccountMoreCount');
+    if (!list) return;
+    if (!_stratusAllAccounts.length) {
+      list.innerHTML = '<div class="spool-empty">No accounts in pool</div>';
+      if (seeMore) seeMore.style.display = 'none';
+      return;
+    }
+    list.innerHTML = '';
+    var shown = Math.min(5, _stratusAllAccounts.length);
+    for (var i = 0; i < shown; i++) list.appendChild(_makeAccountCard(_stratusAllAccounts[i]));
+    var extra = _stratusAllAccounts.length - shown;
+    if (seeMore) seeMore.style.display = extra > 0 ? '' : 'none';
+    if (moreCount) moreCount.textContent = extra;
+  }
+
+  function stratusOpenAllAccounts() {
+    var modal = document.getElementById('stratusAllAccountsModal');
+    var inner = document.getElementById('stratusAllAccountsList');
+    var countEl = document.getElementById('stratusAllAccountsCount');
+    if (!modal || !inner) return;
+    inner.innerHTML = '';
+    if (countEl) countEl.textContent = _stratusAllAccounts.length;
+    _stratusAllAccounts.forEach(function(a) { inner.appendChild(_makeAccountCard(a)); });
+    modal.hidden = false;
+  }
+
+  function stratusCloseAllAccounts() {
+    var modal = document.getElementById('stratusAllAccountsModal');
+    if (modal) modal.hidden = true;
+  }
+
+  function stratusRefreshPool() {
+    fetch('/api/stratus/admin/pool', { credentials: 'same-origin' })
+      .then(function(r){ return r.json(); })
+      .then(function(d){
+        var oldCount = document.getElementById('stratusPoolCount').textContent;
+        var newCount = d.pool_size != null ? String(d.pool_size) : '—';
+        document.getElementById('stratusPoolCount').textContent = newCount;
+        document.getElementById('stratusPoolTarget').textContent = d.pool_target != null ? d.pool_target : '—';
+        document.getElementById('stratusActiveSessions').textContent = d.active_sessions != null ? d.active_sessions : '—';
+        if (oldCount !== newCount) _stratusFlashStat('stratusPoolCount');
+        var msg = document.getElementById('stratusPoolMsg');
+        if (msg) msg.textContent = d.pool_filling ? 'Auto-filling…' : '';
+      })
+      .catch(function(){});
+  }
+
+  function stratusRefreshAccounts() {
+    fetch('/api/stratus/admin/pool/accounts', { credentials: 'same-origin' })
+      .then(function(r){ return r.json(); })
+      .then(function(accounts){ _stratusRenderAccounts(accounts); })
+      .catch(function(){});
+  }
+
+  function stratusRefreshAll() {
+    stratusRefreshPool();
+    stratusRefreshAccounts();
+  }
+
+  function _stratusSetBusy(busy) {
+    _stratusCreating = busy;
+    var addBtn = document.getElementById('stratusAddBtn');
+    var fillBtn = document.getElementById('stratusFillBtn');
+    var clearBtn = document.getElementById('stratusClearBtn');
+    if (addBtn) {
+      addBtn.disabled = busy;
+      if (busy) { addBtn.classList.add('sbtn-spin'); addBtn.textContent = 'Creating…'; }
+      else { addBtn.classList.remove('sbtn-spin'); addBtn.textContent = '+ Add account'; }
+    }
+    if (fillBtn) {
+      fillBtn.disabled = busy;
+      if (busy) { fillBtn.classList.add('sbtn-spin'); fillBtn.textContent = 'Working…'; }
+      else { fillBtn.classList.remove('sbtn-spin'); fillBtn.textContent = 'Fill to target'; }
+    }
+    if (clearBtn) clearBtn.disabled = busy;
+    _stratusSetTermStatus(busy ? '● creating' : '', busy ? '#4a9a4a' : '');
+    if (!busy) _stratusHideBanner();
+  }
+
+  function _stratusShowBanner(text, total) {
+    var banner = document.getElementById('stratusBanner');
+    var txtEl  = document.getElementById('stratusBannerText');
+    var cntEl  = document.getElementById('stratusBannerCount');
+    if (banner) banner.hidden = false;
+    if (txtEl) { txtEl.textContent = text || 'Working…'; txtEl.style.color = ''; }
+    if (cntEl) cntEl.textContent = (total && total > 1) ? '0 / ' + total : '';
+  }
+  function _stratusHideBanner() {
+    var banner = document.getElementById('stratusBanner');
+    if (banner) banner.hidden = true;
+  }
+  function _stratusUpdateBanner(text, isError) {
+    var txtEl = document.getElementById('stratusBannerText');
+    if (txtEl) { txtEl.textContent = text; txtEl.style.color = isError ? 'var(--danger)' : ''; }
+  }
+  function _stratusUpdateBannerCount(current, total) {
+    var cntEl = document.getElementById('stratusBannerCount');
+    if (cntEl && total && total > 1) cntEl.textContent = current + ' / ' + total;
+  }
+
+  // "Add account" button opens a modal asking for quantity
+  var _stratusProxyCount = 0;
+  function stratusAddAccount() {
+    if (_stratusCreating) return;
+    var poolCount  = document.getElementById('stratusPoolCount');
+    var poolTarget = document.getElementById('stratusPoolTarget');
+    var info = document.getElementById('stratusAddModalInfo');
+    var proxyInfo = _stratusProxyCount > 0 ? ' · ' + _stratusProxyCount + ' proxies available' : '';
+    if (info) info.textContent = 'Pool: ' + (poolCount ? poolCount.textContent : '?') + ' / ' + (poolTarget ? poolTarget.textContent : '?') + proxyInfo;
+    var countInput = document.getElementById('stratusAddCount');
+    // Default to one account per available proxy (max 50) so user can just hit Enter
+    if (countInput) countInput.value = _stratusProxyCount > 0 ? Math.min(_stratusProxyCount, 50) : 1;
+    var modal = document.getElementById('stratusAddModal');
+    if (modal) modal.hidden = false;
+    setTimeout(function(){ var c = document.getElementById('stratusAddCount'); if(c){ c.focus(); c.select(); } }, 50);
+  }
+  function stratusCloseAddModal() {
+    var modal = document.getElementById('stratusAddModal');
+    if (modal) modal.hidden = true;
+  }
+  function stratusConfirmAdd() {
+    var countInput = document.getElementById('stratusAddCount');
+    var count = parseInt(countInput ? countInput.value : 1, 10);
+    if (isNaN(count) || count < 1) count = 1;
+    if (count > 50) count = 50;
+    stratusCloseAddModal();
+    var label = 'Creating ' + count + ' account' + (count > 1 ? 's' : '') + '…';
+    _stratusRunStream('/api/stratus/admin/pool/add', label, { count: count }, count);
+  }
+
+  function stratusLoadConfig() {
+    var cfgMsg = document.getElementById('stratusCfgMsg');
+    fetch('/api/stratus/admin/config', { credentials: 'same-origin' })
+      .then(function(r){ return r.json(); })
+      .then(function(d){
+        var v = function(id, val){ var el=document.getElementById(id); if(el) el.value=val; };
+        var c = function(id, val){ var el=document.getElementById(id); if(el) el.checked=val; };
+        v('sCfgPoolTarget', d.pool_target != null ? d.pool_target : '');
+        v('sCfgSessionMins', d.max_session_seconds != null ? Math.round(d.max_session_seconds/60) : '');
+        v('sCfgVerifyTimeout', d.email_verify_timeout_ms != null ? Math.round(d.email_verify_timeout_ms/1000) : '');
+        c('sCfgGuerrilla', d.use_guerrillamail !== false);
+        c('sCfg1secmail', !!d.use_1secmail);
+        var prov = Array.isArray(d.mail_providers) ? d.mail_providers : [];
+        c('sCfgMailTm', prov.indexOf('https://api.mail.tm') >= 0);
+        c('sCfgMailGw', prov.indexOf('https://api.mail.gw') >= 0);
+        if (cfgMsg) cfgMsg.textContent = '';
+      })
+      .catch(function(e){ if (cfgMsg) cfgMsg.textContent = 'Load error'; });
+  }
+
+  function stratusSaveConfig() {
+    var g = function(id){ var el=document.getElementById(id); return el?el.value:null; };
+    var gc = function(id){ var el=document.getElementById(id); return el?el.checked:false; };
+    var cfgMsg = document.getElementById('stratusCfgMsg');
+    var saveBtn = document.getElementById('stratusSaveBtn');
+    var providers = [];
+    if (gc('sCfgMailTm')) providers.push('https://api.mail.tm');
+    if (gc('sCfgMailGw')) providers.push('https://api.mail.gw');
+    var body = { use_guerrillamail: gc('sCfgGuerrilla'), use_1secmail: gc('sCfg1secmail'), mail_providers: providers };
+    if (g('sCfgPoolTarget')) body.pool_target = parseInt(g('sCfgPoolTarget'),10);
+    if (g('sCfgSessionMins')) body.max_session_seconds = parseInt(g('sCfgSessionMins'),10)*60;
+    if (g('sCfgVerifyTimeout')) body.email_verify_timeout_ms = parseInt(g('sCfgVerifyTimeout'),10)*1000;
+    if (cfgMsg) cfgMsg.textContent = 'Saving…';
+    if (saveBtn) saveBtn.disabled = true;
+    fetch('/api/stratus/admin/config', { method:'POST', credentials:'same-origin',
+      headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) })
+      .then(function(r){ return r.json(); })
+      .then(function(d){
+        if (saveBtn) saveBtn.disabled = false;
+        if (d.ok) {
+          if (cfgMsg) { cfgMsg.textContent='✓ Saved'; cfgMsg.style.color='var(--ok)'; setTimeout(function(){ cfgMsg.textContent=''; cfgMsg.style.color=''; },2000); }
+          _stratusTermLog('Settings updated — pool:'+d.config.pool_target+' session:'+Math.round(d.config.max_session_seconds/60)+'m verify:'+Math.round(d.config.email_verify_timeout_ms/1000)+'s', 'dim');
+          stratusRefreshPool();
+        } else {
+          if (cfgMsg) cfgMsg.textContent = 'Error: '+(d.error||'?');
+        }
+      })
+      .catch(function(e){ if(saveBtn) saveBtn.disabled=false; if(cfgMsg) cfgMsg.textContent='Error: '+e.message; });
+  }
+
+  function stratusClearPool() {
+    if (!confirm('Discard all pre-created accounts in the pool?')) return;
+    fetch('/api/stratus/admin/pool/clear', { method:'POST', credentials:'same-origin' })
+      .then(function(r){ return r.json(); })
+      .then(function(d){
+        _stratusTermLog('Pool cleared — removed '+(d.cleared||0)+' account(s)', 'warn');
+        stratusRefreshAll();
+      })
+      .catch(function(e){ _stratusTermLog('Clear error: '+e.message, 'error'); });
+  }
+
+  // body = optional JSON body to POST; total = optional total count for banner
+  function _stratusRunStream(endpoint, startLabel, body, total) {
+    if (_stratusCreating) return;
+    _stratusSetBusy(true);
+    _stratusTermLog(startLabel, 'dim');
+    _stratusShowBanner(startLabel, total);
+    // Scroll terminal into view
+    var term = document.getElementById('stratusTermBody');
+    if (term) term.closest('.panel') && term.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+    var fetchOpts = { method: 'POST', credentials: 'same-origin' };
+    if (body) { fetchOpts.headers = { 'Content-Type': 'application/json' }; fetchOpts.body = JSON.stringify(body); }
+
+    fetch(endpoint, fetchOpts)
+      .then(function(r) {
+        if (!r.ok) return r.text().then(function(t){ throw new Error('HTTP ' + r.status + ': ' + t.slice(0, 200)); });
+        _stratusTermLog('Connected — streaming live output…', 'dim');
+        var reader = r.body.getReader(), dec = new TextDecoder(), buf = '';
+        function pump() {
+          return reader.read().then(function(chunk) {
+            if (chunk.done) { _stratusSetBusy(false); stratusRefreshAll(); return; }
+            buf += dec.decode(chunk.value, { stream: true });
+            var lines = buf.split('\n'); buf = lines.pop();
+            lines.forEach(function(line) {
+              if (!line.trim()) return;
+              try {
+                var evt = JSON.parse(line);
+                if (evt.type === 'log') {
+                  _stratusTermLog(evt.msg);
+                  _stratusUpdateBanner(evt.msg);
+                } else if (evt.type === 'error') {
+                  _stratusTermLog('✗ ' + evt.msg, 'error');
+                  _stratusUpdateBanner(evt.msg, true);
+                } else if (evt.type === 'progress') {
+                  _stratusUpdateBannerCount(evt.current, evt.total);
+                } else if (evt.type === 'done') {
+                  var targetTxt = document.getElementById('stratusPoolTarget');
+                  _stratusTermLog('✓ Done — pool now ' + evt.pool_size + ' / ' + (targetTxt ? targetTxt.textContent : '?'), 'dim');
+                  stratusRefreshAll();
+                }
+              } catch(e2) {}
+            });
+            return pump();
+          });
+        }
+        return pump();
+      })
+      .catch(function(e) {
+        _stratusTermLog('✗ ' + (e.message || 'stream error'), 'error');
+        _stratusSetBusy(false);
+      });
+  }
+
+  function stratusFillPool() { _stratusRunStream('/api/stratus/admin/pool/fill', 'Filling pool to target…'); }
+
+  function stratusLoadProxies() {
+    fetch('/api/stratus/admin/proxy', { credentials: 'same-origin' })
+      .then(function(r){ return r.json(); })
+      .then(function(d){
+        var list = document.getElementById('stratusProxyList');
+        var countEl = document.getElementById('stratusProxyCount');
+        if (!list) return;
+        var working = Array.isArray(d.working) ? d.working : [];
+        _stratusProxyCount = working.length;
+        if (countEl) countEl.textContent = working.length ? '(' + working.length + ' working)' : d.refreshing ? '(refreshing…)' : '(none)';
+        if (!working.length) {
+          list.innerHTML = '<span class="sproxy-none">' + (d.refreshing ? 'Testing proxies…' : 'No working proxies — click Refresh') + '</span>';
+          return;
+        }
+        list.innerHTML = working.map(function(p) {
+          return '<div class="sproxy-chip"><div class="pc-dot"></div>' + esc(p.host + ':' + p.port) + '</div>';
+        }).join('');
+      })
+      .catch(function(){ });
+  }
+
+  function stratusRefreshProxies() {
+    var btn = document.getElementById('stratusProxyRefreshBtn');
+    var msg = document.getElementById('stratusProxyMsg');
+    if (btn) { btn.disabled = true; btn.textContent = 'Refreshing…'; }
+    if (msg) msg.textContent = 'Fetching & testing proxy list…';
+    fetch('/api/stratus/admin/proxy/refresh', { method: 'POST', credentials: 'same-origin' })
+      .then(function(r){ return r.json(); })
+      .then(function(){
+        if (msg) msg.textContent = 'Testing in background — check back in ~30s';
+        setTimeout(function(){
+          stratusLoadProxies();
+          if (btn) { btn.disabled = false; btn.textContent = '↺ Refresh proxies'; }
+          if (msg) msg.textContent = '';
+        }, 30000);
+        // Poll every 5s for 60s to catch when it finishes
+        var polls = 0;
+        var pollTimer = setInterval(function(){
+          polls++;
+          stratusLoadProxies();
+          if (polls >= 12) clearInterval(pollTimer);
+        }, 5000);
+      })
+      .catch(function(e){
+        if (msg) msg.textContent = 'Error: ' + e.message;
+        if (btn) { btn.disabled = false; btn.textContent = '↺ Refresh proxies'; }
+      });
+  }
+
+  // Auto-poll while on the tab
+  function _stratusStartPoll() {
+    _stratusActive = true;
+    clearInterval(_stratusPollTimer);
+    var _pollTick = 0;
+    _stratusPollTimer = setInterval(function(){
+      if (!_stratusActive) return;
+      stratusRefreshPool();
+      stratusRefreshAccounts();
+      _pollTick++;
+      if (_pollTick % 5 === 0) stratusLoadProxies(); // proxy check every 20s
+    }, 4000);
+  }
+  function _stratusStopPoll() {
+    _stratusActive = false;
+    clearInterval(_stratusPollTimer);
+    _stratusPollTimer = null;
+  }
+  // ── End stratus admin ─────────────────────────────────────────────────────────
+
+  function enter(owner){
+    gate.style.display="none"; app.style.display="block";
+    $("#owner").textContent="god · "+owner;
+    wire();
+    api("/summary").then(function(s){$("#stats").innerHTML="<span>"+s.users+" users</span><span>"+s.bans+" bans</span><span>"+s.supportUnresolved+" open tickets</span>";setAdsBtn(!!s.adsOff)}).catch(function(){});
+    $("#adsToggle").addEventListener("click",function(){
+      var b=this,off=b.dataset.off==="1",next=!off;
+      if(!confirm(next?"Turn OFF all ads for every visitor site-wide?":"Turn ads back ON site-wide?"))return;
+      b.disabled=true;
+      api("/ads","POST",{off:next}).then(function(r){setAdsBtn(!!r.adsOff);toast(r.adsOff?"Ads turned OFF site-wide":"Ads turned back ON")}).catch(function(e){toast(e.message,1)}).then(function(){b.disabled=false});
+    });
+    loadOverview().catch(function(e){toast(e.message,1)});
+    startPoll("overview");
+  }
+  function deny(msg){
+    gate.innerHTML='<div><h2>Not signed in as owner</h2><p>'+esc(msg||"Sign in as the owner account to use the admin panel.")+'</p><a href="/account">→ sign in</a></div>';
+  }
+
+  var boot = (window.__ADMIN_BOOT)||null;
+  if(boot && boot.owner){ enter(boot.owner); }
+  else {
+    fetch("/api/auth/me",{credentials:"same-origin",cache:"no-store"}).then(function(r){return r.json()}).then(function(me){
+      if(me && me.authenticated && me.user && String(me.user.username||"").toLowerCase()==="midnightsweat") enter(me.user.username);
+      else deny(me&&me.authenticated?("Signed in as "+(me.user&&me.user.username)+", which is not the owner."):"You are not signed in.");
+    }).catch(function(){ deny("Couldn't verify your session."); });
+  }
+})();
+</script>
+<script src="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.0/src/js/admin-analytics.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.0/src/js/pu3927.js?v=20260929-2" defer></script>
+</body>
+</html>

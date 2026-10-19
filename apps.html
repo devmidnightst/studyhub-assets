@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-69T9E59SM7"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-69T9E59SM7');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="dark">
+    <meta name="theme-color" content="#060509">
+    <title>Nocturne - Apps</title>
+    <style>html,body{background:#060509;color:#ededf0;margin:0}</style>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='9' fill='%230b0a14'/><circle cx='16' cy='16' r='9' fill='%23c9c1ff'/><circle cx='21' cy='14' r='8' fill='%230b0a14'/></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.0/src/css/global.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.0/src/css/dock.css">
+    <style>
+        body { overflow-y: auto; }
+
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 28px 32px 0;
+            max-width: 1100px;
+            margin: 0 auto;
+            opacity: 0;
+            animation: slideDown 0.5s var(--ease) 0.05s forwards;
+        }
+        .brand-title {
+            font-size: 15px;
+            font-weight: 500;
+            letter-spacing: -0.01em;
+            color: var(--fg);
+        }
+        .brand-sub {
+            font-size: 12px;
+            color: var(--fg-3);
+            margin-left: 10px;
+        }
+        .back {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--fg-3);
+            font-size: 12px;
+            text-decoration: none;
+            transition: color 0.15s var(--ease), transform 0.15s var(--ease);
+        }
+        .back:hover { color: var(--fg); transform: translateX(-2px); }
+
+        .wrap {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 36px 32px 120px;
+        }
+
+        .section-title {
+            font-size: 11px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--fg-3);
+            margin: 28px 0 12px;
+            font-weight: 500;
+            opacity: 0;
+            animation: slideUp 0.5s var(--ease) forwards;
+        }
+        .section-title:first-child { margin-top: 0; }
+        .section-title:nth-of-type(1) { animation-delay: 0.15s; }
+        .section-title:nth-of-type(2) { animation-delay: 0.3s; }
+        .section-title:nth-of-type(3) { animation-delay: 0.45s; }
+
+        .app-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 8px;
+        }
+
+        .app-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--line);
+            border-radius: 0;
+            padding: 14px;
+            cursor: pointer;
+            transition: border-color 0.18s var(--ease), background 0.18s var(--ease), transform 0.18s var(--ease);
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            text-align: left;
+            color: inherit;
+            font: inherit;
+            opacity: 0;
+            animation: slideUp 0.5s var(--ease) forwards;
+        }
+        .app-card:hover {
+            border-color: var(--line-3);
+            background: rgba(255, 255, 255, 0.04);
+            transform: translateY(-2px);
+        }
+        .app-card:active { transform: translateY(0); }
+
+        .app-name {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--fg);
+        }
+        .app-desc {
+            font-size: 11.5px;
+            color: var(--fg-3);
+            line-height: 1.45;
+        }
+
+        @media (max-width: 600px) {
+            .page-header { padding: 18px 16px 0; }
+            .wrap { padding: 22px 16px 140px; }
+            .app-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+            .app-card { padding: 12px; }
+            .brand-title { font-size: 14px; }
+            .brand-sub { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="bgCanvas" class="visible"></canvas>
+
+<div class="page-header">
+    <div>
+        <span class="brand-title">Nocturne</span>
+        <span class="brand-sub">Apps</span>
+    </div>
+    <a href="/" class="back">← Home</a>
+</div>
+
+<div class="wrap">
+    <div class="section-title">Streaming</div>
+    <div class="app-grid" id="gridStreaming"></div>
+
+    <div class="section-title">Social</div>
+    <div class="app-grid" id="gridSocial"></div>
+
+    <div class="section-title">Utilities</div>
+    <div class="app-grid" id="gridUtil"></div>
+</div>
+
+<nav id="dock"></nav>
+<script src="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.0/src/js/lr2815.js" defer></script>
+
+<script src="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.0/src/js/wz6714.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.0/src/js/be9460.js"></script>
+<script>
+const APPS = {
+    streaming: [
+        { name: "YouTube", url: "https://www.youtube.com",  desc: "Videos, music, live." },
+        { name: "Twitch",  url: "https://www.twitch.tv",    desc: "Live streaming." },
+        { name: "Spotify", url: "https://open.spotify.com", desc: "Music and podcasts." }
+    ],
+    social: [
+        { name: "X",       url: "https://x.com",           desc: "Microblogging." },
+        { name: "Reddit",  url: "https://www.reddit.com",  desc: "Forums." }
+    ],
+    util: [
+        { name: "GitHub",    url: "https://github.com",       desc: "Code hosting." },
+        { name: "ChatGPT",   url: "https://chat.openai.com",  desc: "Conversational AI." },
+        { name: "Wikipedia", url: "https://en.wikipedia.org", desc: "Encyclopedia." }
+    ]
+};
+
+function card(app, baseDelay) {
+    const el = document.createElement("button");
+    el.className = "app-card";
+    el.style.animationDelay = baseDelay + "s";
+    el.innerHTML = `<div class="app-name">${app.name}</div><div class="app-desc">${app.desc}</div>`;
+    el.addEventListener("click", () => {
+        location.href = "/search/" + btoa(app.url).replace(/=+$/, "");
+    });
+    return el;
+}
+
+const sections = [
+    ["gridStreaming", APPS.streaming, 0.18],
+    ["gridSocial",    APPS.social,    0.33],
+    ["gridUtil",      APPS.util,      0.48]
+];
+for (const [gridId, apps, base] of sections) {
+    const grid = document.getElementById(gridId);
+    apps.forEach((a, i) => grid.appendChild(card(a, base + i * 0.04)));
+}
+</script>
+
+<script src="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.0/src/js/pu3927.js?v=20260929-2" defer></script>
+</body>
+</html>

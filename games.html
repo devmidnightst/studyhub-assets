@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-69T9E59SM7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-69T9E59SM7');
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="dark">
+    <meta name="theme-color" content="#060509">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<title>Nocturne - Games</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='9' fill='%230b0a14'/><circle cx='16' cy='16' r='9' fill='%23c9c1ff'/><circle cx='21' cy='14' r='8' fill='%230b0a14'/></svg>">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script>
+    (function () {
+        try {
+            var p = localStorage.getItem("nocturne-perf") || "auto";
+            var low = (navigator.deviceMemory && navigator.deviceMemory <= 4) ||
+                      (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4);
+            if (p === "lite" || (p !== "full" && low)) document.documentElement.classList.add("perf-lite");
+        } catch (e) {}
+    })();
+</script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.0/src/css/global.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.0/src/css/games.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.0/src/css/nocturne-select.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.0/src/css/notice.css">
+</head>
+<body>
+
+<div class="g-scroll" id="gScroll">
+<header class="g-top">
+    <h1 class="g-title">Games</h1>
+    <div class="lib-switch" id="libSwitch" role="group" aria-label="Game library">
+                <button class="lib-chip" data-lib="lumin" onclick="loadLibrary('lumin')">Lumin</button>
+                <button class="lib-chip active" data-lib="gnmath" onclick="loadLibrary('gnmath')">gnmath</button>
+                <button class="lib-chip" data-lib="ckv" onclick="loadLibrary('ckv')">CKV</button>
+                <button class="lib-chip" data-lib="truffled" onclick="loadLibrary('truffled')">Truffled</button>
+                <button class="lib-chip" data-lib="ugs" onclick="loadLibrary('ugs')">UGS</button>
+                <button class="lib-chip" data-lib="seraph" onclick="loadLibrary('seraph')">Seraph</button>
+                <button class="lib-chip" id="cloudChip" data-lib="stratus" onclick="loadLibrary('stratus')" style="display:none">Cloud</button>
+            </div>
+    <div class="g-tools">
+        <div class="search-wrap">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="7" cy="7" r="5"/><line x1="13" y1="13" x2="10.5" y2="10.5"/></svg>
+            <input type="text" id="searchBar" class="search-field" placeholder="Search games" oninput="handleSearch(this.value)" autocomplete="off" spellcheck="false" aria-label="Search games">
+        </div>
+        <button class="g-icon" onclick="openSettings()" title="Game settings" aria-label="Game settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
+    </div>
+</header>
+<nav class="cat-strip" id="catStrip" aria-label="Categories">
+    <button class="chip active" onclick="switchView('all', event)">All Games</button>
+</nav>
+
+<main>
+<div id="modernView">
+    <div class="swiper featured-slider">
+        <div class="swiper-wrapper" id="heroWrapper"></div>
+        <div class="swiper-pagination"></div>
+        <div class="swiper-button-next"></div>
+        <div class="swiper-button-prev"></div>
+    </div>
+
+    <div class="section">
+        <div class="section-header">
+            <div class="section-title">Trending this week</div>
+        </div>
+        <div class="swiper horizontal-list" id="trendingSwiper">
+            <div class="swiper-wrapper" id="trendingWrapper"></div>
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
+        </div>
+    </div>
+
+    <div id="tagSections"></div>
+
+    <div class="section">
+        <div class="section-header">
+            <div class="section-title clickable" onclick="toggleSection('featuredGrid', this)">
+                Featured
+                <svg class="collapse-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+            </div>
+        </div>
+        <div class="grid" id="featuredGrid"></div>
+    </div>
+
+    <div class="section">
+        <div class="section-header">
+            <div class="section-title clickable" onclick="toggleSection('allGamesGrid', this)">
+                All Games
+                <svg class="collapse-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+            </div>
+            <select id="sortOptions" class="select" onchange="sortZones()">
+                <option value="name">Name</option>
+                <option value="id">ID (Date)</option>
+                <option value="popular">Popular</option>
+            </select>
+        </div>
+        <div class="grid" id="allGamesGrid">
+            <div id="loading" style="grid-column: 1 / -1;">
+                <div class="spinner"></div>
+                <div>Please wait - the games are loading. The site may lag.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="searchView" class="hidden">
+    <div class="section">
+        <div class="section-header"><div class="section-title">Results</div></div>
+        <div class="grid" id="searchResults"></div>
+    </div>
+</div>
+</main>
+
+<footer>
+    <div class="footer-inner">
+        <div class="footer-brand">Libraries are community maintained.</div>
+        <div class="footer-links">
+            <a class="footer-link" onclick="saveData()">Export data</a>
+            <a class="footer-link" onclick="document.getElementById('importFile').click()">Import data</a>
+            <input type="file" id="importFile" style="display:none" onchange="loadData(event)">
+        </div>
+    </div>
+</footer>
+</div>
+
+<div id="zoneViewer">
+    <div class="zone-header">
+        <div class="zone-title">
+            <h2 id="zoneName">Game</h2>
+            <button class="info-button" onclick="showZoneInfo()" title="Info">
+                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
+                </svg>
+            </button>
+            <span id="zoneId" style="display: none;"></span>
+            <a id="zoneAuthor" href="#" target="_blank">by Author</a>
+        </div>
+        <div class="zone-controls">
+            <button onclick="fullscreenZone()">Fullscreen</button>
+            <button onclick="aboutBlank()">New tab</button>
+            <button onclick="downloadZone()">Download</button>
+            <button class="close-btn" onclick="closeZone()">Close</button>
+        </div>
+    </div>
+    <iframe id="zoneFrame"></iframe>
+</div>
+
+<div id="cloudViewer">
+    <div class="zone-header">
+        <div class="zone-title">
+            <h2 id="cloudName">Cloud Game</h2>
+            <span id="cloudStatusBadge" class="cloud-badge"></span>
+        </div>
+        <div class="zone-controls">
+            <button onclick="fullscreenCloud()" id="cloudFsBtn" style="display:none">Fullscreen</button>
+            <button class="close-btn" onclick="closeCloud()">Close</button>
+        </div>
+    </div>
+    <div id="cloudBody">
+        <div id="cloudLoading" class="cloud-loading-overlay">
+            <div class="cload-inner">
+                <!-- Left panel: spinner + steps -->
+                <div class="csteps-wrap">
+                    <div class="csteps-header">
+                        <div class="csteps-name" id="cloudStepsName">Loading…</div>
+                        <div class="csteps-timer" id="cstepsTimer"></div>
+                    </div>
+                    <!-- Google Material spinner -->
+                    <div class="gspinner-wrap">
+                        <svg class="gspinner" viewBox="25 25 50 50">
+                            <circle class="gspinner-circle" cx="50" cy="50" r="20" fill="none" stroke-width="3.5" stroke-linecap="round"/>
+                        </svg>
+                        <div class="gspinner-badge" id="cloudSpinnerLabel"></div>
+                    </div>
+                    <div class="csteps-bar-wrap"><div class="csteps-bar" id="cstepsBar"></div></div>
+                    <ol class="csteps">
+                        <li class="cstep pending" id="cstep-0">
+                            <div class="cstep-track">
+                                <div class="cstep-node">
+                                    <svg class="cstep-check" viewBox="0 0 12 12" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5,6 4.5,9 10.5,3"/></svg>
+                                    <div class="cstep-ring"></div>
+                                </div>
+                                <div class="cstep-line"></div>
+                            </div>
+                            <div class="cstep-body"><span class="cstep-label">Creating Account</span></div>
+                        </li>
+                        <li class="cstep pending" id="cstep-1">
+                            <div class="cstep-track">
+                                <div class="cstep-node">
+                                    <svg class="cstep-check" viewBox="0 0 12 12" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5,6 4.5,9 10.5,3"/></svg>
+                                    <div class="cstep-ring"></div>
+                                </div>
+                                <div class="cstep-line"></div>
+                            </div>
+                            <div class="cstep-body"><span class="cstep-label">Requesting Game</span></div>
+                        </li>
+                        <li class="cstep pending" id="cstep-2">
+                            <div class="cstep-track">
+                                <div class="cstep-node">
+                                    <svg class="cstep-check" viewBox="0 0 12 12" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5,6 4.5,9 10.5,3"/></svg>
+                                    <div class="cstep-ring"></div>
+                                </div>
+                                <div class="cstep-line"></div>
+                            </div>
+                            <div class="cstep-body">
+                                <span class="cstep-label">Joining Queue</span>
+                                <span class="cstep-sub" id="cloudQueuePos"></span>
+                            </div>
+                        </li>
+                        <li class="cstep pending" id="cstep-3">
+                            <div class="cstep-track">
+                                <div class="cstep-node">
+                                    <svg class="cstep-check" viewBox="0 0 12 12" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5,6 4.5,9 10.5,3"/></svg>
+                                    <div class="cstep-ring"></div>
+                                </div>
+                            </div>
+                            <div class="cstep-body">
+                                <span class="cstep-label">Starting Stream</span>
+                                <span class="cstep-sub" id="cstep-3-sub"></span>
+                            </div>
+                        </li>
+                    </ol>
+                    <div class="csteps-error" id="cloudLoadMsg"></div>
+                </div>
+                <!-- Right panel: live terminal -->
+                <div class="cterm-wrap">
+                    <div class="cterm-header">
+                        <span class="cterm-dot" style="background:#ff5f57"></span>
+                        <span class="cterm-dot" style="background:#febc2e"></span>
+                        <span class="cterm-dot" style="background:#28c840"></span>
+                        <span class="cterm-title">live log</span>
+                    </div>
+                    <div class="cterm-body" id="cloudTerminal"></div>
+                </div>
+            </div>
+        </div>
+        <video id="cloudVideo" autoplay playsinline muted class="cloud-video"></video>
+        <div id="cloudClickHint" class="cloud-click-hint" style="display:none">Click to capture input · Hold Esc 3.5s to release</div>
+    </div>
+</div>
+
+<div class="update-toast" id="cherriCreditToast">
+    <div class="ut-icon">★</div>
+    <div class="ut-body">
+        <div class="ut-title">Extra libraries</div>
+        <div class="ut-desc">CKV, Truffled, UGS, and Seraph are curated by x8r, the <a href="https://cherrion.top" target="_blank" rel="noopener">Cherri</a> owner.</div>
+    </div>
+    <button class="ut-close" aria-label="Dismiss">&times;</button>
+</div>
+
+<div id="modalOverlay" class="modal-overlay">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 class="modal-title" id="modalTitle">Settings</h3>
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+        </div>
+        <div class="modal-body" id="modalContent"></div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/luminsdk/script@latest/fonts.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.0/src/js/xk6073.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.0/src/js/qt3674.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.0/src/js/zb8215.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.0/src/js/yc1962.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.0/src/js/pu3927.js?v=20260929-2" defer></script>
+</body>
+</html>
