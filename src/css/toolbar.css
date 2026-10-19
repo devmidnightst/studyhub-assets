@@ -1,0 +1,80 @@
+/* Browser toolbar: back, forward, reload and the address field. It only shows
+   while a page is open, and it spans the workspace to the right of the sidebar. */
+
+#toolbar {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: var(--sb-w, 0px);
+    right: 0;
+    height: 46px;
+    background: var(--bg-2);
+    border-bottom: 1px solid var(--line);
+    align-items: center;
+    gap: 2px;
+    padding: 0 10px;
+    z-index: 50;
+}
+
+#toolbar.visible { display: flex; }
+
+.tb-btn {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0;
+    color: var(--fg-3);
+    background: transparent;
+    transition: background 0.15s var(--ease), color 0.15s var(--ease);
+    flex-shrink: 0;
+}
+.tb-btn svg { stroke-width: 1.6; }
+.tb-btn:hover { background: rgba(255, 255, 255, 0.06); color: var(--fg); }
+.tb-btn:active { background: rgba(255, 255, 255, 0.1); }
+.tb-btn:focus-visible { outline: 2px solid rgba(168, 152, 232, 0.6); outline-offset: -2px; }
+.tb-btn:disabled { opacity: 0.3; cursor: default; }
+.tb-btn:disabled:hover { background: transparent; color: var(--fg-3); }
+
+#navBar {
+    flex: 1;
+    height: 32px;
+    margin: 0 6px;
+    background: var(--surface);
+    border-radius: 0;
+    border: 1px solid var(--line-2);
+    padding: 0 12px;
+    color: var(--fg);
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 30px;
+    outline: none;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    cursor: text;
+    user-select: text;
+    -webkit-user-select: text;
+    font-family: inherit;
+    transition: border-color 0.15s var(--ease), background 0.15s var(--ease);
+}
+#navBar:hover { border-color: var(--line-3); }
+#navBar:focus {
+    border-color: rgba(255, 255, 255, 0.32);
+    background: #0f0e14;
+    overflow: auto;
+    text-overflow: clip;
+}
+#navBar:empty::before {
+    content: attr(data-placeholder);
+    color: var(--fg-3);
+    pointer-events: none;
+}
+
+@media (max-width: 720px) {
+    #toolbar { height: 50px; padding: 0 8px 0 54px; }
+    .tb-btn { width: 36px; height: 36px; }
+    .tb-btn svg { width: 16px; height: 16px; }
+    #navBar { height: 36px; line-height: 34px; font-size: 14px; }
+}
