@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 420" fill="none">
+  <!-- placeholder chibi Hatsune Miku plush — replace with miku-plush.png to use a real photo -->
+  <!-- twin-tails -->
+  <path d="M122 122 C70 142 54 252 70 342 C76 374 112 374 118 344 C130 272 134 182 142 142 Z" fill="#39c5bb"/>
+  <path d="M238 122 C290 142 306 252 290 342 C284 374 248 374 242 344 C230 272 226 182 218 142 Z" fill="#39c5bb"/>
+  <path d="M70 332 C72 356 110 356 116 334 L114 356 C106 376 78 376 70 354 Z" fill="#2aa39b"/>
+  <path d="M290 332 C288 356 250 356 244 334 L246 356 C254 376 282 376 290 354 Z" fill="#2aa39b"/>
+  <rect x="96" y="150" width="46" height="22" rx="9" fill="#0e1622"/>
+  <rect x="218" y="150" width="46" height="22" rx="9" fill="#0e1622"/>
+  <!-- arms -->
+  <ellipse cx="118" cy="298" rx="22" ry="30" fill="#222838"/>
+  <ellipse cx="242" cy="298" rx="22" ry="30" fill="#222838"/>
+  <!-- body -->
+  <path d="M118 300 C118 268 140 250 180 250 C220 250 242 268 242 300 L246 362 C246 392 114 392 114 362 Z" fill="#1d2230"/>
+  <rect x="150" y="262" width="60" height="74" rx="11" fill="#2b3242"/>
+  <!-- tie -->
+  <path d="M180 262 l16 16 -16 16 -16 -16 Z" fill="#39c5bb"/>
+  <rect x="174" y="290" width="12" height="44" rx="4" fill="#39c5bb"/>
+  <!-- feet -->
+  <ellipse cx="150" cy="378" rx="27" ry="16" fill="#11161f"/>
+  <ellipse cx="210" cy="378" rx="27" ry="16" fill="#11161f"/>
+  <!-- head -->
+  <circle cx="180" cy="168" r="88" fill="#f7ecd9"/>
+  <!-- hair -->
+  <path d="M92 168 C92 108 128 78 180 78 C232 78 268 108 268 168 C268 148 246 130 222 128 C212 108 148 108 138 128 C114 130 92 148 92 168 Z" fill="#39c5bb"/>
+  <path d="M104 150 C120 120 150 108 180 108 C210 108 240 120 256 150 C246 132 220 122 180 122 C140 122 114 132 104 150 Z" fill="#49d6cc"/>
+  <!-- face -->
+  <ellipse cx="150" cy="176" rx="11" ry="15" fill="#16323a"/>
+  <ellipse cx="210" cy="176" rx="11" ry="15" fill="#16323a"/>
+  <circle cx="146" cy="171" r="3.6" fill="#d6f5f4"/>
+  <circle cx="206" cy="171" r="3.6" fill="#d6f5f4"/>
+  <ellipse cx="128" cy="199" rx="12" ry="7" fill="#f4a9bc" opacity="0.85"/>
+  <ellipse cx="232" cy="199" rx="12" ry="7" fill="#f4a9bc" opacity="0.85"/>
+  <path d="M171 199 q9 9 18 0" stroke="#16323a" stroke-width="4" stroke-linecap="round" fill="none"/>
+</svg>
