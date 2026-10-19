@@ -1,0 +1,28 @@
+#viewStack {
+    position: fixed;
+    top: 46px;
+    left: var(--sb-w, 0px);
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+}
+
+.tab-frame {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: none;
+    background: var(--bg);
+    color-scheme: dark;
+    pointer-events: auto;
+}
+
+.tab-frame.active.visible { display: block; }
+.tab-frame.active { display: block; visibility: hidden; }
+.tab-frame.active.visible { visibility: visible; }
+
+@media (max-width: 720px) {
+    #viewStack { top: 50px; }
+}
