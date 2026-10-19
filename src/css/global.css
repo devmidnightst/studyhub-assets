@@ -1,0 +1,379 @@
+:root {
+    /* nocturne midnight: near-black, neutral hairlines, violet only as an accent */
+    --bg:        #060509;
+    --bg-2:      #0a090d;
+    --surface:   #0d0c11;
+    --surface-2: #131218;
+    --panel:     rgba(13, 12, 17, 0.92);
+    --line:      rgba(255, 255, 255, 0.06);
+    --line-2:    rgba(255, 255, 255, 0.10);
+    --line-3:    rgba(255, 255, 255, 0.18);
+    --fg:        #ededf0;
+    --fg-2:      #a8a7b0;
+    --fg-3:      #85848e;
+    --dim:       #3c3b45;
+    --accent:    #a898e8;
+    --accent-2:  #7e6bd0;
+    --glow:      126, 107, 208;
+    --r-sm:      0;
+    --r-md:      0;
+    --ease:      cubic-bezier(0.22, 0.72, 0.14, 1);
+    --ease-out:  cubic-bezier(0.16, 1, 0.3, 1);
+    --font:      'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html {
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    background: var(--bg);
+    color: var(--fg);
+}
+
+body {
+    font-family: var(--font, 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+    overflow: hidden;
+    height: 100%;
+    width: 100%;
+    background: var(--bg);
+    color: var(--fg);
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* cursor inherits, so one declaration on html covers every element */
+html { cursor: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='23' height='23'><path d='M5.4 4 L5.4 19.2 L9.3 15.5 L11.8 20.9 L14.1 19.8 L11.6 14.6 L16.7 14.6 Z' fill='%23000' opacity='0.28' transform='translate(0.6,0.7)'/><path d='M5 3.5 L5 18.9 L8.9 15.2 L11.5 20.7 L14 19.5 L11.4 14.2 L16.6 14.2 Z' fill='%23cdc2ff' stroke='%23241a45' stroke-width='1.25' stroke-linejoin='round'/></svg>") 5 4, auto; }
+a, button, [role="button"], select, summary, label[for], [onclick],
+.clickable, .nav-card, .link-btn, .dock-btn, .rail-item, .quick-chip, .suggest-item,
+.tab-item, .tab-add, .tab-close, .tb-btn, .gc-tile, .chip, .lib-chip, .g-sb-btn,
+.seg-btn, .cfg-btn, .ai-quick-btn, .settings-nav-item, .toggle-wrap,
+.swiper-button-next, .swiper-button-prev,
+input[type=checkbox], input[type=radio], input[type=button] {
+    cursor: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='23' height='23'><path d='M11 3.5a1.5 1.5 0 0 1 3 0v7.5h1V9a1.5 1.5 0 0 1 3 0v2h1v-1a1.5 1.5 0 0 1 3 0v6a5 5 0 0 1-5 5h-3a5 5 0 0 1-3.5-1.5l-3.5-3.5a1.5 1.5 0 0 1 2.1-2.1l1.9 1.9V3.5z' fill='%23cdc2ff' stroke='%23241a45' stroke-width='1.05' stroke-linejoin='round'/></svg>") 11 3, pointer;
+}
+input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=color]):not([type=button]),
+textarea, [contenteditable="true"], #navBar, .search-field, #searchHome, #searchBar {
+    cursor: text !important;
+}
+
+.verify-badge { display: inline-flex; align-items: center; gap: 7px; padding: 5px 11px; border-radius: 0; font-size: 12px; font-weight: 600; border: 1px solid var(--line-2); background: rgba(255, 255, 255, 0.04); color: var(--fg-2); white-space: nowrap; }
+.verify-badge .verify-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--fg-3); flex-shrink: 0; }
+.verify-badge.ok { color: #7ce0a8; border-color: rgba(124, 224, 168, 0.32); background: rgba(124, 224, 168, 0.09); }
+.verify-badge.ok .verify-dot { background: #7ce0a8; box-shadow: 0 0 8px rgba(124, 224, 168, 0.65); }
+
+#bgCanvas {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0;
+    animation: bgDust 1.2s ease 0.2s forwards;
+}
+
+#bgCanvas.visible { animation: bgDust 1.2s ease 0.2s forwards; }
+
+/* the starfield is kept only as faint dust on inner pages */
+@keyframes bgDust { to { opacity: 0.2; } }
+
+#bgParticles {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    animation: bgFadeIn 1s ease forwards;
+}
+
+#bgPlush {
+    position: fixed;
+    right: clamp(-32px, -2vmin, 0px);
+    bottom: clamp(-32px, -2vmin, 0px);
+    width: clamp(230px, 42vmin, 540px);
+    height: clamp(230px, 42vmin, 540px);
+    z-index: 0;
+    pointer-events: none;
+    background-repeat: no-repeat;
+    background-position: bottom right;
+    background-size: contain;
+    opacity: 0;
+    transition: opacity 1.1s var(--ease, ease);
+    -webkit-mask-image: radial-gradient(125% 125% at 80% 80%, #000 64%, transparent 96%);
+            mask-image: radial-gradient(125% 125% at 80% 80%, #000 64%, transparent 96%);
+    animation: bgPlushFloat 9s ease-in-out infinite alternate;
+}
+#bgPlush.on { opacity: 0.72; }
+
+@keyframes bgPlushFloat {
+    from { transform: translateY(0); }
+    to   { transform: translateY(-12px); }
+}
+
+.reduce-motion #bgPlush { animation: none; }
+
+@keyframes bgFadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+#bgAurora {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 1.2s var(--ease);
+    filter: blur(44px);
+    background: var(--bg);
+    will-change: transform, opacity;
+    transform-origin: center center;
+    backface-visibility: hidden;
+}
+
+#bgAurora.active { opacity: 1; }
+
+#bgAurora.theme-aurora {
+    background:
+        radial-gradient(60% 50% at 18% 22%, rgba(155, 218, 176, 0.18), transparent 60%),
+        radial-gradient(55% 50% at 82% 78%, rgba(149, 200, 224, 0.22), transparent 60%),
+        radial-gradient(45% 40% at 62% 36%, rgba(168, 152, 232, 0.154), transparent 60%),
+        var(--bg);
+    animation: bgAuroraDrift 36s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
+}
+
+@keyframes bgAuroraDrift {
+    0%   { background-position: 0% 0%, 100% 100%, 50% 50%; transform: translate3d(0, 0, 0) scale(1); }
+    100% { background-position: 8% 4%, 92% 96%, 48% 52%; transform: translate3d(-0.6%, 0.4%, 0) scale(1.015); }
+}
+
+#bgAurora.theme-nebula {
+    background:
+        radial-gradient(70% 60% at 22% 28%, rgba(190, 110, 210, 0.24), transparent 60%),
+        radial-gradient(60% 55% at 78% 72%, rgba(110, 110, 230, 0.26), transparent 60%),
+        radial-gradient(48% 42% at 50% 50%, rgba(220, 140, 200, 0.14), transparent 60%),
+        var(--bg);
+    animation: bgNebulaDrift 48s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
+}
+@keyframes bgNebulaDrift {
+    0%   { transform: translate3d(0, 0, 0) scale(1)    rotate(0deg); }
+    100% { transform: translate3d(-0.4%, 0.3%, 0) scale(1.02) rotate(0.6deg); }
+}
+
+#bgAurora.theme-ocean {
+    background:
+        radial-gradient(65% 55% at 20% 25%, rgba(80, 150, 200, 0.26), transparent 60%),
+        radial-gradient(55% 50% at 80% 75%, rgba(60, 200, 180, 0.22), transparent 60%),
+        radial-gradient(45% 40% at 50% 55%, rgba(100, 180, 220, 0.18), transparent 60%),
+        linear-gradient(180deg, #03060d 0%, #060d18 100%);
+    animation: bgOceanFlow 40s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
+}
+@keyframes bgOceanFlow {
+    0%   { transform: translate3d(0, 0, 0) scale(1); }
+    100% { transform: translate3d(-0.8%, 0.5%, 0) scale(1.018); }
+}
+
+#bgAurora.theme-sunset {
+    background:
+        radial-gradient(70% 60% at 22% 78%, rgba(232, 130, 102, 0.22), transparent 60%),
+        radial-gradient(60% 55% at 78% 28%, rgba(186, 96, 138, 0.28), transparent 60%),
+        radial-gradient(50% 45% at 50% 50%, rgba(220, 150, 132, 0.16), transparent 60%),
+        linear-gradient(180deg, #0d0612 0%, #1c0a1a 100%);
+    animation: bgSunsetDrift 44s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
+}
+@keyframes bgSunsetDrift {
+    0%   { transform: translate3d(0, 0, 0) scale(1); }
+    100% { transform: translate3d(0.4%, -0.4%, 0) scale(1.014); }
+}
+
+#bgAurora.theme-mono {
+    background:
+        radial-gradient(60% 50% at 30% 30%, rgba(200, 200, 222, 0.07), transparent 60%),
+        radial-gradient(50% 45% at 70% 70%, rgba(180, 180, 210, 0.05), transparent 60%),
+        linear-gradient(180deg, #0a0a10 0%, #050508 100%);
+    animation: bgMonoBreathe 32s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
+}
+@keyframes bgMonoBreathe {
+    0%   { opacity: 1;    transform: scale(1); }
+    100% { opacity: 0.86; transform: scale(1.01); }
+}
+
+#bgAurora.theme-embers {
+    background:
+        radial-gradient(45% 40% at 24% 72%, rgba(224, 112, 60, 0.18), transparent 60%),
+        radial-gradient(40% 35% at 76% 28%, rgba(204, 80, 52, 0.16), transparent 60%),
+        radial-gradient(35% 30% at 60% 60%, rgba(232, 142, 80, 0.10), transparent 60%),
+        linear-gradient(180deg, #0a0508 0%, #08060d 100%);
+    animation: bgEmbersGlow 34s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
+}
+@keyframes bgEmbersGlow {
+    0%   { opacity: 1;    transform: translate3d(0, 0, 0) scale(1); }
+    100% { opacity: 0.88; transform: translate3d(0.3%, -0.3%, 0) scale(1.015); }
+}
+
+#app {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    opacity: 0;
+    animation: appFadeIn 0.4s var(--ease) forwards;
+}
+
+@keyframes appFadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.09); border-radius: 0; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.16); }
+
+::selection { background: rgba(168, 152, 232, 0.154); color: #fff; }
+
+button, input, textarea, select { font-family: inherit; color: inherit; outline: none; }
+button { cursor: pointer; background: none; border: none; }
+
+.hidden { display: none !important; }
+
+.reduce-motion *,
+.reduce-motion *::before,
+.reduce-motion *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+}
+
+html.perf-lite { --panel: rgba(13, 12, 17, 0.94); }
+html.perf-lite *,
+html.perf-lite *::before,
+html.perf-lite *::after,
+html.noc-bfx *,
+html.noc-bfx *::before,
+html.noc-bfx *::after {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+html.perf-lite #bgCanvas { display: none !important; }
+html.perf-lite #bgAurora {
+    filter: none !important;
+    animation: none !important;
+    will-change: auto !important;
+}
+
+/* Performance: Low tier — same near-zero-duration trick as .reduce-motion (kept
+   as a separate class since the two are independent user choices: someone can
+   want reduced motion without picking the low performance tier, or vice versa),
+   plus a hard stop on the remaining decorative canvas effects .perf-lite alone
+   doesn't touch (particles.js is gated on this in JS; wordmark.js bails out on
+   this class before ever creating its canvas). */
+html.perf-min *,
+html.perf-min *::before,
+html.perf-min *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+}
+html.perf-min #bgParticles,
+html.perf-min .noc-canvas {
+    display: none !important;
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.ban-chip {
+    position: fixed;
+    top: 18px;
+    left: 18px;
+    z-index: 50;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 12px 7px 11px;
+    background: rgba(40, 16, 22, 0.85);
+    border: 1px solid rgba(208, 130, 130, 0.32);
+    border-radius: 0;
+    color: #f0c4c4;
+    font-size: 12px;
+    font-weight: 500;
+    text-decoration: none;
+    backdrop-filter: blur(14px);
+    transition: all 0.18s var(--ease);
+    animation: slideDown 0.4s var(--ease);
+    cursor: pointer;
+}
+.ban-chip:hover {
+    background: rgba(60, 22, 30, 0.9);
+    border-color: rgba(208, 130, 130, 0.5);
+    transform: translateY(-1px);
+}
+.ban-chip svg { color: #d08282; }
+.ban-chip-text {
+    font-weight: 600;
+    letter-spacing: 0.02em;
+}
+.ban-chip-timer {
+    color: #f0c4c4;
+    opacity: 0.75;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 11px;
+    padding-left: 6px;
+    border-left: 1px solid rgba(208, 130, 130, 0.25);
+    margin-left: 2px;
+}
+
+body.banned #searchHome {
+    pointer-events: none;
+    opacity: 0.5;
+}
+body.banned #searchHome::placeholder {
+    color: #d08282;
+}
+body.banned #navBar {
+    pointer-events: none;
+    opacity: 0.5;
+}
+
+/* Cap captcha widget (see captcha.js). It ships a light-mode look by default, so re-point its
+   custom properties at the site's palette — otherwise a white card lands in the middle of the
+   dark auth forms. Lives here rather than in account.css because the same widget appears in the
+   code-projects modal and the AI sign-in gate too. */
+cap-widget {
+    --cap-widget-width: 100%;
+    --cap-background: var(--bg-2);
+    --cap-border-color: var(--line);
+    --cap-border-radius: 0;
+    --cap-color: var(--fg-2);
+    --cap-font: var(--font);
+    --cap-checkbox-background: rgba(255, 255, 255, 0.04);
+    --cap-checkbox-border: 1px solid var(--line-3);
+    --cap-checkbox-border-radius: 0;
+    --cap-spinner-color: var(--accent);
+    --cap-spinner-background-color: var(--line-2);
+    --cap-focus-ring: var(--accent-2);
+    --cap-troubleshoot-color: var(--fg-3);
+    display: block;
+}
+
+@supports (height: 100dvh) {
+    body { height: 100dvh; }
+}
+
+@media (max-width: 768px) and (pointer: coarse) {
+    input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=color]):not([type=button]),
+    textarea,
+    select { font-size: 16px !important; }
+}
+
+/* Square corners are the system default. Anything that needs a circle (spinners,
+   status dots) says so explicitly; :where keeps this at zero specificity. */
+:where(*) { border-radius: 0; }
