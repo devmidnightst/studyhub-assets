@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-69T9E59SM7"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-69T9E59SM7');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="dark">
+    <meta name="theme-color" content="#060509">
+    <title>Nocturne - Settings</title>
+    <style>html,body{background:#060509;color:#ededf0;margin:0}</style>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='9' fill='%230b0a14'/><circle cx='16' cy='16' r='9' fill='%23c9c1ff'/><circle cx='21' cy='14' r='8' fill='%230b0a14'/></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.7/src/css/global.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.7/src/css/dock.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.7/src/css/nocturne-select.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.7/src/css/settings-page.css">
+    <script>
+        (function () {
+            try {
+                var t = localStorage.getItem("nocturne-bg-theme");
+                if (!t || t === "stars") return;
+                var c = document.getElementById("bgCanvas");
+                if (c) c.style.display = "none";
+                if (t === "off") return;
+                var known = ["aurora", "nebula", "ocean", "sunset", "mono", "embers"];
+                if (known.indexOf(t) === -1) return;
+                document.addEventListener("DOMContentLoaded", function () {
+                    var a = document.createElement("div");
+                    a.id = "bgAurora";
+                    a.className = "active theme-" + t;
+                    document.body.insertBefore(a, document.body.firstChild);
+                });
+            } catch (e) {}
+        })();
+    </script>
+</head>
+<body class="sp-page">
+
+<canvas id="bgCanvas" class="visible"></canvas>
+
+<div class="sp-shell">
+
+    <aside class="sp-sidebar" aria-label="Settings categories">
+        <div class="sp-head">
+            <span class="sp-brand-mark"></span>
+            <div class="sp-head-text">
+                <span class="sp-head-title">Nocturne</span>
+                <span class="sp-head-sub">Settings</span>
+            </div>
+        </div>
+
+        <nav class="sp-nav" id="spNav">
+            <button class="sp-nav-item active" data-pane="appearance" type="button">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+                <span>Appearance</span>
+            </button>
+            <button class="sp-nav-item" data-pane="browse" type="button">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <span>Browse</span>
+            </button>
+            <button class="sp-nav-item" data-pane="history" type="button">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l3 2"/></svg>
+                <span>History</span>
+            </button>
+            <button class="sp-nav-item" data-pane="engine" type="button">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L3 7v6c0 5 4 8.5 9 10 5-1.5 9-5 9-10V7l-9-5z"/></svg>
+                <span>Engine</span>
+            </button>
+            <button class="sp-nav-item" data-pane="advanced" type="button">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+                <span>Advanced</span>
+            </button>
+            <button class="sp-nav-item" data-pane="performance" type="button">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 18 0"/><line x1="12" y1="12" x2="8" y2="8"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/></svg>
+                <span>Performance</span>
+            </button>
+            <button class="sp-nav-item sp-nav-danger" data-pane="recovery" type="button">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+                <span>Recovery</span>
+            </button>
+            <button class="sp-nav-item" data-pane="about" type="button">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                <span>About</span>
+            </button>
+        </nav>
+
+        <div class="sp-sidebar-foot">
+            <a href="/" class="sp-back">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+                Back to Nocturne
+            </a>
+            <div class="sp-version">v2.0.0</div>
+        </div>
+    </aside>
+
+    <main class="sp-main">
+
+        <section class="sp-pane active" data-pane="appearance" aria-labelledby="paneAppearanceTitle">
+            <header class="sp-pane-head">
+                <h1 id="paneAppearanceTitle" class="sp-pane-title">Appearance</h1>
+                <p class="sp-pane-sub">Tune the way Nocturne looks - backdrop, colors, motion.</p>
+            </header>
+
+            <div class="sp-card">
+                <div class="sp-card-head">
+                    <h2 class="sp-card-title">Backdrop</h2>
+                    <p class="sp-card-sub">Pick a palette, animation, or upload your own image.</p>
+                </div>
+
+                <div class="row">
+                    <div class="row-label">
+                        <div class="row-name">Background palette</div>
+                        <div class="row-desc">Switch the ambient color scheme.</div>
+                    </div>
+                    <div class="row-control">
+                        <select id="bgThemeSelect" class="select"></select>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="row-label">
+                        <div class="row-name">Animated stars</div>
+                        <div class="row-desc">JS canvas for the Starfield palette. Other palettes are pure CSS.</div>
+                    </div>
+                    <div class="row-control">
+                        <label class="toggle"><input type="checkbox" id="fxToggle"><span class="track"></span></label>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="row-label">
+                        <div class="row-name">Custom background image</div>
+                        <div class="row-desc">Layered on top of the palette. Stored locally, max 5 MB.</div>
+                    </div>
+                    <div class="row-control row-control-stack">
+                        <div class="bg-preview" id="bgPreview"></div>
+                        <div class="row-actions">
+                            <input type="file" id="bgUploadInput" accept="image/png,image/jpeg,image/webp,image/gif" style="display:none">
+                            <button class="btn" id="bgUploadBtn">Choose image…</button>
+                            <button class="btn ghost" id="bgClearBtn">Remove</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="row-label">
+                        <div class="row-name">Background opacity</div>
+                        <div class="row-desc">Applies to your custom image.</div>
+                    </div>
+                    <div class="row-control">
+                        <input type="range" id="bgOpacityRange" min="0" max="100" step="5" class="range">
+                        <span class="range-val" id="bgOpacityVal">100%</span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="row-label">
+                        <div class="row-name">Background blur</div>
+                        <div class="row-desc">Soft-focus your custom image.</div>
+                    </div>
+                    <div class="row-control">
+                        <input type="range" id="bgBlurRange" min="0" max="40" step="2" class="range">
+                        <span class="range-val" id="bgBlurVal">0px</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sp-card">
+                <div class="sp-card-head">
+                    <h2 class="sp-card-title">Theme</h2>
+                    <p class="sp-card-sub">Accent color, scaling, and motion preferences.</p>
+                </div>
+
+                <div class="row">
+                    <div class="row-label">
+                        <div class="row-name">Accent color</div>
+                        <div class="row-desc">Used for buttons, highlights, and chips.</div>
+                    </div>
+                    <div class="row-control">
+                        <div class="swatch-row">
+                            <button class="swatch" data-color="#a898e8" style="background:#a898e8" title="Lavender (default)"></button>
+                            <button class="swatch" data-color="#82d0a4" style="background:#82d0a4" title="Mint"></button>
+                            <button class="swatch" data-color="#d8b16a" style="background:#d8b16a" title="Amber"></button>
+                            <button class="swatch" data-color="#d08282" style="background:#d08282" title="Coral"></button>
+                            <button class="swatch" data-color="#88b8e0" style="background:#88b8e0" title="Sky"></button>
+                            <button class="swatch" data-color="#c188e0" style="background:#c188e0" title="Orchid"></button>
+                            <input type="color" id="accentPicker" class="color-picker" title="Custom">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="row-label">
+                        <div class="row-name">Font</div>
+                        <div class="row-desc">Pick the typeface used across Nocturne (loaded from Google Fonts).</div>
+                    </div>
+                    <div class="row-control">
+                        <select id="fontSelect" class="select"></select>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="row-label">
+                        <div class="row-name">UI scale</div>
+                        <div class="row-desc">Make Nocturne's UI bigger or smaller.</div>
+                    </div>
+                    <div class="row-control">
+                        <input type="range" id="scaleRange" min="80" max="130" step="5" class="range">
+                        <span class="range-val" id="scaleVal">100%</span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="row-label">
+                        <div class="row-name">Reduce animations</div>
+                        <div class="row-desc">Disable transitions and motion effects.</div>
+                    </div>
+                    <div class="row-control">
+                        <label class="toggle"><input type="checkbox" id="reduceMotionToggle"><span class="track"></span></label>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="row-label">
+                        <div class="row-name">Dynamic island</div>
+                        <div class="row-desc">The floating bar for navigation, music, Pocket AI and extensions. Turn it off to hide it completely.</div>
+                    </div>
+                    <div class="row-control">
+                        <label class="toggle"><input type="checkbox" id="islandToggle"><span class="track"></span></label>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="sp-pane" data-pane="browse" aria-labelledby="paneBrowseTitle">
+            <header class="sp-pane-head">
+                <h1 id="paneBrowseTitle" class="sp-pane-title">Browse</h1>
+                <p class="sp-pane-sub">Default search engine, tab appearance, and how URLs are entered.</p>
+            </header>
+
+            <div class="sp-card">
+                <div class="row">
+                    <div class="row-label">
+                        <div class="row-name">Search engine</div>
+                        <div class="row-desc">Default engine for the home search bar.</div>
+                    </div>
+                    <div class="row-control">
+                        <select id="engineSelect" class="select"></select>
+                    </div>
+                </div>
+
+
+                <div class="row">
+                    <div class="row-label">
+                        <div class="row-name">Tab theme</div>
+                        <div class="row-desc">Change the tab title and icon.</div>
+                    </div>
+                    <div class="row-control">
+                        <select id="cloakSelect" class="select"></select>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="row-label">
+                        <div class="row-name">Open in about:blank</div>
+                        <div class="row-desc">Reopen Nocturne in a new tab whose address bar reads <code>about:blank</code>.</div>
+                    </div>
+                    <div class="row-control">
+                        <button class="btn" id="aboutBlankBtn">Open</button>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="row-label">
+                        <div class="row-name">Auto about:blank on every visit</div>
+                        <div class="row-desc">When on, opening Nocturne pops it into a blank-titled tab automatically &mdash; click anywhere once after the page loads to allow the pop-up, then close this original tab.<br><strong>To turn it off:</strong> switch this off here. If the pop-up never appears, click the blocked-pop-up icon in your browser's address bar and choose &ldquo;Always allow pop-ups&rdquo; for this site.</div>
+                    </div>
+                    <div class="row-control">
+                        <label class="toggle"><input type="checkbox" id="autoAbToggle"><span class="track"></span></label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sp-card">
+                <div class="row">
+                    <div class="row-label">
+                        <div class="row-name">Flood history with educational sites</div>
+                        <div class="row-desc">Quickly visits the sites below in a pop-up so your recent browser history fills up with school-friendly pages. Add or remove sites to taste.</div>
+                    </div>
+                    <div class="row-control">
+                        <button class="btn" id="floodBtn" type="button">Flood now</button>
+                    </div>
+                </div>
+
+                <div class="sp-flood">
+                    <div class="sp-flood-add">
+                        <input type="text" id="floodInput" placeholder="khanacademy.org" spellcheck="false" autocomplete="off" autocapitalize="off">
+                        <button class="btn" id="floodAdd" type="button">Add</button>
+                    </div>
+                    <div id="floodList" class="sp-flood-list"></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="sp-pane" data-pane="history" aria-labelledby="paneHistoryTitle">
+            <header class="sp-pane-head">
+                <h1 id="paneHistoryTitle" class="sp-pane-title">History</h1>
+                <p class="sp-pane-sub">Pages you have opened through Nocturne. Stored on this device.</p>
+            </header>
+
+            <div class="sp-card">
+                <div class="sp-hist-bar">
+                    <div class="sp-hist-search-wrap">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                        <input type="text" id="histSearch" placeholder="Search history" spellcheck="false" autocomplete="off">
+                    </div>
+                    <button class="btn sp-hist-clear" id="histClear" type="button">Clear all</button>
+                </div>
+                <div id="histList" class="sp-hist-list"></div>
+                <div id="histEmpty" class="sp-hist-empty">No history yet. Pages you visit will show up here.</div>
+            </div>
+        </section>
+
+        <section class="sp-pane" data-pane="engine" aria-labelledby="paneEngineTitle">
+            <header class="sp-pane-head">
+                <h1 id="paneEngineTitle" class="sp-pane-title">Engine</h1>
+                <p class="sp-pane-sub">Choose the engine Nocturne uses to load sites — compare the trade-offs, then switch anytime.</p>
+            </header>
+
+            <div class="sp-card">
+                <div class="engine-grid">
+                    <div class="engine-opt" data-engine="exp">
+                        <div class="engine-top">
+                            <div class="engine-name">Experimental <span class="engine-tag">Default</span></div>
+                        </div>
+                        <div class="engine-meta">Modern rendering engine</div>
+                        <ul class="engine-list pros">
+                            <li>Loads complex modern sites (Spotify, web apps, more)</li>
+                            <li>Actively developed</li>
+                            <li>Best compatibility with modern web</li>
+                        </ul>
+                        <ul class="engine-list cons">
+                            <li>Some sites may load or behave unexpectedly</li>
+                        </ul>
+                        <div class="engine-foot" data-foot="exp"></div>
+                    </div>
+                    <div class="engine-opt" data-engine="std">
+                        <div class="engine-top">
+                            <div class="engine-name">Standard <span class="engine-tag beta">Legacy</span></div>
+                        </div>
+                        <div class="engine-meta">Classic rendering mode</div>
+                        <ul class="engine-list pros">
+                            <li>Fast and stable</li>
+                            <li>Works on the large majority of sites</li>
+                            <li>Reliable fallback</li>
+                        </ul>
+                        <ul class="engine-list cons">
+                            <li>A few modern apps (Spotify, some web apps) may not fully load</li>
+                            <li>If something breaks, try switching to Experimental</li>
+                        </ul>
+                        <div class="engine-foot" data-foot="std"></div>
+                    </div>
+                </div>
+                <div class="engine-confirm" id="engineConfirm">
+                    <div class="engine-confirm-text" id="engineConfirmText"></div>
+                    <div class="engine-confirm-row">
+                        <button type="button" class="btn ghost" id="engineCancel">Cancel</button>
+                        <button type="button" class="btn" id="engineGo">Switch &amp; reload</button>
+                    </div>
+                </div>
+            </div>
+            <script>(function(){try{var cur=localStorage.getItem("view-mode")==="std"?"std":"exp";var names={std:"Standard",exp:"Experimental"};var pending=null;var bar=document.getElementById("engineConfirm");var txt=document.getElementById("engineConfirmText");function render(){["std","exp"].forEach(function(eng){var opt=document.querySelector('.engine-opt[data-engine="'+eng+'"]');var foot=document.querySelector('.engine-foot[data-foot="'+eng+'"]');if(!opt||!foot)return;if(eng===cur){opt.classList.add("is-current");foot.innerHTML='<span class="engine-cur">● Currently active</span>';}else{opt.classList.remove("is-current");foot.innerHTML='<button type="button" class="btn engine-switch" data-switch="'+eng+'">Switch to '+names[eng]+'</button>';}});}var grid=document.querySelector(".engine-grid");if(grid){grid.addEventListener("click",function(e){var b=e.target.closest("[data-switch]");if(!b)return;pending=b.getAttribute("data-switch")==="exp"?"exp":"std";txt.textContent="Switch to "+names[pending]+"? This clears the current mode's caches and stored site cookies, then reloads - you'll be signed out of sites you opened here. You can switch back anytime if a site doesn't work.";bar.classList.add("show");});}document.getElementById("engineCancel").addEventListener("click",function(){pending=null;bar.classList.remove("show");});document.getElementById("engineGo").addEventListener("click",async function(){if(!pending)return;var go=this;try{go.disabled=true;go.textContent="Switching…";}catch(e){}try{localStorage.setItem("view-mode",pending);localStorage.setItem("nocturne-reset","true");localStorage.setItem("view-switch","true");}catch(e){}try{if(navigator.serviceWorker){var regs=await navigator.serviceWorker.getRegistrations();await Promise.all(regs.map(function(r){return r.unregister().catch(function(){});}));}}catch(e){}try{if(self.caches&&caches.keys){var cks=await caches.keys();await Promise.all(cks.map(function(k){return caches.delete(k).catch(function(){});}));}}catch(e){}var target="/?mode="+pending+"&_="+Date.now();var w=window;try{if(window.top&&window.top!==window)w=window.top;}catch(e){w=window;}try{w.location.replace(target);}catch(e){window.location.replace(target);}});render();}catch(e){}})();</script>
+        </section>
+
+        <section class="sp-pane" data-pane="advanced" aria-labelledby="paneAdvancedTitle">
+            <header class="sp-pane-head">
+                <h1 id="paneAdvancedTitle" class="sp-pane-title">Advanced</h1>
+                <p class="sp-pane-sub">Diagnostics for power users.</p>
+            </header>
+
+            <div class="sp-card">
+                <div class="row">
+                    <div class="row-label">
+                        <div class="row-name">Debug overlay</div>
+                        <div class="row-desc">Show engine diagnostics on screen.</div>
+                    </div>
+                    <div class="row-control">
+                        <label class="toggle"><input type="checkbox" id="debugToggle"><span class="track"></span></label>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="sp-pane" data-pane="performance" aria-labelledby="panePerformanceTitle">
+            <header class="sp-pane-head">
+                <h1 id="panePerformanceTitle" class="sp-pane-title">Performance</h1>
+                <p class="sp-pane-sub">Control how ads behave. Ads help keep Nocturne free.</p>
+            </header>
+
+            <div class="sp-card">
+                <div class="sp-card-head">
+                    <h2 class="sp-card-title">Ads</h2>
+                    <p class="sp-card-sub">Ads support Nocturne. You can adjust how often they appear.</p>
+                </div>
+
+                <div class="row">
+                    <div class="row-label">
+                        <div class="row-name">Ad frequency</div>
+                        <div class="row-desc">Minimum time between ads after a click. Max is every 10 minutes.</div>
+                    </div>
+                    <div class="row-control">
+                        <input type="range" id="adCooldownRange" min="1" max="10" step="1" class="range">
+                        <span class="range-val" id="adCooldownVal">2 min</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="sp-pane" data-pane="recovery" aria-labelledby="paneRecoveryTitle">
+            <header class="sp-pane-head">
+                <h1 id="paneRecoveryTitle" class="sp-pane-title">Recovery</h1>
+                <p class="sp-pane-sub">Reset things if something gets stuck.</p>
+            </header>
+
+            <div class="sp-card sp-card-danger">
+                <div class="row">
+                    <div class="row-label">
+                        <div class="row-name">Reset engine</div>
+                        <div class="row-desc">Clears the active session state. Reloads the page.</div>
+                    </div>
+                    <div class="row-control">
+                        <button class="btn" id="resetEngineBtn">Reset engine</button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="row-label">
+                        <div class="row-name">Reset all settings</div>
+                        <div class="row-desc">Restore everything to default. Doesn't sign you out.</div>
+                    </div>
+                    <div class="row-control">
+                        <button class="btn danger" id="resetAllBtn">Reset all</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="sp-pane" data-pane="about" aria-labelledby="paneAboutTitle">
+            <header class="sp-pane-head">
+                <h1 id="paneAboutTitle" class="sp-pane-title">About</h1>
+                <p class="sp-pane-sub"></p>
+            </header>
+
+            <div class="sp-card">
+                <div class="row">
+                    <div class="row-label"><div class="row-name">Version</div></div>
+                    <div class="row-control"><strong>2.0.0</strong></div>
+                </div>
+                <div class="row">
+                    <div class="row-label"><div class="row-name">Main builder</div></div>
+                    <div class="row-control"><strong>midnightsweat</strong></div>
+                </div>
+                <div class="row">
+                    <div class="row-label"><div class="row-name">Community</div></div>
+                    <div class="row-control">
+                        <a class="btn" href="https://discord.gg/eep35ceZus" target="_blank" rel="noopener noreferrer">Discord</a>
+                    </div>
+                </div>
+            </div>
+
+            <h2 class="sp-section-title">Security</h2>
+            <div class="sp-card">
+                <div class="row">
+                    <div class="row-label">
+                        <div class="row-name">DDoS protection</div>
+                        <div class="row-desc">Browser verification status for this session.</div>
+                    </div>
+                    <div class="row-control">
+                        <span class="verify-badge" id="verifyBadge"><span class="verify-dot"></span><span id="verifyText">Checking</span></span>
+                    </div>
+                </div>
+            </div>
+            <script>(function(){try{var ok=/(?:^|; *)nf_pass=/.test(document.cookie);var b=document.getElementById("verifyBadge"),t=document.getElementById("verifyText");if(b&&t){if(ok){b.classList.add("ok");t.textContent="Passed";}else{t.textContent="Not verified";}}}catch(e){}})();</script>
+
+            <h2 class="sp-section-title">Credits</h2>
+            <div class="sp-card">
+                <div class="row">
+                    <div class="row-label"><div class="row-name">Engine</div></div>
+                    <div class="row-control"><strong>Nocturne</strong></div>
+                </div>
+                <div class="row">
+                    <div class="row-label"><div class="row-name">Game library</div></div>
+                    <div class="row-control"><strong>luminsdk, and gnmath</strong></div>
+                </div>
+            </div>
+
+            <h2 class="sp-section-title">Tech stack</h2>
+            <div class="sp-card">
+                <div class="row">
+                    <div class="row-label"><div class="row-name">Runtime</div></div>
+                    <div class="row-control"><strong>Node.js · Express</strong></div>
+                </div>
+                <div class="row">
+                    <div class="row-label"><div class="row-name">Frontend</div></div>
+                    <div class="row-control"><strong>Vanilla JS · CSS</strong></div>
+                </div>
+            </div>
+
+            <div class="sp-legal">
+                <a href="/privacy.html">Privacy</a>
+                <span>·</span>
+                <a href="/terms.html">Terms</a>
+                <span>·</span>
+                <a href="/dmca.html">DMCA</a>
+                <span>·</span>
+                <a href="/legal.html">Legal</a>
+            </div>
+        </section>
+
+    </main>
+
+</div>
+
+<nav id="dock"></nav>
+<script src="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.7/src/js/lr2815.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.7/src/js/qt3674.js" defer></script>
+
+<script src="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.7/src/js/wz6714.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.7/src/js/ie7331.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.7/src/js/nk1873.js" defer></script>
+
+<script src="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.7/src/js/pu3927.js?v=20260929-2" defer></script>
+</body>
+</html>

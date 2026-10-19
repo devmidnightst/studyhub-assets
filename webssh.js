@@ -20,14 +20,15 @@ const CONSOLE_PW_FILE = path.join(process.env.NOCTURNE_DATA_DIR || path.join(__d
 
 function loadConsoleHash() { try { return fs.readFileSync(CONSOLE_PW_FILE, "utf8").trim(); } catch { return ""; } }
 function consolePasswordSet() { return !!loadConsoleHash(); }
-function verifyConsolePassword(pw) {
+async function verifyConsolePassword(pw) {
     const h = loadConsoleHash();
     if (!h) return false;
-    try { return verifyPassword(String(pw || ""), h); } catch { return false; }
+    return (await verifyPassword(String(pw || ""), h)) && loadConsoleHash() === h;
 }
-function setConsolePassword(pw) {
+async function setConsolePassword(pw) {
+    const hash = await hashPassword(pw);
     fs.mkdirSync(path.dirname(CONSOLE_PW_FILE), { recursive: true });
-    fs.writeFileSync(CONSOLE_PW_FILE, hashPassword(pw) + "\n", { mode: 0o600 });
+    fs.writeFileSync(CONSOLE_PW_FILE, hash + "\n", { mode: 0o600 });
 }
 function clearConsolePassword() { try { fs.unlinkSync(CONSOLE_PW_FILE); } catch {} }
 
@@ -35,7 +36,16 @@ function ownerFromReq(req) {
     try {
         let token = "";
         const m = /(?:^|;\s*)nocturne_sid=([^;]+)/.exec(req.headers.cookie || "");
-        if (m) token = decodeURIComponent(m[1]);
+        if (m) {
+            // The browser attaches this cookie to sockets opened by any same-site
+            // page, so a cookie login only counts when the page is our own origin.
+            // (The ?_noc_session path below needs the token itself, so it is safe
+            // from cross-origin mirrors.)
+            const origin = String(req.headers.origin || "");
+            let sameOrigin = !origin;
+            if (origin) { try { sameOrigin = new URL(origin).host.toLowerCase() === String(req.headers.host || "").toLowerCase(); } catch { sameOrigin = false; } }
+            if (sameOrigin) token = decodeURIComponent(m[1]);
+        }
         // Static S3/CloudFront pages cannot send the httpOnly cookie on a
         // cross-origin socket, so the console also passes the session as
         // ?_noc_session= (same token authMiddleware already accepts).
@@ -80,6 +90,7 @@ export function terminalUpgrade(req, socket, head) {
     wss.handleUpgrade(req, socket, head, (ws) => {
         let child = null;
         let authed = false;
+        let verifying = false;
 
         const lockRemainingSec = () => Math.max(0, Math.ceil((consoleLockedUntil - Date.now()) / 1000));
 
@@ -106,13 +117,14 @@ export function terminalUpgrade(req, socket, head) {
             try { ws.send(JSON.stringify({ __auth: "password-required" })); } catch {}
         }
 
-        ws.on("message", (d) => {
+        ws.on("message", async (d) => {
             if (authed) { try { child.stdin.write(d); } catch {}; return; }   // raw keystrokes once past the gate
 
             // Pre-auth: the only thing we accept is the password frame.
             let msg;
             try { msg = JSON.parse(d.toString()); } catch { return; }
-            if (msg.type !== "auth") return;
+            if (msg.type !== "auth" || verifying) return;
+            if (typeof msg.password !== "string" || msg.password.length > 256) return;
 
             // Locked out? Refuse regardless of what they send.
             if (lockRemainingSec() > 0) {
@@ -121,7 +133,17 @@ export function terminalUpgrade(req, socket, head) {
                 return;
             }
 
-            if (verifyConsolePassword(msg.password)) {
+            verifying = true;
+            let verified;
+            try { verified = await verifyConsolePassword(msg.password); }
+            catch {
+                if (ws.readyState === 1) ws.close(1013, "Password service busy; retry shortly");
+                return;
+            } finally { verifying = false; }
+            // The socket, owner session, or lock may have changed while hashing.
+            if (ws.readyState !== 1) return;
+            if (!ownerFromReq(req) || lockRemainingSec() > 0) { ws.close(); return; }
+            if (verified) {
                 consoleFails = 0;
                 startShell();
             } else {
@@ -155,12 +177,16 @@ export function mountConsole(app, { authMiddleware } = {}) {
         res.json({ set: consolePasswordSet() });
     });
 
-    app.post("/api/admin/console-password", ...guard, (req, res) => {
+    app.post("/api/admin/console-password", ...guard, async (req, res) => {
         if (req.body?.clear) { clearConsolePassword(); return res.json({ ok: true, set: false }); }
         const pw = typeof req.body?.password === "string" ? req.body.password : "";
         if (pw.length < 6) return res.status(400).json({ error: "Console password must be at least 6 characters." });
         if (pw.length > 256) return res.status(400).json({ error: "Too long." });
-        setConsolePassword(pw);
+        try { await setConsolePassword(pw); }
+        catch (error) {
+            if (error.status !== 503) throw error;
+            return res.set("Retry-After", "2").status(503).json({ error: "Password service busy; retry shortly." });
+        }
         res.json({ ok: true, set: true });
     });
 }

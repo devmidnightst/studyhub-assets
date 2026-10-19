@@ -2082,7 +2082,12 @@ async function aiApiHandler(req, res) {
         if (!userId) return res.status(401).json({ error: "Invalid API key." });
     } else if (req.body && (req.body.account || req.body.username) && req.body.password) {
         if (apiAuthBlocked(ip)) return res.status(429).json({ error: "Too many failed sign-ins — wait a few minutes." });
-        const u = authenticateUser(String(req.body.account || req.body.username), String(req.body.password));
+        let u;
+        try { u = await authenticateUser(String(req.body.account || req.body.username), String(req.body.password)); }
+        catch (error) {
+            if (error.status !== 503) throw error;
+            return res.set("Retry-After", "2").status(503).json({ error: "Password service busy; retry shortly." });
+        }
         if (!u) { apiAuthFail(ip); return res.status(401).json({ error: "Invalid account or password." }); }
         userId = u.id; username = u.username;
     } else {

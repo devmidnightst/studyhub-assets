@@ -1,20 +1,21 @@
 #dock {
     position: fixed;
-    bottom: 20px;
+    bottom: 22px;
     left: 50%;
     display: flex;
     align-items: center;
     gap: 2px;
     z-index: 20;
-    background: rgba(10, 11, 20, 0.78);
-    padding: 5px;
-    border-radius: 12px;
-    backdrop-filter: blur(18px);
+    background: rgba(14, 11, 22, 0.94);
+    padding: 4px;
+    border-radius: 0;
+    
+    
     border: 1px solid var(--line);
     transform: translate(-50%, 18px);
     opacity: 0;
-    transition: opacity 0.32s var(--ease), transform 0.32s var(--ease);
-    animation: dockIn 0.55s var(--ease) 0.22s forwards;
+    transition: opacity 0.32s var(--ease), transform 0.32s var(--ease), background 0.3s var(--ease);
+    animation: dockIn 0.7s var(--ease-out) 0.5s forwards;
 }
 
 @keyframes dockIn {
@@ -35,14 +36,14 @@ body.browsing #dock {
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 8px;
+    border-radius: 0;
     color: var(--fg-3);
     transition: background 0.18s var(--ease), color 0.18s var(--ease), transform 0.18s var(--ease);
     text-decoration: none;
 }
 
 .dock-btn:hover {
-    background: rgba(200, 195, 230, 0.06);
+    background: rgba(190, 170, 240, 0.08);
     color: var(--fg);
     transform: translateY(-1px);
 }
@@ -50,16 +51,18 @@ body.browsing #dock {
 .dock-btn:active { transform: translateY(0); }
 
 .dock-btn.active {
-    background: rgba(200, 195, 230, 0.08);
+    background: rgba(var(--glow), 0.14);
     color: var(--accent);
 }
 
-.dock-btn svg { width: 16px; height: 16px; }
+.dock-btn svg { width: 16px; height: 16px; stroke-width: 1.5; }
+.dock-btn:focus-visible { outline: 2px solid rgba(179, 148, 255, 0.55); outline-offset: 1px; }
+#dock:hover { background: rgba(14, 11, 22, 0.72); }
 
 .dock-toggle {
     position: relative;
     border: none;
-    background: rgba(200, 195, 230, 0.04);
+    background: rgba(255, 255, 255, 0.04);
     cursor: pointer;
 }
 .dock-toggle.has-active::after {
@@ -70,10 +73,10 @@ body.browsing #dock {
     width: 5px;
     height: 5px;
     background: var(--accent);
-    border-radius: 50%;
+    border-radius: 0;
 }
 .dock-toggle.open {
-    background: rgba(200, 195, 230, 0.1);
+    background: rgba(255, 255, 255, 0.1);
     color: var(--fg);
 }
 .dock-toggle.open svg { transform: rotate(45deg); }
@@ -89,10 +92,10 @@ body.browsing #dock {
     display: flex;
     gap: 2px;
     padding: 5px;
-    background: rgba(10, 11, 20, 0.92);
+    background: rgba(10, 9, 13, 0.92);
     border: 1px solid var(--line-2);
-    border-radius: 12px;
-    backdrop-filter: blur(20px);
+    border-radius: 0;
+    
     z-index: 25;
     pointer-events: none;
     opacity: 0;
@@ -114,13 +117,13 @@ body.browsing #dock {
         bottom: 14px;
         padding: 6px;
         gap: 4px;
-        border-radius: 14px;
+        border-radius: 0;
         max-width: calc(100vw - 24px);
     }
     .dock-btn {
         width: 40px;
         height: 40px;
-        border-radius: 10px;
+        border-radius: 0;
     }
     .dock-btn svg { width: 18px; height: 18px; }
     .dock-popover { max-width: calc(100vw - 24px); flex-wrap: wrap; justify-content: center; bottom: 76px; }

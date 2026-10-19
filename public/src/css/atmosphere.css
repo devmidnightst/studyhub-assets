@@ -1,0 +1,99 @@
+/* Atmosphere: one shaped light source, not a wash of colour.
+   A large moon limb enters from the top right. Its lit rim is a thin, crisp
+   crescent that falls off into the dark, and a very faint veil carries a little
+   of that light across the page. Everything else stays near-black, with a slow accent-tinted light pass over the moon. */
+
+.atmos {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+    background: var(--bg);
+    opacity: 0;
+    animation: atmosIn 1.4s var(--ease-out) 0.05s forwards;
+}
+
+.atmos i { position: absolute; display: block; }
+
+/* the moon: a dark disc whose lower-left limb catches light */
+.atmos .a-moon {
+    right: -64vmin;
+    top: -74vmin;
+    width: 116vmin;
+    height: 116vmin;
+    border-radius: 50%;
+    overflow: hidden;
+    background: radial-gradient(circle at 28% 72%, #09080f 0%, #060509 64%);
+    box-shadow:
+        inset 1.5px -1px 0 0 rgba(200, 184, 250, 0.2),
+        inset 34px -28px 100px -44px rgba(140, 118, 226, 0.22),
+        -34px 40px 180px -34px rgba(104, 84, 196, 0.13);
+}
+
+.atmos .a-moon::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: conic-gradient(from 0deg, color-mix(in srgb, var(--accent) 68%, transparent) 0deg, #fff 2deg, color-mix(in srgb, var(--accent) 82%, transparent) 4deg, transparent 7deg 360deg);
+    -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 1px));
+    mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 1px));
+    opacity: 0;
+    transform: rotate(0deg);
+    animation: moonSweep var(--moon-sweep-duration, 12s) linear var(--moon-sweep-delay, 0s) infinite;
+    pointer-events: none;
+}
+
+@keyframes moonSweep {
+    0% { opacity: 0.9; transform: rotate(-110deg); }
+    82% { opacity: 0.9; transform: rotate(-164deg); }
+    96%, 100% { opacity: 0; transform: rotate(-180deg); }
+}
+
+/* a faint veil that lets the light reach the page without tinting all of it */
+.atmos .a-veil {
+    inset: 0;
+    background:
+        radial-gradient(52% 46% at 74% 22%, rgba(96, 78, 168, 0.075), transparent 70%),
+        radial-gradient(40% 36% at 6% 104%, rgba(58, 48, 108, 0.07), transparent 72%);
+}
+
+/* edge falloff keeps the lit area feeling anchored */
+.atmos::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(135% 105% at 50% 40%, rgba(3, 2, 6, 0) 55%, rgba(3, 2, 6, 0.6) 100%);
+}
+
+/* fine grain: hides gradient banding and gives the dark some texture */
+.atmos::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    opacity: 0.05;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .6 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    background-size: 160px 160px;
+}
+
+/* the starfield read as a template, so it is retired from the default look */
+#bgCanvas,
+#bgCanvas.visible { display: none; }
+
+@keyframes atmosIn { to { opacity: 1; } }
+
+/* a proxied page covers the viewport, so stop painting the backdrop */
+body.browsing .atmos { visibility: hidden; }
+
+@media (max-width: 720px) {
+    .atmos .a-moon { right: -52vmin; top: -62vmin; width: 104vmin; height: 104vmin; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .atmos { animation: none; opacity: 1; }
+    .atmos .a-moon::after { animation: none; opacity: 0.9; transform: rotate(-110deg); }
+}
+html.perf-lite .atmos::after,
+html.perf-min .atmos::after { display: none; }
+

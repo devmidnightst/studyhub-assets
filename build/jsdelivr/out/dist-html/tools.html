@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-69T9E59SM7"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-69T9E59SM7');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="dark">
+    <meta name="theme-color" content="#060509">
+    <title>Nocturne - Developer Tools</title>
+    <style>html,body{background:#060509;color:#ededf0;margin:0}</style>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='9' fill='%230b0a14'/><circle cx='16' cy='16' r='9' fill='%23c9c1ff'/><circle cx='21' cy='14' r='8' fill='%230b0a14'/></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.7/src/css/global.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.7/src/css/dock.css">
+    <style>
+        body { overflow-y: auto; }
+        .page-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 22px 32px 0; max-width: 980px; margin: 0 auto;
+            opacity: 0; animation: slideDown 0.5s var(--ease) 0.05s forwards;
+        }
+        .brand-title { font-size: 15px; font-weight: 500; color: var(--fg); }
+        .brand-sub { font-size: 12px; color: var(--fg-3); margin-left: 10px; }
+        .back {
+            display: inline-flex; align-items: center; gap: 6px;
+            color: var(--fg-3); font-size: 12px; text-decoration: none;
+            transition: color 0.15s, transform 0.15s;
+        }
+        .back:hover { color: var(--fg); transform: translateX(-2px); }
+        .wrap { max-width: 980px; margin: 0 auto; padding: 32px; padding-bottom: 140px; }
+
+        .intro {
+            opacity: 0; animation: slideUp 0.5s var(--ease) 0.1s forwards;
+            margin-bottom: 28px;
+        }
+        .intro h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 6px; }
+        .intro p { font-size: 13px; color: var(--fg-3); line-height: 1.55; }
+
+        .tabs {
+            display: flex; gap: 4px; padding: 4px;
+            background: var(--panel); border: 1px solid var(--line-2);
+            border-radius: 0; margin-bottom: 24px;
+            
+            opacity: 0; animation: slideUp 0.5s var(--ease) 0.16s forwards;
+            overflow-x: auto;
+        }
+        .tab {
+            padding: 9px 16px; border-radius: 0; font-size: 12px; font-weight: 500;
+            color: var(--fg-3); transition: all 0.15s; white-space: nowrap;
+        }
+        .tab:hover { color: var(--fg-2); }
+        .tab.active { background: rgba(255, 255, 255, 0.08); color: var(--fg); }
+
+        .panel {
+            background: var(--panel); border: 1px solid var(--line-2);
+            border-radius: 0; padding: 22px;
+            
+            opacity: 0; animation: slideUp 0.5s var(--ease) 0.22s forwards;
+        }
+        .panel.hidden { display: none; }
+
+        .field { margin-bottom: 14px; }
+        .field-label {
+            display: block; font-size: 11px; font-weight: 600;
+            letter-spacing: 0.06em; text-transform: uppercase;
+            color: var(--fg-3); margin-bottom: 7px;
+        }
+        textarea, input[type=text] {
+            width: 100%; background: var(--bg-2); border: 1px solid var(--line);
+            border-radius: 0; padding: 11px 12px; color: var(--fg);
+            font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12.5px;
+            resize: vertical; transition: border-color 0.15s;
+        }
+        textarea:focus, input[type=text]:focus { border-color: var(--line-3); outline: none; }
+        textarea { min-height: 110px; line-height: 1.55; }
+
+        .row-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; align-items: center; }
+        .btn {
+            padding: 8px 14px; border-radius: 0; font-size: 12px; font-weight: 500;
+            border: 1px solid var(--line-2); color: var(--fg-2); transition: all 0.15s;
+            background: rgba(13, 12, 17, 0.4);
+        }
+        .btn:hover { background: rgba(40, 42, 58, 0.6); color: var(--fg); border-color: var(--line-3); }
+        .btn.primary { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+        .btn.primary:hover { background: var(--accent); border-color: var(--accent); }
+        .btn.ghost { background: none; border: none; color: var(--fg-3); padding: 8px 10px; }
+        .btn.ghost:hover { color: var(--fg); background: rgba(255, 255, 255, 0.06); }
+
+        .status {
+            display: inline-flex; align-items: center; gap: 6px;
+            font-size: 11px; color: var(--fg-3); margin-left: auto;
+        }
+        .status.ok { color: #82d0a4; }
+        .status.err { color: #d08282; }
+        .status.copied { color: var(--accent); }
+
+        .qr-result {
+            display: flex; flex-direction: column; align-items: center; gap: 12px;
+            padding: 24px; background: var(--bg-2); border-radius: 0; margin-top: 14px;
+            border: 1px solid var(--line);
+        }
+        .qr-result img {
+            width: 240px; height: 240px; background: #fff; padding: 12px; border-radius: 0;
+        }
+        .qr-result .meta { font-size: 11px; color: var(--fg-3); text-align: center; }
+
+        .hash-grid { display: grid; gap: 10px; }
+        .hash-row {
+            display: grid; grid-template-columns: 80px 1fr auto; gap: 10px; align-items: center;
+            padding: 10px 12px; background: var(--bg-2); border: 1px solid var(--line); border-radius: 0;
+            font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11.5px;
+        }
+        .hash-row .label { font-weight: 600; color: var(--accent); }
+        .hash-row .value { color: var(--fg-2); overflow-wrap: anywhere; }
+
+        @media (max-width: 600px) {
+            .wrap { padding: 18px; padding-bottom: 140px; }
+            .qr-result img { width: 180px; height: 180px; }
+            .hash-row { grid-template-columns: 60px 1fr; }
+            .hash-row .copy { grid-column: 1 / -1; justify-self: end; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-header">
+    <div>
+        <span class="brand-title">Nocturne</span>
+        <span class="brand-sub">Tools</span>
+    </div>
+    <a href="/" class="back">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        Back
+    </a>
+</div>
+
+<div class="wrap">
+
+    <div class="intro">
+        <h1>Tools</h1>
+        <p>Quick utilities - encode, format, hash, generate. Everything runs locally in your browser unless noted.</p>
+    </div>
+
+    <div class="tabs" id="tabs">
+        <button class="tab active" data-tab="b64">Base64</button>
+        <button class="tab" data-tab="url">URL Encode</button>
+        <button class="tab" data-tab="json">JSON</button>
+        <button class="tab" data-tab="qr">QR Code</button>
+        <button class="tab" data-tab="hash">Hash</button>
+        <button class="tab" data-tab="uuid">UUID</button>
+        <button class="tab" data-tab="ts">Timestamp</button>
+    </div>
+
+    <section class="panel" id="panel-b64">
+        <div class="field">
+            <label class="field-label">Input</label>
+            <textarea id="b64In" placeholder="Type or paste text here..."></textarea>
+        </div>
+        <div class="row-actions">
+            <button class="btn primary" id="b64Encode">Encode →</button>
+            <button class="btn" id="b64Decode">← Decode</button>
+            <button class="btn ghost" id="b64Swap">↑↓ Swap</button>
+            <span class="status" id="b64Status"></span>
+        </div>
+        <div class="field" style="margin-top:14px">
+            <label class="field-label">Output</label>
+            <textarea id="b64Out" readonly placeholder="Result will appear here..."></textarea>
+        </div>
+        <div class="row-actions">
+            <button class="btn" id="b64Copy">Copy</button>
+        </div>
+    </section>
+
+    <section class="panel hidden" id="panel-url">
+        <div class="field">
+            <label class="field-label">Input</label>
+            <textarea id="urlIn" placeholder="Type a URL or string..."></textarea>
+        </div>
+        <div class="row-actions">
+            <button class="btn primary" id="urlEncode">Encode →</button>
+            <button class="btn" id="urlDecode">← Decode</button>
+            <button class="btn ghost" id="urlComponent">Component-only</button>
+            <span class="status" id="urlStatus"></span>
+        </div>
+        <div class="field" style="margin-top:14px">
+            <label class="field-label">Output</label>
+            <textarea id="urlOut" readonly></textarea>
+        </div>
+        <div class="row-actions">
+            <button class="btn" id="urlCopy">Copy</button>
+        </div>
+    </section>
+
+    <section class="panel hidden" id="panel-json">
+        <div class="field">
+            <label class="field-label">JSON Input</label>
+            <textarea id="jsonIn" placeholder='{"hello":"world"}' style="min-height:160px"></textarea>
+        </div>
+        <div class="row-actions">
+            <button class="btn primary" id="jsonFormat">Format</button>
+            <button class="btn" id="jsonMinify">Minify</button>
+            <button class="btn" id="jsonValidate">Validate</button>
+            <span class="status" id="jsonStatus"></span>
+        </div>
+        <div class="field" style="margin-top:14px">
+            <label class="field-label">Output</label>
+            <textarea id="jsonOut" readonly style="min-height:160px"></textarea>
+        </div>
+        <div class="row-actions">
+            <button class="btn" id="jsonCopy">Copy</button>
+        </div>
+    </section>
+
+    <section class="panel hidden" id="panel-qr">
+        <div class="field">
+            <label class="field-label">Content</label>
+            <textarea id="qrIn" placeholder="URL, text, contact info..."></textarea>
+        </div>
+        <div class="row-actions">
+            <button class="btn primary" id="qrGen">Generate</button>
+            <span class="status" id="qrStatus">Powered by api.qrserver.com</span>
+        </div>
+        <div id="qrResult"></div>
+    </section>
+
+    <section class="panel hidden" id="panel-hash">
+        <div class="field">
+            <label class="field-label">Input</label>
+            <textarea id="hashIn" placeholder="Text to hash..."></textarea>
+        </div>
+        <div class="row-actions">
+            <button class="btn primary" id="hashCompute">Compute Hashes</button>
+            <span class="status" id="hashStatus"></span>
+        </div>
+        <div class="hash-grid" id="hashGrid" style="margin-top:14px"></div>
+    </section>
+
+    <section class="panel hidden" id="panel-uuid">
+        <div class="row-actions" style="margin-bottom:14px">
+            <button class="btn primary" id="uuidGen">Generate UUID v4</button>
+            <button class="btn" id="uuidGen5">Generate 5 at once</button>
+        </div>
+        <div class="field">
+            <label class="field-label">Output</label>
+            <textarea id="uuidOut" readonly style="min-height:140px"></textarea>
+        </div>
+        <div class="row-actions">
+            <button class="btn" id="uuidCopy">Copy</button>
+        </div>
+    </section>
+
+    <section class="panel hidden" id="panel-ts">
+        <div class="field">
+            <label class="field-label">Unix Timestamp (seconds or milliseconds)</label>
+            <input type="text" id="tsIn" placeholder="1714291200 or 1714291200000">
+        </div>
+        <div class="row-actions">
+            <button class="btn primary" id="tsParse">Parse →</button>
+            <button class="btn" id="tsNow">Insert Now</button>
+            <span class="status" id="tsStatus"></span>
+        </div>
+        <div class="hash-grid" id="tsResult" style="margin-top:14px"></div>
+    </section>
+
+</div>
+
+<nav id="dock"></nav>
+<script src="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.7/src/js/lr2815.js" defer></script>
+
+<script>
+const $ = id => document.getElementById(id);
+
+document.getElementById("tabs").addEventListener("click", e => {
+    const t = e.target.closest(".tab");
+    if (!t) return;
+    document.querySelectorAll(".tab").forEach(x => x.classList.remove("active"));
+    t.classList.add("active");
+    document.querySelectorAll(".panel").forEach(p => p.classList.add("hidden"));
+    $("panel-" + t.dataset.tab).classList.remove("hidden");
+});
+
+function flash(el, msg, cls) {
+    el.textContent = msg;
+    el.className = "status " + (cls || "");
+    clearTimeout(el._t);
+    el._t = setTimeout(() => { el.textContent = ""; el.className = "status"; }, 1800);
+}
+async function copyText(text, statusEl) {
+    try { await navigator.clipboard.writeText(text); flash(statusEl, "Copied", "copied"); }
+    catch { flash(statusEl, "Copy failed", "err"); }
+}
+
+$("b64Encode").onclick = () => {
+    try {
+        const s = $("b64In").value;
+        $("b64Out").value = btoa(unescape(encodeURIComponent(s)));
+        flash($("b64Status"), "Encoded", "ok");
+    } catch (e) { flash($("b64Status"), e.message, "err"); }
+};
+$("b64Decode").onclick = () => {
+    try {
+        $("b64Out").value = decodeURIComponent(escape(atob($("b64In").value.trim())));
+        flash($("b64Status"), "Decoded", "ok");
+    } catch (e) { flash($("b64Status"), "Invalid Base64", "err"); }
+};
+$("b64Swap").onclick = () => {
+    const a = $("b64In").value, b = $("b64Out").value;
+    $("b64In").value = b; $("b64Out").value = a;
+};
+$("b64Copy").onclick = () => copyText($("b64Out").value, $("b64Status"));
+
+let urlMode = "full";
+$("urlEncode").onclick = () => {
+    try {
+        const s = $("urlIn").value;
+        $("urlOut").value = urlMode === "component" ? encodeURIComponent(s) : encodeURI(s);
+        flash($("urlStatus"), "Encoded (" + urlMode + ")", "ok");
+    } catch (e) { flash($("urlStatus"), e.message, "err"); }
+};
+$("urlDecode").onclick = () => {
+    try {
+        $("urlOut").value = decodeURIComponent($("urlIn").value);
+        flash($("urlStatus"), "Decoded", "ok");
+    } catch (e) { flash($("urlStatus"), "Decode failed", "err"); }
+};
+$("urlComponent").onclick = () => {
+    urlMode = urlMode === "full" ? "component" : "full";
+    flash($("urlStatus"), "Mode: " + urlMode, "ok");
+};
+$("urlCopy").onclick = () => copyText($("urlOut").value, $("urlStatus"));
+
+$("jsonFormat").onclick = () => {
+    try {
+        const v = JSON.parse($("jsonIn").value);
+        $("jsonOut").value = JSON.stringify(v, null, 2);
+        flash($("jsonStatus"), "Formatted", "ok");
+    } catch (e) { flash($("jsonStatus"), e.message, "err"); }
+};
+$("jsonMinify").onclick = () => {
+    try {
+        $("jsonOut").value = JSON.stringify(JSON.parse($("jsonIn").value));
+        flash($("jsonStatus"), "Minified", "ok");
+    } catch (e) { flash($("jsonStatus"), e.message, "err"); }
+};
+$("jsonValidate").onclick = () => {
+    try {
+        JSON.parse($("jsonIn").value);
+        flash($("jsonStatus"), "Valid JSON", "ok");
+    } catch (e) { flash($("jsonStatus"), e.message, "err"); }
+};
+$("jsonCopy").onclick = () => copyText($("jsonOut").value, $("jsonStatus"));
+
+$("qrGen").onclick = () => {
+    const v = $("qrIn").value.trim();
+    if (!v) { flash($("qrStatus"), "Empty input", "err"); return; }
+    const url = `https://api.qrserver.com/v1/create-qr-code/?size=480x480&format=png&margin=4&data=${encodeURIComponent(v)}`;
+    $("qrResult").innerHTML = `
+        <div class="qr-result">
+            <img src="${url}" alt="QR code">
+            <div class="meta">${v.length} characters · click image to download</div>
+            <a href="${url}" download="qrcode.png" class="btn">Download PNG</a>
+        </div>`;
+    flash($("qrStatus"), "Generated", "ok");
+};
+
+async function sha(algo, text) {
+    const buf = new TextEncoder().encode(text);
+    const hash = await crypto.subtle.digest(algo, buf);
+    return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, "0")).join("");
+}
+$("hashCompute").onclick = async () => {
+    const t = $("hashIn").value;
+    if (!t) { flash($("hashStatus"), "Empty input", "err"); return; }
+    flash($("hashStatus"), "Computing…");
+    try {
+        const [s1, s256, s384, s512] = await Promise.all([sha("SHA-1", t), sha("SHA-256", t), sha("SHA-384", t), sha("SHA-512", t)]);
+        const rows = [["SHA-1", s1], ["SHA-256", s256], ["SHA-384", s384], ["SHA-512", s512]];
+        $("hashGrid").innerHTML = rows.map(([k, v]) => `
+            <div class="hash-row">
+                <span class="label">${k}</span>
+                <span class="value">${v}</span>
+                <button class="btn ghost copy" data-h="${v}">Copy</button>
+            </div>`).join("");
+        flash($("hashStatus"), "Done", "ok");
+    } catch (e) { flash($("hashStatus"), e.message, "err"); }
+};
+$("hashGrid").addEventListener("click", e => {
+    const b = e.target.closest(".copy");
+    if (!b) return;
+    copyText(b.dataset.h, $("hashStatus"));
+});
+
+function uuid4() {
+    const b = crypto.getRandomValues(new Uint8Array(16));
+    b[6] = (b[6] & 0x0f) | 0x40;
+    b[8] = (b[8] & 0x3f) | 0x80;
+    const h = Array.from(b, x => x.toString(16).padStart(2, "0")).join("");
+    return `${h.slice(0,8)}-${h.slice(8,12)}-${h.slice(12,16)}-${h.slice(16,20)}-${h.slice(20)}`;
+}
+$("uuidGen").onclick = () => { $("uuidOut").value = uuid4(); };
+$("uuidGen5").onclick = () => { $("uuidOut").value = Array.from({ length: 5 }, uuid4).join("\n"); };
+$("uuidCopy").onclick = () => copyText($("uuidOut").value, null);
+
+$("tsParse").onclick = () => {
+    const raw = $("tsIn").value.trim();
+    if (!raw) { flash($("tsStatus"), "Empty", "err"); return; }
+    let n = parseInt(raw, 10);
+    if (isNaN(n)) { flash($("tsStatus"), "Not a number", "err"); return; }
+    if (n < 1e12) n *= 1000;
+    const d = new Date(n);
+    if (isNaN(d.getTime())) { flash($("tsStatus"), "Invalid date", "err"); return; }
+    const rows = [
+        ["Local", d.toString()],
+        ["UTC", d.toUTCString()],
+        ["ISO", d.toISOString()],
+        ["Date", d.toLocaleDateString()],
+        ["Time", d.toLocaleTimeString()],
+        ["Sec", String(Math.floor(n / 1000))],
+        ["Ms", String(n)]
+    ];
+    $("tsResult").innerHTML = rows.map(([k, v]) => `
+        <div class="hash-row">
+            <span class="label">${k}</span>
+            <span class="value">${v}</span>
+        </div>`).join("");
+    flash($("tsStatus"), "Parsed", "ok");
+};
+$("tsNow").onclick = () => { $("tsIn").value = String(Date.now()); $("tsParse").click(); };
+</script>
+
+<script src="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.7/src/js/pu3927.js?v=20260929-2" defer></script>
+</body>
+</html>

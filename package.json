@@ -7,7 +7,9 @@
   "scripts": {
     "start": "node index.js",
     "dev": "node index.js",
-    "build:sapphire": "esbuild node_modules/@x8r/sapphire/src/index.ts --bundle --format=esm --platform=browser --target=es2020 --alias:@mercuryworkshop/scramjet-controller=./build/scramjet-controller-shim.mjs --outfile=public/sapphire/sapphire.bundle.mjs --sourcemap"
+    "build:sapphire": "esbuild node_modules/@x8r/sapphire/src/index.ts --bundle --format=esm --platform=browser --target=es2020 --alias:@mercuryworkshop/scramjet-controller=./build/scramjet-controller-shim.mjs --outfile=public/sapphire/sapphire.bundle.mjs --sourcemap",
+    "build:assets": "node scripts/build-assets.mjs",
+    "test:optimizations": "node --test tests/optimizations.test.mjs tests/chat-moderation.test.mjs"
   },
   "keywords": [
     "proxy",
@@ -26,6 +28,7 @@
     "@mercuryworkshop/wisp-js": "^0.4.0",
     "@titaniumnetwork-dev/ultraviolet": "^3.2.10",
     "@x8r/sapphire": "^0.1.3",
+    "animejs": "^4.5.0",
     "better-sqlite3": "^12.9.0",
     "cap-widget": "^0.1.56",
     "capjs-core": "^0.1.1",

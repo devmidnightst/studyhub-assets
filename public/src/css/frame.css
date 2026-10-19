@@ -1,9 +1,9 @@
-#frameStack {
+#viewStack {
     position: fixed;
     top: 46px;
-    left: 0;
-    width: 100%;
-    height: calc(100% - 46px);
+    left: var(--sb-w, 0px);
+    right: 0;
+    bottom: 0;
     pointer-events: none;
 }
 
@@ -23,14 +23,6 @@
 .tab-frame.active { display: block; visibility: hidden; }
 .tab-frame.active.visible { visibility: visible; }
 
-.tab-strip.visible ~ #frameStack {
-    top: 98px;
-    height: calc(100% - 98px);
-}
-
-@media (max-width: 580px) {
-    .tab-strip.visible ~ #frameStack {
-        top: 102px;
-        height: calc(100% - 102px);
-    }
+@media (max-width: 720px) {
+    #viewStack { top: 50px; }
 }

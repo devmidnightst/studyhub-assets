@@ -10,9 +10,9 @@
     justify-content: center;
     overflow-y: auto;
     padding: 24px 16px;
-    background: radial-gradient(circle at 50% 35%, rgba(40, 36, 70, 0.45) 0%, rgba(5, 6, 13, 0.92) 60%, rgba(5, 6, 13, 0.98) 100%);
-    backdrop-filter: blur(22px);
-    -webkit-backdrop-filter: blur(22px);
+    background: radial-gradient(circle at 50% 35%, rgba(40, 36, 70, 0.45) 0%, rgba(6, 5, 9, 0.92) 60%, rgba(6, 5, 9, 0.98) 100%);
+    
+    
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.55s var(--ob-ease);
@@ -32,9 +32,9 @@
 #onboarding .ob-card {
     width: min(560px, calc(100vw - 32px));
     margin: auto;
-    background: linear-gradient(180deg, rgba(20, 22, 38, 0.78) 0%, rgba(14, 15, 28, 0.82) 100%);
+    background: rgba(13, 12, 17, 0.78);
     border: 1px solid var(--line-2);
-    border-radius: 22px;
+    border-radius: 0;
     padding: 32px 32px 24px;
     box-shadow: 0 28px 80px rgba(0, 0, 0, 0.55), 0 1px 0 rgba(255, 255, 255, 0.04) inset;
     transform: translate3d(0, 18px, 0) scale(0.98);
@@ -74,11 +74,11 @@
 .ob-brand-mark {
     width: 22px;
     height: 22px;
-    border-radius: 50%;
+    border-radius: 0;
     background:
         radial-gradient(circle at 70% 35%, var(--bg) 38%, transparent 39%),
         radial-gradient(circle at 50% 50%, var(--accent) 0%, var(--accent-2) 100%);
-    box-shadow: 0 0 24px rgba(184, 176, 218, 0.28);
+    box-shadow: none;
 }
 
 .ob-skip {
@@ -88,7 +88,7 @@
     border: none;
     cursor: pointer;
     padding: 6px 10px;
-    border-radius: 8px;
+    border-radius: 0;
     transition: color 0.15s var(--ease), background 0.15s var(--ease);
 }
 
@@ -107,7 +107,7 @@
 .ob-step-dot {
     flex: 1;
     height: 3px;
-    border-radius: 999px;
+    border-radius: 0;
     background: var(--line-2);
     overflow: hidden;
     position: relative;
@@ -119,7 +119,7 @@
     inset: 0;
     transform-origin: left center;
     transform: scaleX(0);
-    background: linear-gradient(90deg, var(--accent-2), var(--accent));
+    background: var(--accent-2);
     transition: transform 0.6s var(--ob-ease);
 }
 
@@ -194,18 +194,18 @@
     width: 84px;
     height: 84px;
     margin: 12px auto 24px;
-    border-radius: 50%;
+    border-radius: 0;
     background:
         radial-gradient(circle at 70% 35%, var(--bg) 38%, transparent 39%),
         radial-gradient(circle at 50% 50%, var(--accent) 0%, var(--accent-2) 100%);
-    box-shadow: 0 0 60px rgba(184, 176, 218, 0.35), 0 0 0 1px rgba(184, 176, 218, 0.1) inset;
+    box-shadow: 0 0 0 1px rgba(168, 152, 232, 0.07) inset;
     animation: obOrbPulse 5.2s cubic-bezier(0.45, 0, 0.55, 1) infinite;
     will-change: transform;
 }
 
 @keyframes obOrbPulse {
-    0%, 100% { transform: scale(1); box-shadow: 0 0 60px rgba(184, 176, 218, 0.35), 0 0 0 1px rgba(184, 176, 218, 0.1) inset; }
-    50%      { transform: scale(1.045); box-shadow: 0 0 84px rgba(184, 176, 218, 0.52), 0 0 0 1px rgba(184, 176, 218, 0.18) inset; }
+    0%, 100% { transform: scale(1); box-shadow: 0 0 0 1px rgba(168, 152, 232, 0.07) inset; }
+    50%      { transform: scale(1.045); box-shadow: 0 0 0 1px rgba(168, 152, 232, 0.126) inset; }
 }
 
 .ob-welcome-headline {
@@ -238,7 +238,7 @@
 
 .ob-swatch {
     aspect-ratio: 1;
-    border-radius: 14px;
+    border-radius: 0;
     border: 1.5px solid var(--line-2);
     cursor: pointer;
     position: relative;
@@ -271,7 +271,7 @@
 
 .ob-swatch.selected {
     border-color: var(--fg);
-    box-shadow: 0 0 0 1px var(--fg) inset, 0 0 30px var(--swatch-glow, rgba(184, 176, 218, 0.5));
+    box-shadow: 0 0 0 1px var(--fg) inset;
 }
 
 .ob-swatch .ob-swatch-check {
@@ -303,9 +303,9 @@
     justify-content: center;
     gap: 8px;
     padding: 18px 12px;
-    border-radius: 14px;
+    border-radius: 0;
     border: 1.5px solid var(--line-2);
-    background: rgba(20, 22, 38, 0.45);
+    background: rgba(13, 12, 17, 0.45);
     cursor: pointer;
     transition: transform 0.28s var(--ob-ease), border-color 0.28s var(--ob-ease), background 0.28s var(--ob-ease);
     text-align: center;
@@ -314,7 +314,7 @@
 .ob-tile-preview {
     width: 100%;
     aspect-ratio: 1.55;
-    border-radius: 10px;
+    border-radius: 0;
     overflow: hidden;
     position: relative;
     background: var(--bg-2);
@@ -325,7 +325,7 @@
         radial-gradient(1.5px 1.5px at 18% 22%, rgba(255, 255, 255, 0.9), transparent 60%),
         radial-gradient(1px 1px at 62% 36%, rgba(255, 255, 255, 0.7), transparent 60%),
         radial-gradient(1.4px 1.4px at 78% 70%, rgba(255, 255, 255, 0.85), transparent 60%),
-        radial-gradient(1px 1px at 36% 78%, rgba(201, 193, 255, 0.7), transparent 60%),
+        radial-gradient(1px 1px at 36% 78%, rgba(168, 152, 232, 0.49), transparent 60%),
         radial-gradient(2px 2px at 88% 18%, rgba(255, 255, 255, 0.9), transparent 60%),
         radial-gradient(circle at 30% 60%, rgba(138, 128, 182, 0.18), transparent 60%),
         var(--bg);
@@ -335,7 +335,7 @@
     background:
         radial-gradient(80% 60% at 20% 20%, rgba(155, 218, 176, 0.25), transparent 60%),
         radial-gradient(70% 60% at 80% 80%, rgba(149, 200, 224, 0.3), transparent 60%),
-        radial-gradient(60% 50% at 60% 30%, rgba(184, 176, 218, 0.28), transparent 60%),
+        radial-gradient(60% 50% at 60% 30%, rgba(168, 152, 232, 0.196), transparent 60%),
         var(--bg);
     animation: obAuroraDrift 6s var(--ease) infinite alternate;
 }
@@ -430,13 +430,13 @@
 .ob-tile:hover {
     transform: translateY(-2px);
     border-color: var(--line-3);
-    background: rgba(28, 30, 50, 0.55);
+    background: rgba(13, 12, 17, 0.55);
 }
 
 .ob-tile.selected {
     border-color: var(--accent);
     background: rgba(40, 36, 70, 0.45);
-    box-shadow: 0 0 0 1px var(--accent) inset, 0 0 24px rgba(184, 176, 218, 0.22);
+    box-shadow: 0 0 0 1px var(--accent) inset;
 }
 
 .ob-perf-card {
@@ -444,9 +444,9 @@
     flex-direction: column;
     gap: 6px;
     padding: 16px 14px;
-    border-radius: 14px;
+    border-radius: 0;
     border: 1.5px solid var(--line-2);
-    background: rgba(20, 22, 38, 0.45);
+    background: rgba(13, 12, 17, 0.45);
     cursor: pointer;
     text-align: left;
     transition: transform 0.28s var(--ob-ease), border-color 0.28s var(--ob-ease), background 0.28s var(--ob-ease);
@@ -454,12 +454,12 @@
 .ob-perf-card:hover {
     transform: translateY(-2px);
     border-color: var(--line-3);
-    background: rgba(28, 30, 50, 0.55);
+    background: rgba(13, 12, 17, 0.55);
 }
 .ob-perf-card.selected {
     border-color: var(--accent);
     background: rgba(40, 36, 70, 0.45);
-    box-shadow: 0 0 0 1px var(--accent) inset, 0 0 24px rgba(184, 176, 218, 0.22);
+    box-shadow: 0 0 0 1px var(--accent) inset;
 }
 .ob-perf-name { font-size: 14px; font-weight: 600; color: var(--fg); }
 .ob-perf-sub { font-size: 12px; color: var(--fg-2); }
@@ -473,24 +473,24 @@
     width: 100%;
     margin-top: 14px;
     padding: 11px 14px;
-    border-radius: 11px;
+    border-radius: 0;
     border: 1.5px dashed var(--line-3);
-    background: rgba(184, 176, 218, 0.06);
+    background: rgba(168, 152, 232, 0.042);
     color: var(--fg-2);
     font-size: 13px;
     font-weight: 500;
     cursor: pointer;
     transition: border-color 0.2s var(--ob-ease), background 0.2s var(--ob-ease), color 0.2s var(--ob-ease);
 }
-.ob-ai-detect:hover { border-color: var(--accent); background: rgba(184, 176, 218, 0.1); color: var(--fg); }
+.ob-ai-detect:hover { border-color: var(--accent); background: rgba(168, 152, 232, 0.07); color: var(--fg); }
 .ob-ai-detect:disabled { cursor: default; opacity: 0.7; }
 .ob-ai-detect svg { width: 15px; height: 15px; flex-shrink: 0; }
 
 .ob-perf-ai-result {
     margin-top: 10px;
     padding: 10px 12px;
-    border-radius: 10px;
-    background: rgba(184, 176, 218, 0.06);
+    border-radius: 0;
+    background: rgba(168, 152, 232, 0.042);
     border: 1px solid var(--line-2);
     font-size: 12.5px;
     line-height: 1.5;
@@ -510,9 +510,9 @@
     align-items: center;
     gap: 12px;
     padding: 12px 14px;
-    border-radius: 12px;
+    border-radius: 0;
     border: 1.5px solid var(--line-2);
-    background: rgba(20, 22, 38, 0.45);
+    background: rgba(13, 12, 17, 0.45);
     cursor: pointer;
     transition: transform 0.26s var(--ob-ease), border-color 0.26s var(--ob-ease), background 0.26s var(--ob-ease);
     text-align: left;
@@ -521,7 +521,7 @@
 .ob-engine:hover, .ob-cloak:hover {
     transform: translateY(-1px);
     border-color: var(--line-3);
-    background: rgba(28, 30, 50, 0.55);
+    background: rgba(13, 12, 17, 0.55);
 }
 
 .ob-engine.selected, .ob-cloak.selected {
@@ -533,7 +533,7 @@
 .ob-engine-icon, .ob-cloak-icon {
     width: 26px;
     height: 26px;
-    border-radius: 7px;
+    border-radius: 0;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -581,9 +581,9 @@
     align-items: center;
     gap: 12px;
     padding: 14px;
-    border-radius: 12px;
+    border-radius: 0;
     border: 1.5px solid var(--line-2);
-    background: rgba(20, 22, 38, 0.45);
+    background: rgba(13, 12, 17, 0.45);
     cursor: pointer;
     text-align: left;
     transition: transform 0.26s var(--ob-ease), border-color 0.26s var(--ob-ease), background 0.26s var(--ob-ease);
@@ -591,7 +591,7 @@
 .ob-choice:hover {
     transform: translateY(-1px);
     border-color: var(--line-3);
-    background: rgba(28, 30, 50, 0.55);
+    background: rgba(13, 12, 17, 0.55);
 }
 .ob-choice.selected {
     border-color: var(--accent);
@@ -601,7 +601,7 @@
 .ob-choice-ic {
     width: 30px;
     height: 30px;
-    border-radius: 8px;
+    border-radius: 0;
     flex-shrink: 0;
     display: flex;
     align-items: center;
@@ -622,13 +622,13 @@
 .ob-done-tick {
     width: 56px;
     height: 56px;
-    border-radius: 50%;
+    border-radius: 0;
     margin: 8px auto 18px;
-    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    background: var(--accent);
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 0 40px rgba(184, 176, 218, 0.45);
+    box-shadow: none;
     animation: obTickPop 0.6s var(--ease);
 }
 
@@ -671,8 +671,8 @@
     gap: 2px;
     padding: 10px 12px;
     border: 1px solid var(--line);
-    background: rgba(20, 22, 38, 0.4);
-    border-radius: 10px;
+    background: rgba(13, 12, 17, 0.4);
+    border-radius: 0;
 }
 
 .ob-summary-label {
@@ -712,11 +712,11 @@
     align-items: center;
     gap: 6px;
     padding: 10px 18px;
-    border-radius: 10px;
+    border-radius: 0;
     font-size: 13px;
     font-weight: 500;
     border: 1px solid var(--line-2);
-    background: rgba(28, 30, 50, 0.55);
+    background: rgba(13, 12, 17, 0.55);
     color: var(--fg);
     cursor: pointer;
     transition: transform 0.26s var(--ob-ease), border-color 0.26s var(--ob-ease), background 0.26s var(--ob-ease), box-shadow 0.26s var(--ob-ease);
@@ -735,15 +735,15 @@
 }
 
 .ob-btn.primary {
-    background: linear-gradient(180deg, var(--accent) 0%, var(--accent-2) 100%);
+    background: var(--accent);
     color: var(--bg);
     border-color: transparent;
     font-weight: 600;
-    box-shadow: 0 6px 18px rgba(184, 176, 218, 0.25);
+    box-shadow: 0 6px 18px rgba(168, 152, 232, 0.175);
 }
 
 .ob-btn.primary:hover {
-    box-shadow: 0 10px 28px rgba(184, 176, 218, 0.35);
+    box-shadow: 0 10px 28px rgba(168, 152, 232, 0.245);
 }
 
 .ob-foot-right {
@@ -755,7 +755,7 @@
 @media (max-width: 520px) {
     #onboarding .ob-card {
         padding: 24px 20px 18px;
-        border-radius: 18px;
+        border-radius: 0;
     }
     .ob-grid.cols-6 { grid-template-columns: repeat(3, 1fr); }
     .ob-engines, .ob-cloaks { grid-template-columns: 1fr; }

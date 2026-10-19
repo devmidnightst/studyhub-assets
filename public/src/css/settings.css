@@ -7,9 +7,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: radial-gradient(circle at 50% 35%, rgba(40, 36, 70, 0.40) 0%, rgba(5, 6, 13, 0.92) 60%, rgba(5, 6, 13, 0.98) 100%);
-    backdrop-filter: blur(22px);
-    -webkit-backdrop-filter: blur(22px);
+    background: radial-gradient(circle at 50% 35%, rgba(40, 36, 70, 0.40) 0%, rgba(6, 5, 9, 0.92) 60%, rgba(6, 5, 9, 0.98) 100%);
+    
+    
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.32s var(--ease);
@@ -23,9 +23,9 @@
 .settings-modal {
     width: min(880px, calc(100vw - 32px));
     height: min(600px, calc(100vh - 80px));
-    background: linear-gradient(180deg, rgba(20, 22, 38, 0.78) 0%, rgba(14, 15, 28, 0.82) 100%);
+    background: rgba(13, 12, 17, 0.78);
     border: 1px solid var(--line-2);
-    border-radius: 22px;
+    border-radius: 0;
     box-shadow: 0 28px 80px rgba(0, 0, 0, 0.55), 0 1px 0 rgba(255, 255, 255, 0.04) inset;
     display: grid;
     grid-template-columns: 220px 1fr;
@@ -64,11 +64,11 @@
 .settings-brand-mark {
     width: 18px;
     height: 18px;
-    border-radius: 50%;
+    border-radius: 0;
     background:
         radial-gradient(circle at 70% 35%, var(--bg) 38%, transparent 39%),
         radial-gradient(circle at 50% 50%, var(--accent) 0%, var(--accent-2) 100%);
-    box-shadow: 0 0 16px rgba(184, 176, 218, 0.32);
+    box-shadow: none;
     flex-shrink: 0;
 }
 
@@ -84,7 +84,7 @@
     align-items: center;
     gap: 10px;
     padding: 9px 10px;
-    border-radius: 8px;
+    border-radius: 0;
     background: transparent;
     border: 1px solid transparent;
     color: var(--fg-2);
@@ -102,17 +102,17 @@
 }
 
 .settings-nav-item:hover {
-    background: rgba(200, 195, 230, 0.04);
+    background: rgba(255, 255, 255, 0.04);
     color: var(--fg);
 }
 
 .settings-nav-item:hover svg { opacity: 1; }
 
 .settings-nav-item.active {
-    background: rgba(184, 176, 218, 0.10);
-    border-color: rgba(184, 176, 218, 0.18);
+    background: rgba(168, 152, 232, 0.07);
+    border-color: rgba(168, 152, 232, 0.126);
     color: var(--fg);
-    box-shadow: 0 0 0 1px rgba(184, 176, 218, 0.05) inset;
+    box-shadow: 0 0 0 1px rgba(168, 152, 232, 0.035) inset;
 }
 
 .settings-nav-item.active svg {
@@ -142,11 +142,11 @@
     right: 18px;
     width: 28px;
     height: 28px;
-    border-radius: 50%;
+    border-radius: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(200, 195, 230, 0.05);
+    background: rgba(255, 255, 255, 0.05);
     border: 1px solid var(--line-2);
     color: var(--fg-2);
     cursor: pointer;
@@ -155,7 +155,7 @@
 }
 
 .settings-close:hover {
-    background: rgba(200, 195, 230, 0.10);
+    background: rgba(255, 255, 255, 0.10);
     color: var(--fg);
     border-color: var(--line-3);
     transform: rotate(90deg);
@@ -197,9 +197,9 @@
 }
 
 .settings-section {
-    background: rgba(20, 22, 38, 0.4);
+    background: rgba(13, 12, 17, 0.4);
     border: 1px solid var(--line);
-    border-radius: 12px;
+    border-radius: 0;
     padding: 6px 14px;
     margin-bottom: 12px;
 }
@@ -291,9 +291,9 @@
 }
 
 .cfg-select {
-    background: rgba(200, 195, 230, 0.04);
+    background: rgba(255, 255, 255, 0.04);
     border: 1px solid var(--line-2);
-    border-radius: 8px;
+    border-radius: 0;
     color: var(--fg);
     padding: 7px 10px;
     font-size: 12.5px;
@@ -301,9 +301,9 @@
     transition: border-color 0.15s var(--ease), background 0.15s var(--ease);
 }
 
-.cfg-select:hover { border-color: var(--line-3); background: rgba(200, 195, 230, 0.07); }
+.cfg-select:hover { border-color: var(--line-3); background: rgba(255, 255, 255, 0.07); }
 .cfg-select:focus { border-color: var(--accent); outline: none; }
-.cfg-select option { background: #0c0d18; color: var(--fg); }
+.cfg-select option { background: #0a090d; color: var(--fg); }
 
 .toggle-wrap {
     position: relative;
@@ -319,8 +319,8 @@
     position: absolute;
     cursor: pointer;
     inset: 0;
-    background: rgba(200, 195, 230, 0.10);
-    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.10);
+    border-radius: 0;
     transition: background 0.22s var(--ease);
 }
 
@@ -332,7 +332,7 @@
     left: 3px;
     top: 3px;
     background: var(--fg-3);
-    border-radius: 50%;
+    border-radius: 0;
     transition: transform 0.22s var(--ease), background 0.22s var(--ease);
 }
 
@@ -344,9 +344,9 @@ input:checked + .toggle-track::before {
 
 .cfg-btn {
     padding: 8px 14px;
-    background: rgba(200, 195, 230, 0.05);
+    background: rgba(255, 255, 255, 0.05);
     border: 1px solid var(--line-2);
-    border-radius: 8px;
+    border-radius: 0;
     color: var(--fg-2);
     font-size: 12px;
     font-weight: 500;
@@ -354,7 +354,7 @@ input:checked + .toggle-track::before {
 }
 
 .cfg-btn:hover {
-    background: rgba(200, 195, 230, 0.09);
+    background: rgba(255, 255, 255, 0.09);
     color: var(--fg);
     border-color: var(--line-3);
     transform: translateY(-1px);
@@ -396,8 +396,8 @@ input:checked + .toggle-track::before {
 .override-modal {
     position: fixed;
     inset: 0;
-    background: rgba(5, 6, 13, 0.85);
-    backdrop-filter: blur(14px);
+    background: rgba(6, 5, 9, 0.94);
+    
     z-index: 1000;
     display: none;
     align-items: center;
@@ -412,10 +412,10 @@ input:checked + .toggle-track::before {
     max-width: 420px;
     background: var(--panel);
     border: 1px solid var(--line-2);
-    border-radius: 14px;
+    border-radius: 0;
     padding: 28px;
     text-align: center;
-    backdrop-filter: blur(20px);
+    
     box-shadow: 0 30px 80px rgba(0,0,0,0.5);
     animation: ovIn 0.25s var(--ease);
 }
@@ -423,7 +423,7 @@ input:checked + .toggle-track::before {
 .override-icon {
     width: 44px;
     height: 44px;
-    border-radius: 50%;
+    border-radius: 0;
     background: rgba(208, 130, 130, 0.12);
     color: #d08282;
     display: flex;
@@ -450,7 +450,7 @@ input:checked + .toggle-track::before {
     width: 100%;
     background: var(--bg-2);
     border: 1px solid var(--line);
-    border-radius: 8px;
+    border-radius: 0;
     padding: 11px 14px;
     color: var(--fg);
     font-size: 13px;
@@ -474,11 +474,11 @@ input:checked + .toggle-track::before {
 }
 .override-btn {
     padding: 9px 16px;
-    border-radius: 7px;
+    border-radius: 0;
     font-size: 12px;
     font-weight: 500;
     color: var(--fg-2);
-    background: rgba(20, 22, 38, 0.6);
+    background: rgba(13, 12, 17, 0.6);
     border: 1px solid var(--line-2);
     transition: all 0.15s;
 }

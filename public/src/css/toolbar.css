@@ -1,64 +1,54 @@
+/* Browser toolbar: back, forward, reload and the address field. It only shows
+   while a page is open, and it spans the workspace to the right of the sidebar. */
+
 #toolbar {
     display: none;
     position: fixed;
     top: 0;
-    left: 0;
-    width: 100%;
+    left: var(--sb-w, 0px);
+    right: 0;
     height: 46px;
-    background: rgba(8, 9, 16, 0.78);
+    background: var(--bg-2);
     border-bottom: 1px solid var(--line);
     align-items: center;
-    gap: 4px;
+    gap: 2px;
     padding: 0 10px;
     z-index: 50;
-    backdrop-filter: blur(14px);
 }
 
-#toolbar.visible {
-    display: flex;
-    animation: slideDown 0.3s var(--ease);
-}
+#toolbar.visible { display: flex; }
 
 .tb-btn {
-    width: 34px;
-    height: 34px;
+    width: 32px;
+    height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 50%;
+    border-radius: 0;
     color: var(--fg-3);
-    background: rgba(200, 195, 230, 0.03);
-    transition: background 0.24s cubic-bezier(0.22, 1, 0.36, 1), color 0.22s ease, transform 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+    background: transparent;
+    transition: background 0.15s var(--ease), color 0.15s var(--ease);
     flex-shrink: 0;
 }
+.tb-btn svg { stroke-width: 1.6; }
+.tb-btn:hover { background: rgba(255, 255, 255, 0.06); color: var(--fg); }
+.tb-btn:active { background: rgba(255, 255, 255, 0.1); }
+.tb-btn:focus-visible { outline: 2px solid rgba(168, 152, 232, 0.6); outline-offset: -2px; }
+.tb-btn:disabled { opacity: 0.3; cursor: default; }
+.tb-btn:disabled:hover { background: transparent; color: var(--fg-3); }
 
-.tb-btn:hover {
-    background: rgba(200, 195, 230, 0.1);
-    color: var(--fg);
-    transform: scale(1.09);
-}
-
-.tb-btn:active { transform: scale(0.9); }
-
-.tb-btn:disabled {
-    opacity: 0.25;
-    cursor: default;
-}
-.tb-btn:disabled:hover { background: rgba(200, 195, 230, 0.03); color: var(--fg-3); transform: none; }
-
-#urlBar {
+#navBar {
     flex: 1;
-    height: 34px;
+    height: 32px;
     margin: 0 6px;
-    background: rgba(200, 195, 230, 0.03);
-    border-radius: 999px;
-    border: 1px solid var(--line);
-    padding: 0 16px;
+    background: var(--surface);
+    border-radius: 0;
+    border: 1px solid var(--line-2);
+    padding: 0 12px;
     color: var(--fg);
-    font-size: 12.5px;
+    font-size: 13px;
     font-weight: 400;
-    transition: border-color 0.24s cubic-bezier(0.22, 1, 0.36, 1), background 0.24s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.28s cubic-bezier(0.22, 1, 0.36, 1);
-    line-height: 32px;
+    line-height: 30px;
     outline: none;
     overflow: hidden;
     white-space: nowrap;
@@ -67,249 +57,24 @@
     user-select: text;
     -webkit-user-select: text;
     font-family: inherit;
+    transition: border-color 0.15s var(--ease), background 0.15s var(--ease);
 }
-
-#urlBar:hover {
-    border-color: var(--line-3);
-    background: rgba(200, 195, 230, 0.06);
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 12%, transparent),
-                0 0 22px -2px color-mix(in srgb, var(--accent) 34%, transparent);
-}
-
-#urlBar:focus {
-    border-color: var(--line-3);
-    background: rgba(200, 195, 230, 0.05);
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 16%, transparent),
-                0 0 24px -2px color-mix(in srgb, var(--accent) 42%, transparent);
+#navBar:hover { border-color: var(--line-3); }
+#navBar:focus {
+    border-color: rgba(255, 255, 255, 0.32);
+    background: #0f0e14;
     overflow: auto;
     text-overflow: clip;
 }
-
-#urlBar:empty::before {
+#navBar:empty::before {
     content: attr(data-placeholder);
     color: var(--fg-3);
     pointer-events: none;
 }
 
-.tab-strip {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 52px;
-    background: rgba(5, 6, 13, 0.85);
-    border-bottom: 1px solid var(--line);
-    align-items: center;
-    padding: 7px 8px;
-    z-index: 51;
-    backdrop-filter: blur(14px);
-    gap: 5px;
-}
-.tab-strip.visible { display: flex; }
-.tab-strip.visible ~ #toolbar { top: 52px; }
-.tab-strip.visible ~ #lineLoader { top: 98px; }
-.tab-strip.visible ~ #frame { top: 98px; height: calc(100vh - 98px); }
-.tab-strip.visible ~ #slowToast { top: 136px; }
-
-.tab-list {
-    display: flex;
-    flex: 1;
-    gap: 2px;
-    overflow-x: auto;
-    overflow-y: hidden;
-    scrollbar-width: thin;
-    align-items: center;
-}
-.tab-list::-webkit-scrollbar { height: 0; }
-
-.tab-item {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    height: 38px;
-    padding: 0 9px 0 17px;
-    background: rgba(200, 195, 230, 0.03);
-    border: 1px solid transparent;
-    border-radius: 999px;
-    color: var(--fg-3);
-    font-size: 13.5px;
-    cursor: pointer;
-    max-width: 240px;
-    min-width: 130px;
-    flex-shrink: 0;
-    transition: background 0.32s cubic-bezier(0.22, 1, 0.36, 1), color 0.3s ease, border-color 0.3s ease, transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
-    user-select: none;
-}
-.tab-item:hover { background: rgba(200, 195, 230, 0.07); color: var(--fg-2); }
-.tab-item.active {
-    background: rgba(184, 176, 218, 0.16);
-    border-color: rgba(184, 176, 218, 0.32);
-    color: var(--fg);
-}
-.tab-favicon {
-    width: 18px;
-    height: 18px;
-    border-radius: 3px;
-    flex-shrink: 0;
-    object-fit: contain;
-}
-.tab-favicon.tf-hide { visibility: hidden; }
-.tab-favicon-blank {
-    background: rgba(200, 195, 230, 0.12);
-    border-radius: 4px;
-}
-.tab-title {
-    flex: 1;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    font-weight: 400;
-}
-.tab-close {
-    width: 23px;
-    height: 23px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 0;
-    background: transparent;
-    border-radius: 50%;
-    color: var(--fg-3);
-    cursor: pointer;
-    opacity: 0;
-    transition: opacity 0.22s cubic-bezier(0.22, 1, 0.36, 1), background 0.18s ease, color 0.18s ease, transform 0.18s cubic-bezier(0.22, 1, 0.36, 1);
-    flex-shrink: 0;
-}
-.tab-item:hover .tab-close,
-.tab-item.active .tab-close { opacity: 1; }
-.tab-close:hover { background: rgba(200, 195, 230, 0.18); color: var(--fg); transform: scale(1.12); }
-.tab-close:active { transform: scale(0.9); }
-
-.tab-add {
-    width: 36px;
-    height: 36px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 0;
-    background: transparent;
-    color: var(--fg-3);
-    border-radius: 50%;
-    cursor: pointer;
-    transition: background 0.18s cubic-bezier(0.22, 1, 0.36, 1), color 0.18s ease, transform 0.18s cubic-bezier(0.22, 1, 0.36, 1);
-    flex-shrink: 0;
-}
-.tab-add:hover { background: rgba(200, 195, 230, 0.1); color: var(--fg); transform: scale(1.08); }
-.tab-add:active { transform: scale(0.92); }
-
-@keyframes tabIn {
-    0%   { max-width: 0; min-width: 0; padding-left: 0; padding-right: 0; opacity: 0; transform: translateY(7px) scale(0.9); }
-    55%  { opacity: 1; }
-    78%  { transform: translateY(-2px) scale(1.04); }
-    100% { transform: translateY(0) scale(1); }
-}
-.tab-item.tab-enter {
-    animation: tabIn 0.5s cubic-bezier(0.22, 1, 0.36, 1);
-    overflow: hidden;
-}
-@keyframes tabPop {
-    0%   { transform: scale(0.93); }
-    42%  { transform: scale(1.06); }
-    70%  { transform: scale(0.98); }
-    100% { transform: scale(1); }
-}
-.tab-item.tab-activate {
-    animation: tabPop 0.46s cubic-bezier(0.22, 1, 0.36, 1);
-}
-@keyframes tabOut {
-    to { max-width: 0; min-width: 0; padding-left: 0; padding-right: 0; opacity: 0; transform: scale(0.9) translateY(2px); margin-left: -5px; }
-}
-.tab-item.tab-closing {
-    animation: tabOut 0.26s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-    overflow: hidden;
-    pointer-events: none;
-}
-@media (prefers-reduced-motion: reduce) {
-    .tab-item.tab-enter,
-    .tab-item.tab-activate,
-    .tab-item.tab-closing { animation: none; }
-}
-
-.online-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    padding: 4px 8px;
-    height: 22px;
-    border-radius: 5px;
-    background: rgba(200, 195, 230, 0.06);
-    border: 1px solid rgba(200, 195, 230, 0.1);
-    font-size: 10.5px;
-    font-family: 'JetBrains Mono', 'Space Mono', ui-monospace, monospace;
-    color: var(--fg-2);
-    flex-shrink: 0;
-    margin-left: 6px;
-    align-self: center;
-}
-.online-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: #7ce0a8;
-    box-shadow: 0 0 6px rgba(124, 224, 168, 0.6);
-    animation: onlineDotPulse 2s ease-in-out infinite;
-}
-@keyframes onlineDotPulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.45; }
-}
-.online-num {
-    color: var(--fg);
-    font-variant-numeric: tabular-nums;
-    font-weight: 500;
-}
-
-@media (max-width: 580px) {
-    #toolbar {
-        height: 50px;
-        gap: 3px;
-        padding: 0 8px;
-    }
-    .tb-btn {
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
-    }
+@media (max-width: 720px) {
+    #toolbar { height: 50px; padding: 0 8px 0 54px; }
+    .tb-btn { width: 36px; height: 36px; }
     .tb-btn svg { width: 16px; height: 16px; }
-    #urlBar {
-        height: 34px;
-        line-height: 32px;
-        font-size: 14px;
-        padding: 0 14px;
-        margin: 0 4px;
-        border-radius: 999px;
-    }
-    .tab-strip {
-        height: 52px;
-        padding: 7px 6px;
-    }
-    .tab-strip.visible ~ #toolbar { top: 52px; }
-    .tab-strip.visible ~ #lineLoader { top: 102px; }
-    .tab-strip.visible ~ #frame { top: 102px; height: calc(100vh - 102px); }
-    .tab-strip.visible ~ #slowToast { top: 140px; }
-    .tab-item {
-        min-width: 92px;
-        max-width: 165px;
-        height: 38px;
-        padding: 0 6px 0 13px;
-        font-size: 13.5px;
-    }
-    .tab-add { width: 36px; height: 36px; }
-    .online-chip {
-        height: 26px;
-        padding: 4px 7px;
-        font-size: 10.5px;
-        margin-left: 4px;
-    }
+    #navBar { height: 36px; line-height: 34px; font-size: 14px; }
 }

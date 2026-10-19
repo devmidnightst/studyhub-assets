@@ -4,6 +4,9 @@ import { server as wisp } from "@mercuryworkshop/wisp-js/server";
 import express from "express";
 import compression from "compression";
 import http from "http";
+import https from "https";
+import net from "node:net";
+import zlib from "node:zlib";
 import path from "path";
 import fs from "fs";
 import crypto from "node:crypto";
@@ -17,7 +20,7 @@ import { mountGroq } from "./groq.js";
 import { mountModeration } from "./moderation.js";
 import { mountChat } from "./chat.js";
 import { mountVms, vmProxyUpgrade } from "./vms.js";
-import { mountRunner, runnerProxyUpgrade, scrubDevOriginAuth } from "./runner.js";
+import { mountRunner, runnerProxyUpgrade, scrubDevOriginAuth, runnerHostGuard } from "./runner.js";
 import { mountBoxes, boxesTerminalUpgrade } from "./boxes.js";
 import { terminalUpgrade, mountConsole } from "./webssh.js";
 import { mountFlix, flixProxyUpgrade } from "./flix.js";
@@ -31,7 +34,6 @@ import { mountProjects } from "./projects.js";
 import { mountStratus, stratusSignalUpgrade } from "./stratus.js";
 import { voiceUpgrade } from "./voice.js";
 import { stmts } from "./db.js";
-import JavaScriptObfuscator from "javascript-obfuscator";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -47,6 +49,7 @@ const app = express();
 const PORT = process.env.PORT || 8080;
 
 app.disable("x-powered-by");
+app.use(runnerHostGuard);   // the user-app host serves user apps only
 // "trust proxy" = exact number of reverse proxies in front of this app so req.ip resolves to
 // the real client (the rightmost X-Forwarded-For entry your own proxy appended), NOT a value
 // the client can spoof. Set NOCTURNE_TRUST_PROXY to match the deployment: "1" behind a single
@@ -87,12 +90,12 @@ const _jsonSmall = express.json({ limit: "4mb" });
 const _jsonBig = express.json({ limit: "40mb" });
 app.use((req, res, next) => {
     const p = req.path;
-    if (p.startsWith("/vm/")) return next();   // leave the body stream intact for the VM proxy
+    if (p.startsWith("/vm/") || p.startsWith("/cfp/")) return next();   // leave the body stream intact for the VM proxy and /cfp/ relay
     if (p === "/api/ai" || p === "/api/ai/chat" || p === "/api/ai/history" || p.startsWith("/api/ai/chats") || p === "/api/chat/profile" || p.startsWith("/api/projects")) return _jsonBig(req, res, next);
     return _jsonSmall(req, res, next);
 });
 app.use((req, res, next) => {
-    if (req.path.startsWith("/vm/")) return next();
+    if (req.path.startsWith("/vm/") || req.path.startsWith("/cfp/")) return next();
     return express.urlencoded({ extended: true, limit: "1mb" })(req, res, next);
 });
 
@@ -118,6 +121,12 @@ function isAllowedApiOrigin(origin) {
         if (host === "nocturne.lol" || host === "www.nocturne.lol" || host.endsWith(".cloudfront.net")) return true;
         if (host === "olive-fun.com" || host === "www.olive-fun.com") return true;
         if (host.includes("elahomework") || host.includes("blooketassets")) return true;
+        // Google Cloud Storage static hosting: path-style (storage.googleapis.com/<bucket>/...)
+        // sends Origin "https://storage.googleapis.com" with no bucket in the host, and
+        // virtual-hosted style is "<bucket>.storage.googleapis.com". Cover both plus the
+        // storage.cloud.google.com console host so the GCS mirror can reach /api cross-origin.
+        if (host === "storage.googleapis.com" || host === "storage.cloud.google.com") return true;
+        if (host.endsWith(".storage.googleapis.com")) return true;
     } catch {}
     return false;
 }
@@ -141,40 +150,101 @@ app.use((req, res, next) => {
 app.use(sanctionMiddleware);
 mountSanction(app);
 
-app.all("/cfp/", async (req, res) => {
+// /cfp/ is an open fetch relay for the static mirrors, so it must never reach
+// loopback, private, link-local or metadata addresses. Literal IPs are checked
+// up front; hostnames are checked inside the socket's own DNS lookup, so the
+// address that gets validated is the one that gets connected (no rebinding gap).
+// Separate lists per family: a BlockList treats an ipv4 address as matching an
+// ::ffff:0:0/96 ipv6 rule, which would block every v4 host.
+const _cfpBlock4 = new net.BlockList();
+const _cfpBlock6 = new net.BlockList();
+for (const [a, p] of [["0.0.0.0", 8], ["10.0.0.0", 8], ["100.64.0.0", 10], ["127.0.0.0", 8], ["169.254.0.0", 16], ["172.16.0.0", 12], ["192.0.0.0", 24], ["192.0.2.0", 24], ["192.168.0.0", 16], ["198.18.0.0", 15], ["198.51.100.0", 24], ["203.0.113.0", 24], ["224.0.0.0", 4], ["240.0.0.0", 4]]) _cfpBlock4.addSubnet(a, p, "ipv4");
+for (const [a, p] of [["::", 127], ["64:ff9b::", 96], ["64:ff9b:1::", 48], ["100::", 64], ["2001::", 32], ["2001:db8::", 32], ["2002::", 16], ["fc00::", 7], ["fe80::", 10], ["ff00::", 8]]) _cfpBlock6.addSubnet(a, p, "ipv6");
+function cfpAddrBlocked(ip) {
+    const fam = net.isIP(ip);
+    if (!fam) return true;
+    if (fam === 4) return _cfpBlock4.check(ip, "ipv4");
+    if (/^(?:0{0,4}:){0,5}:?ffff:/i.test(ip)) return true;   // ipv4-mapped (::ffff:a.b.c.d or ::ffff:7f00:1)
+    return _cfpBlock6.check(ip, "ipv6");
+}
+function cfpLookup(hostname, opts, cb) {
+    dns.lookup(hostname, { all: true }, (err, addrs) => {
+        if (err) return cb(err);
+        if (!addrs.length || addrs.some(a => cfpAddrBlocked(a.address))) {
+            return cb(Object.assign(new Error("blocked address"), { code: "ECFPBLOCKED" }));
+        }
+        if (opts && opts.all) return cb(null, addrs);
+        cb(null, addrs[0].address, addrs[0].family);
+    });
+}
+const CFP_DROP_HEADERS = new Set(["host", "connection", "content-length", "transfer-encoding", "keep-alive", "upgrade", "proxy-connection", "te", "trailer"]);
+
+app.all("/cfp/", authMiddleware, (req, res) => {
     const targetUrl = req.headers["x-bare-url"];
     if (!targetUrl) return res.status(400).json({ error: "missing x-bare-url" });
     let parsed;
     try { parsed = new URL(targetUrl); } catch { return res.status(400).json({ error: "invalid url" }); }
-    if (parsed.hostname === "localhost" || parsed.hostname === "127.0.0.1" || parsed.hostname === "::1") return res.status(403).json({ error: "blocked" });
+    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") return res.status(400).json({ error: "invalid url" });
+    const host = parsed.hostname.replace(/^\[|\]$/g, "");
+    if (!host || host.toLowerCase() === "localhost" || host.toLowerCase().endsWith(".localhost")) return res.status(403).json({ error: "blocked" });
+    if (net.isIP(host) && cfpAddrBlocked(host)) return res.status(403).json({ error: "blocked" });
+
     let targetHeaders = {};
     try { if (req.headers["x-bare-headers"]) targetHeaders = JSON.parse(req.headers["x-bare-headers"]); } catch {}
-    const ctrl = new AbortController();
-    req.on("close", () => ctrl.abort());
-    const timer = setTimeout(() => ctrl.abort(), 30000);
+    const headers = {};
+    if (targetHeaders && typeof targetHeaders === "object" && !Array.isArray(targetHeaders)) {
+        for (const [k, v] of Object.entries(targetHeaders)) {
+            if (CFP_DROP_HEADERS.has(String(k).toLowerCase())) continue;
+            if (typeof v === "string" || typeof v === "number") headers[k] = String(v);
+            else if (Array.isArray(v)) headers[k] = v.map(String);
+        }
+    }
+    headers.host = parsed.host;
+    const hasBody = req.method !== "GET" && req.method !== "HEAD" && req.method !== "OPTIONS";
+    if (hasBody && req.headers["content-length"]) headers["content-length"] = req.headers["content-length"];
+
+    let upReq;
     try {
-        const upstream = await fetch(targetUrl, {
+        upReq = (parsed.protocol === "https:" ? https : http).request({
+            hostname: host,
+            port: parsed.port || undefined,
+            path: parsed.pathname + parsed.search,
             method: req.method === "OPTIONS" ? "GET" : req.method,
-            headers: targetHeaders,
-            body: (req.method !== "GET" && req.method !== "HEAD") ? req : undefined,
-            signal: ctrl.signal,
-            redirect: "manual",
-            duplex: "half",
+            headers,
+            lookup: cfpLookup,
+            servername: net.isIP(host) ? undefined : host,
+            timeout: 30000,
         });
-        clearTimeout(timer);
+    } catch (e) {
+        return res.status(400).json({ error: "invalid request" });
+    }
+    const fail = (e) => {
+        if (res.headersSent) { try { res.destroy(); } catch {} return; }
+        if (e && e.code === "ECFPBLOCKED") return res.status(403).json({ error: "blocked" });
+        res.status(502).json({ error: (e && e.message) || "upstream error" });
+    };
+    upReq.on("timeout", () => upReq.destroy(new Error("upstream timeout")));
+    upReq.on("error", fail);
+    res.on("close", () => { if (!res.writableFinished) upReq.destroy(); });
+    upReq.on("response", (up) => {
+        upReq.setTimeout(0);
         const rh = {};
-        upstream.headers.forEach((v, k) => { rh[k] = v; });
-        res.setHeader("X-Bare-Status", String(upstream.status));
-        res.setHeader("X-Bare-Status-Text", upstream.statusText || "");
+        for (const [k, v] of Object.entries(up.headers)) rh[k] = Array.isArray(v) ? v.join(", ") : v;
+        res.setHeader("X-Bare-Status", String(up.statusCode));
+        res.setHeader("X-Bare-Status-Text", up.statusMessage || "");
         res.setHeader("X-Bare-Headers", JSON.stringify(rh));
         res.status(200);
-        if (!upstream.body) return res.end();
-        const { Readable } = await import("node:stream");
-        Readable.fromWeb(upstream.body).pipe(res);
-    } catch (e) {
-        clearTimeout(timer);
-        if (!res.headersSent) res.status(502).json({ error: e.message });
-    }
+        // fetch() used to decode compressed bodies here; keep handing back plain bytes.
+        const enc = String(up.headers["content-encoding"] || "").trim().toLowerCase();
+        const dec = enc === "gzip" || enc === "x-gzip" ? zlib.createGunzip()
+            : enc === "deflate" ? zlib.createInflate()
+            : enc === "br" ? zlib.createBrotliDecompress() : null;
+        if (dec) {
+            dec.on("error", () => { try { res.destroy(); } catch {} });
+            up.pipe(dec).pipe(res);
+        } else up.pipe(res);
+    });
+    if (hasBody) req.pipe(upReq); else upReq.end();
 });
 
 app.use((req, res, next) => {
@@ -207,17 +277,17 @@ function _isBot(req) {
     return false;
 }
 
+// Bot middleware: let crawlers see the real site so URL reputation agents
+// categorize us correctly. JS/CSS/module assets are still blocked for bots
+// that don't need them.
 app.use((req, res, next) => {
     if (req.method !== "GET" && req.method !== "HEAD") return next();
     if (req.path.startsWith("/api/")) return next();
     if (req.path === "/ping") return next();
     if (req.path === "/robots.txt") return next();
+    if (req.path === "/.well-known/security.txt" || req.path === "/security.txt" || req.path === "/llms.txt") return next();
+    if (req.path === "/sw.js") return next();
     if (!_isBot(req)) return next();
-    const accept = String(req.headers.accept || "");
-    if (accept.includes("text/html") || req.path === "/" || /\.html?$/i.test(req.path)) {
-        res.type("text/html").set("Cache-Control", "public, max-age=3600").send(_EDU_DECOY);
-        return;
-    }
     if (/\.(?:js|mjs|css)$/i.test(req.path)) {
         res.status(404).end();
         return;
@@ -225,8 +295,14 @@ app.use((req, res, next) => {
     next();
 });
 
-app.get("/robots.txt", (req, res) => {
-    res.type("text/plain").send("User-agent: *\nAllow: /\nSitemap: https://edupath-academy.org/sitemap.xml\n");
+// Caddy serves /.well-known/ straight off disk for nocturne.lol; every other
+// domain lands here, and express.static skips dot-folders, so serve it by hand.
+// (sendFile also refuses a dot-folder in an absolute path, hence `root`.)
+const WELL_KNOWN_DIR = path.join(__dirname, ".well-known");
+app.get(["/.well-known/security.txt", "/security.txt"], (req, res) => {
+    res.type("text/plain; charset=utf-8").set("Cache-Control", "public, max-age=3600").sendFile("security.txt", { root: WELL_KNOWN_DIR }, (err) => {
+        if (err && !res.headersSent) res.status(404).end();
+    });
 });
 
 app.get("/ping", (req, res) => res.status(204).end());
@@ -730,7 +806,7 @@ app.use((req, res, next) => {
 });
 
 mountCaptcha(app);
-mountAuth(app);
+await mountAuth(app);
 mountStorage(app);
 mountGroq(app, { authMiddleware });
 mountModeration(app);
@@ -1625,7 +1701,8 @@ function getWrapperTemplate() {
 const TAB_PAGES = new Set([
     "games.html", "apps.html", "chat.html", "ai.html", "films.html", "music.html",
     "tools.html", "code.html", "youtube.html", "settings.html", "account.html", "privacy.html",
-    "terms.html", "dmca.html", "legal.html", "linkcheck.html", "vms.html"
+    "terms.html", "dmca.html", "legal.html", "linkcheck.html", "vms.html",
+    "voice.html", "support.html", "about.html", "api.html", "admin.html", "console.html", "box-term.html"
 ]);
 
 // Extensionless internal-page aliases (mirrors PAGE_SLUGS in app.js). A direct
@@ -1641,7 +1718,9 @@ const SLUG_PAGES = {
     settings: "settings.html", account: "account.html",
     privacy: "privacy.html", terms: "terms.html", dmca: "dmca.html",
     legal: "legal.html", linkcheck: "linkcheck.html", links: "linkcheck.html",
-    admin: "admin.html", god: "admin.html", cp: "admin.html", panel: "admin.html"
+    admin: "admin.html", god: "admin.html", cp: "admin.html", panel: "admin.html",
+    voice: "voice.html", support: "support.html", about: "about.html", console: "console.html",
+    terminal: "box-term.html", "box-term": "box-term.html"
 };
 
 // ── Browser-challenge clearance ────────────────────────────────────────────
@@ -1676,7 +1755,7 @@ function nfCookie(req) {
 // Master switch for the educational decoy cloak. When true every top-level
 // document request serves the BrightPath template; in-page JS fetches the real
 // page via x-nf-raw and swaps it in with document.write.
-const CLOAK_ENABLED = true;
+const CLOAK_ENABLED = false;
 
 function shouldWrap(req, filePath) {
     if (!CLOAK_ENABLED) return false;
@@ -1812,42 +1891,9 @@ app.get(/^\/s\/[^\/]+\/\d+$/, (req, res) => {
 
 // Obfuscate first-party JS on the fly (source stays readable on disk; what we
 // SEND is scrambled). Cached by file mtime; falls back to the original on error.
-const OBF_OPTS = {
-    compact: true,
-    identifierNamesGenerator: "mangled",
-    renameGlobals: false,
-    // stringArray is DISABLED. Its index can desync on these ES-module files,
-    // which either threw (undefined.charAt in the base64 decoder) or, worse,
-    // silently returned the wrong string literal - that made dock.js's
-    // shouldIntercept("href") read the wrong attribute, so internal-page links
-    // navigated the whole page instead of opening a tab. Identifier mangling +
-    // compaction still scramble the code without that fragility.
-    stringArray: false,
-    controlFlowFlattening: false,
-    deadCodeInjection: false,
-    selfDefending: false,
-    debugProtection: false,
-    numbersToExpressions: false,
-    simplify: true,
-    splitStrings: false,
-    transformObjectKeys: false,
-    unicodeEscapeSequence: false
-};
-const _obfCache = new Map();
-function getObfuscatedJs(filePath) {
-    let stat;
-    try { stat = fs.statSync(filePath); if (!stat.isFile()) return null; } catch { return null; }
-    const key = filePath + ":" + stat.mtimeMs;
-    if (_obfCache.has(key)) return _obfCache.get(key);
-    let src;
-    try { src = fs.readFileSync(filePath, "utf8"); } catch { return null; }
-    let out;
-    try { out = JavaScriptObfuscator.obfuscate(src, OBF_OPTS).getObfuscatedCode(); }
-    catch (e) { console.warn("[obf] failed:", path.basename(filePath), e.message); out = src; }
-    if (_obfCache.size > 128) _obfCache.clear();
-    _obfCache.set(key, out);
-    return out;
-}
+
+const ASSET_DIR = path.join(__dirname, "build", "assets");
+const assetManifest = JSON.parse(fs.readFileSync(path.join(ASSET_DIR, "manifest.json"), "utf8"));
 
 app.use((req, res, next) => {
     if (req.method !== "GET" && req.method !== "HEAD") return next();
@@ -1855,12 +1901,14 @@ app.use((req, res, next) => {
     const pubRoot = path.join(__dirname, "public");
     const filePath = path.normalize(path.join(pubRoot, req.path));
     if (!filePath.startsWith(pubRoot)) return next();
-    const code = getObfuscatedJs(filePath);
-    if (code == null) return next();
-    res.type("application/javascript");
+    const relative = path.relative(pubRoot, filePath).split(path.sep).join("/");
+    const artifact = assetManifest[relative];
+    if (!artifact || !/^[a-f0-9]{64}\.js$/.test(artifact)) return res.status(503).end();
+    // sendFile handles ETag, conditional requests and HEAD without transforming source.
     res.set("Cache-Control", "no-cache");
-    if (req.method === "HEAD") return res.end();
-    res.send(code);
+    res.type("application/javascript");
+    res.sendFile(path.join(ASSET_DIR, artifact));
+
 });
 
 // Standalone single-file build — a thin shell that loads the CDN copy into an
@@ -1931,15 +1979,3 @@ cfRangesReady.finally(() => server.listen(PORT, () => {
     console.log(`  \x1b[2mnode\x1b[0m       ${process.version}`);
     console.log();
 }));
-
-setTimeout(() => {
-    try {
-        const jsDir = path.join(__dirname, "public/src/js");
-        for (const f of fs.readdirSync(jsDir)) {
-            if (f.toLowerCase().endsWith(".js")) { try { getObfuscatedJs(path.join(jsDir, f)); } catch {} }
-        }
-        try { getObfuscatedJs(path.join(__dirname, "public/app/main.mjs")); } catch {}
-        try { getObfuscatedJs(path.join(__dirname, "public/app/runtime/engine.mjs")); } catch {}
-        console.log(`[obf] warmed ${_obfCache.size} JS files`);
-    } catch {}
-}, 600).unref();

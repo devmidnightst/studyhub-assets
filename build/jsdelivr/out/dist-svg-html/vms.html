@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-69T9E59SM7"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-69T9E59SM7');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="dark">
+    <meta name="theme-color" content="#060509">
+    <title>Nocturne - Cloud VMs</title>
+    <style>html,body{background:#060509;color:#ededf0;margin:0}</style>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='9' fill='%230b0a14'/><circle cx='16' cy='16' r='9' fill='%23c9c1ff'/><circle cx='21' cy='14' r='8' fill='%230b0a14'/></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.7/src/css/global.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.7/src/css/dock.css">
+    <style>
+        html, body { height: 100%; overflow: hidden; }
+
+        .vm-home {
+            position: relative; z-index: 2;
+            min-height: 100vh;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            text-align: center; padding: 32px;
+        }
+        .vm-icon {
+            width: 66px; height: 66px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 0;
+            background: rgba(168, 152, 232, 0.049);
+            border: 1px solid var(--line-2);
+            color: var(--accent);
+            margin-bottom: 24px;
+            box-shadow: none;
+            opacity: 0; animation: slideDown 0.5s var(--ease) forwards;
+        }
+        .vm-title {
+            font-size: 27px; font-weight: 600; letter-spacing: -0.02em; color: var(--fg);
+            opacity: 0; animation: slideUp 0.55s var(--ease) 0.06s forwards;
+        }
+        .vm-sub {
+            font-size: 13.5px; color: var(--fg-2); margin-top: 9px;
+            max-width: 380px; line-height: 1.65;
+            opacity: 0; animation: slideUp 0.55s var(--ease) 0.12s forwards;
+        }
+        .vm-launch {
+            margin-top: 30px;
+            display: inline-flex; align-items: center; gap: 9px;
+            background: var(--accent);
+            color: #0a090d; font-weight: 600; font-size: 14px; font-family: inherit;
+            border: none; border-radius: 0; padding: 13px 34px;
+            cursor: pointer;
+            box-shadow: 0 6px 26px rgba(138, 128, 182, 0.30);
+            transition: transform 0.15s var(--ease), box-shadow 0.2s var(--ease), filter 0.15s var(--ease);
+            opacity: 0; animation: slideUp 0.55s var(--ease) 0.24s forwards;
+        }
+        .vm-launch:hover { transform: translateY(-1px); filter: brightness(1.07); box-shadow: 0 9px 32px rgba(138, 128, 182, 0.42); }
+        .vm-launch:active { transform: translateY(0); }
+        .vm-launch:disabled { opacity: 0.55; cursor: default; filter: none; transform: none; box-shadow: none; }
+        .vm-locked {
+            margin-top: 30px;
+            display: inline-flex; align-items: center; gap: 9px;
+            font-size: 13px; color: var(--fg-2);
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--line-2);
+            border-radius: 0;
+            padding: 12px 22px;
+            opacity: 0; animation: slideUp 0.55s var(--ease) 0.24s forwards;
+        }
+        .vm-locked svg { color: var(--accent); flex-shrink: 0; }
+        .vm-status { margin-top: 18px; font-size: 12.5px; color: var(--fg-3); min-height: 18px; }
+        .vm-queue { margin-top: 6px; font-size: 12.5px; color: #e0b15e; min-height: 16px; }
+        .vm-spin {
+            width: 13px; height: 13px; display: inline-block; vertical-align: -2px; margin-right: 8px;
+            border: 2px solid var(--line-3); border-top-color: var(--accent); border-radius: 50%;
+            animation: vmspin 0.7s linear infinite;
+        }
+        @keyframes vmspin { to { transform: rotate(360deg); } }
+
+        .vm-active { position: fixed; inset: 0; z-index: 50; display: none; flex-direction: column; background: var(--bg); }
+        .vm-active.show { display: flex; }
+        .vm-bar {
+            height: 46px; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 14px;
+            background: var(--bg-2);
+            border-bottom: 1px solid var(--line);
+        }
+        .vm-bar-left { display: flex; align-items: center; gap: 9px; font-size: 13px; font-weight: 500; color: var(--fg); }
+        .vm-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: none; }
+        .vm-bar-right { display: flex; align-items: center; gap: 9px; }
+        .vm-time {
+            font-variant-numeric: tabular-nums; font-size: 13px; font-weight: 600;
+            color: var(--accent); letter-spacing: 0.03em;
+            padding: 5px 11px; border-radius: 0;
+            background: rgba(168, 152, 232, 0.056); border: 1px solid var(--line-2);
+        }
+        .vm-time.warn { color: #e8b06a; background: rgba(232, 176, 106, 0.10); border-color: rgba(232, 176, 106, 0.30); }
+        .vm-time.danger { color: #e87a7a; background: rgba(232, 122, 122, 0.12); border-color: rgba(232, 122, 122, 0.35); animation: vmpulse 1s var(--ease) infinite; }
+        @keyframes vmpulse { 50% { opacity: 0.5; } }
+        .vm-btn {
+            font-size: 12.5px; font-weight: 500; color: var(--fg-2); font-family: inherit;
+            background: rgba(255, 255, 255, 0.04); border: 1px solid var(--line-2);
+            border-radius: 0; padding: 6px 13px; cursor: pointer;
+            display: inline-flex; align-items: center; gap: 6px;
+            transition: color 0.15s var(--ease), background 0.15s var(--ease), border-color 0.15s var(--ease);
+        }
+        .vm-btn:hover { color: var(--fg); background: rgba(255, 255, 255, 0.08); border-color: var(--line-3); }
+        .vm-btn.danger:hover { color: #ff9b9b; border-color: rgba(232, 122, 122, 0.40); background: rgba(232, 122, 122, 0.10); }
+        .vm-frame { flex: 1; border: none; width: 100%; background: #000; }
+
+        
+        .vm-tab {
+            position: fixed; left: 0; top: 50%; transform: translateY(-50%) translateX(-110%);
+            z-index: 60; display: flex; align-items: center; gap: 9px;
+            padding: 12px 16px 12px 13px;
+            background: var(--bg-2); border: 1px solid var(--line-2); border-left: none;
+            border-radius: 0; cursor: pointer; color: var(--fg);
+            box-shadow: 6px 0 26px rgba(0,0,0,0.32);
+            transition: transform 0.28s var(--ease), background 0.15s var(--ease);
+        }
+        .vm-tab.show { transform: translateY(-50%) translateX(0); }
+        .vm-tab:hover { background: rgba(255, 255, 255, 0.06); }
+        .vm-tab .vm-dot { width: 9px; height: 9px; }
+        .vm-tab-label { display: flex; flex-direction: column; align-items: flex-start; line-height: 1.25; }
+        .vm-tab-label b { font-size: 12.5px; font-weight: 600; }
+        .vm-tab-label small { font-size: 10.5px; color: var(--fg-3); font-variant-numeric: tabular-nums; }
+
+        .vm-eta {
+            display: inline-flex; align-items: center; gap: 6px; margin-top: 8px;
+            font-size: 10.5px; color: var(--fg-3);
+            border: 1px dashed var(--line-2); border-radius: 0; padding: 3px 11px;
+        }
+        .vm-eta .d { width: 4px; height: 4px; border-radius: 50%; background: var(--fg-3); }
+
+        
+        .vm-live {
+            display: inline-flex; align-items: center; gap: 8px; margin-top: 18px;
+            font-size: 12.5px; color: var(--fg-2); font-variant-numeric: tabular-nums;
+            border: 1px solid var(--line-2); border-radius: 0; padding: 5px 14px;
+            background: rgba(255, 255, 255, 0.02);
+            opacity: 0; animation: slideUp 0.55s var(--ease) 0.16s forwards;
+        }
+        .vm-live b { color: var(--fg); font-weight: 600; }
+        .vm-live-dot {
+            width: 7px; height: 7px; border-radius: 50%;
+            background: #5fd08a; box-shadow: none;
+            animation: vmLivePulse 1.8s ease-in-out infinite;
+        }
+        @keyframes vmLivePulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+        .vm-live.off { color: var(--fg-3); }
+        .vm-live.off .vm-live-dot { background: var(--fg-3); box-shadow: none; animation: none; }
+    </style>
+<script src="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.7/src/js/df5162.js" defer></script>
+</head>
+<body>
+
+<canvas id="bgCanvas" class="visible"></canvas>
+
+<section id="vmHome" class="vm-home">
+    <div class="vm-icon">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="3" width="20" height="14" rx="2"/>
+            <line x1="8" y1="21" x2="16" y2="21"/>
+            <line x1="12" y1="17" x2="12" y2="21"/>
+        </svg>
+    </div>
+    <h1 class="vm-title">Virtual Machines</h1>
+    <p class="vm-sub">A full cloud desktop, right in your browser. Spins up in seconds and resets when you leave.</p>
+
+    <div id="vmLive" class="vm-live"><span class="vm-live-dot"></span><span id="vmLiveText">Checking…</span></div>
+
+    <button id="vmLaunch" class="vm-launch">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Launch a VM
+    </button>
+    <div id="vmStatus" class="vm-status"></div>
+    <div id="vmQueue" class="vm-queue"></div>
+    <div id="boxWrap" style="margin-top:28px;width:100%;max-width:560px;display:none">
+        <div style="font-size:12px;color:#85848e;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;text-align:left">Your boxes</div>
+        <div id="boxList" style="display:flex;flex-direction:column;gap:10px"></div>
+    </div>
+</section>
+
+<section id="vmActive" class="vm-active">
+    <div class="vm-bar">
+        <div class="vm-bar-left"><span class="vm-dot"></span> Nocturne VM</div>
+        <div class="vm-bar-right">
+            <span id="vmTime" class="vm-time">No time limit</span>
+            <button id="vmMin" class="vm-btn" title="Keep it running, hide for now">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Minimize
+            </button>
+            <button id="vmFs" class="vm-btn">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
+                Fullscreen
+            </button>
+            <button id="vmEnd" class="vm-btn danger">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                End session
+            </button>
+        </div>
+    </div>
+    <div class="vm-stage">
+        <iframe id="vmFrame" class="vm-frame" src="" allow="fullscreen; clipboard-read; clipboard-write; autoplay" allowfullscreen></iframe>
+        <div id="vmOverlay" class="vm-overlay">
+            <div class="vm-overlay-card">
+                <span id="vmSpin" class="vm-spin vm-spin-lg"></span>
+                <div id="vmOverlayTitle" class="vm-overlay-title">Connecting to your machine…</div>
+                <div id="vmOverlaySub" class="vm-overlay-sub">This can take a few seconds while the desktop boots.</div>
+                <div id="vmOverlayActions" class="vm-overlay-actions" hidden>
+                    <button id="vmResume" class="vm-btn" hidden>Start it again</button>
+                    <button id="vmEnter" class="vm-btn" hidden>Enter VM</button>
+                    <button id="vmRestart" class="vm-btn" hidden>Restart VM</button>
+                    <button id="vmNew" class="vm-btn" hidden>Request a new VM</button>
+                    <button id="vmRetry" class="vm-btn">Reload</button>
+                    <button id="vmGiveUp" class="vm-btn danger">End session</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<button id="vmTab" class="vm-tab" title="Return to your VM">
+    <span class="vm-dot"></span>
+    <span class="vm-tab-label"><b>Your VM</b><small id="vmTabTime">running</small></span>
+</button>
+<style>
+.vm-stage { position: relative; flex: 1; min-height: 0; display: flex; }
+.vm-stage .vm-frame { flex: 1; }
+.vm-overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    background: radial-gradient(circle at 50% 40%, rgba(13, 12, 17, 0.96), rgba(6,7,14,0.98)); z-index: 5;
+    transition: opacity .35s ease; }
+.vm-overlay.hide { opacity: 0; pointer-events: none; }
+.vm-overlay-card { text-align: center; max-width: 360px; padding: 24px; }
+.vm-overlay-title { margin-top: 16px; font-size: 16px; font-weight: 600; color: var(--fg); }
+.vm-overlay-sub { margin-top: 7px; font-size: 13px; color: var(--fg-3); line-height: 1.5; }
+.vm-overlay-actions { margin-top: 18px; display: flex; gap: 10px; justify-content: center; }
+.vm-spin-lg { width: 30px; height: 30px; border-width: 3px; display: inline-block; }
+</style>
+
+<div class="vm-welcome-back" id="vmWelcome" style="display:none">
+    <div class="vm-welcome">
+        <div class="vw-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
+            </svg>
+        </div>
+        <h2 class="vw-title">Welcome to Nocturne VMs</h2>
+        <p class="vw-sub">Before you launch your first machine, please read the guidelines below.</p>
+
+        <div class="vw-section">
+            <div class="vw-label">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5z"/></svg>
+                Usage Rules
+            </div>
+            <ul class="vw-list">
+                <li>Do not install or distribute malware, viruses, ransomware, keyloggers, or any harmful software.</li>
+                <li>Do not attempt to attack, scan, or exploit other systems from your VM.</li>
+                <li>Do not use VMs for cryptocurrency mining.</li>
+                <li>Do not access, store, or distribute illegal content of any kind.</li>
+                <li>Do not attempt to bypass resource limits or escape the VM environment.</li>
+                <li>Your VM resets when you leave. Don't store anything important inside it.</li>
+            </ul>
+        </div>
+
+        <div class="vw-section">
+            <div class="vw-label">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                Technical Specs
+            </div>
+            <ul class="vw-list tech">
+                <li><b>OS:</b> Debian 13 (Trixie) with XFCE desktop</li>
+                <li><b>Browser:</b> Firefox ESR (pre-installed)</li>
+                <li><b>Access:</b> Full root / sudo access</li>
+                <li><b>Session:</b> Ephemeral, wiped on disconnect</li>
+            </ul>
+        </div>
+
+        <div class="vw-section">
+            <div class="vw-label">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17l6-6-6-6"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+                Supported Software
+            </div>
+            <p class="vw-note">You can install packages from the Debian repos with <code>apt</code>. Common supported software:</p>
+            <div class="vw-tags">
+                <span>Firefox</span><span>VS Code</span><span>LibreOffice</span><span>GIMP</span>
+                <span>VLC</span><span>Python</span><span>Node.js</span><span>GCC / G++</span>
+                <span>Git</span><span>Docker</span><span>Blender</span><span>Audacity</span>
+            </div>
+            <p class="vw-note warn">Do not install software from untrusted sources. Stick to <code>apt</code>, Flatpak, or official project sites.</p>
+        </div>
+
+        <div class="vw-foot">
+            <label class="vw-check"><input type="checkbox" id="vmAgree"> I've read and agree to the guidelines above</label>
+            <button class="vm-launch vw-go" id="vmAgreeBtn" disabled>Continue</button>
+        </div>
+    </div>
+</div>
+
+<style>
+.vm-welcome-back {
+    position: fixed; inset: 0; z-index: 200;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(6, 5, 9, 0.92); 
+    animation: fadeIn 0.3s ease;
+    overflow-y: auto; padding: 24px;
+}
+@keyframes fadeIn { from { opacity: 0; } }
+.vm-welcome {
+    background: var(--bg-2, #0e0d1a); border: 1px solid var(--line-2, rgba(255, 255, 255, 0.12));
+    border-radius: 0; max-width: 520px; width: 100%; padding: 32px 28px;
+    animation: slideUp 0.4s var(--ease, ease) forwards;
+}
+.vw-icon {
+    width: 52px; height: 52px; display: flex; align-items: center; justify-content: center;
+    border-radius: 0; background: rgba(168, 152, 232, 0.049); border: 1px solid var(--line-2);
+    color: var(--accent); margin-bottom: 18px;
+}
+.vw-title { font-size: 20px; font-weight: 600; color: var(--fg); margin: 0 0 6px; }
+.vw-sub { font-size: 13px; color: var(--fg-3); margin: 0 0 22px; line-height: 1.5; }
+.vw-section { margin-bottom: 18px; }
+.vw-label {
+    display: flex; align-items: center; gap: 7px;
+    font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--accent); margin-bottom: 8px;
+}
+.vw-list { margin: 0; padding: 0 0 0 18px; font-size: 13px; color: var(--fg-2); line-height: 1.7; }
+.vw-list li { margin-bottom: 2px; }
+.vw-list.tech { list-style: none; padding: 0; }
+.vw-list.tech li { padding: 4px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.06); }
+.vw-list.tech li:last-child { border: none; }
+.vw-list.tech b { color: var(--fg); font-weight: 500; }
+.vw-note { font-size: 12.5px; color: var(--fg-3); margin: 6px 0 8px; line-height: 1.5; }
+.vw-note code { background: rgba(255, 255, 255, 0.08); padding: 1px 5px; border-radius: 0; font-size: 12px; }
+.vw-note.warn { color: #e0b15e; }
+.vw-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 6px; }
+.vw-tags span {
+    font-size: 11.5px; padding: 3px 10px; border-radius: 0;
+    background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.10);
+    color: var(--fg-2);
+}
+.vw-foot { margin-top: 22px; display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.vw-check { font-size: 13px; color: var(--fg-2); cursor: pointer; display: flex; align-items: center; gap: 8px; }
+.vw-check input { accent-color: var(--accent); width: 16px; height: 16px; }
+.vw-go { margin-top: 0; opacity: 1; animation: none; }
+</style>
+
+<nav id="dock"></nav>
+<script src="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.7/src/js/lr2815.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.7/src/js/wz6714.js" defer></script>
+<script>
+(function(){
+  function gb(mb){return (mb/1024).toFixed(1)}
+  function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+  function load(){
+    fetch("/api/boxes/mine",{credentials:"same-origin",cache:"no-store"}).then(function(r){return r.ok?r.json():{boxes:[]}}).then(function(d){
+      var boxes=d.boxes||[],wrap=document.getElementById("boxWrap"),list=document.getElementById("boxList");
+      if(!wrap||!boxes.length){if(wrap)wrap.style.display="none";return}
+      wrap.style.display="block";
+      list.innerHTML=boxes.map(function(b){return '<div style="display:flex;align-items:center;gap:10px;background:rgba(255, 255, 255, .05);border:1px solid rgba(255, 255, 255, .13);border-radius: 0;padding:12px 14px"><div style="flex:1;text-align:left"><div style="font-weight:600">'+esc(b.name)+' <span style="color:#85848e;font-size:12px;font-weight:400">Ubuntu 26.04 · '+b.cpus+'c / '+gb(b.memoryMb)+'GB</span></div><div style="font-size:12px;color:#85848e">'+(b.up?"running":"stopped")+'</div></div><button data-bt="'+b.id+'" style="background:rgba(126,231,135,.16);border:1px solid rgba(126,231,135,.4);color:#7ee787;border-radius: 0;padding:7px 14px;font:13px system-ui;cursor:pointer">Connect</button><button data-br="'+b.id+'" style="background:rgba(168, 152, 232, 0.07);border:1px solid rgba(255, 255, 255, .22);color:#ededf0;border-radius: 0;padding:7px 11px;font:12px system-ui;cursor:pointer">Reset</button></div>'}).join("");
+    }).catch(function(){});
+  }
+  document.addEventListener("click",function(e){
+    var t=e.target.closest("[data-bt]");if(t){window.open("/box-term.html?id="+t.dataset.bt,"_blank");return}
+    var r=e.target.closest("[data-br]");if(r){if(!confirm("Reset this box? Everything inside it is wiped."))return;fetch("/api/boxes/reset/"+r.dataset.br,{method:"POST",credentials:"same-origin"}).then(function(){load()}).catch(function(){});}
+  });
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",load);else load();
+})();
+</script>
+
+<script>
+(function () {
+    "use strict";
+    // The server sends maxMinutes = null when a session has no time limit, which is
+    // the default. timeLeft stays null in that case and no countdown ever runs.
+    var DEFAULT_SECONDS = null;
+
+    var homeEl   = document.getElementById("vmHome");
+    var activeEl = document.getElementById("vmActive");
+    var frameEl  = document.getElementById("vmFrame");
+    var launchBtn = document.getElementById("vmLaunch");
+    var statusEl = document.getElementById("vmStatus");
+    var queueEl  = document.getElementById("vmQueue");
+    var timeEl   = document.getElementById("vmTime");
+
+    var slotId = null, userId = null, timer = null, timeLeft = DEFAULT_SECONDS, requesting = false;
+    var queued = false, queuePollTimer = null;
+    var currentVmUrl = null, overlayWatch = null, loadWatch = null, timerStarted = false;
+    // Set while an end/cancel is in flight so the status poll cannot re-attach the
+    // session the user just asked to close.
+    var ending = false;
+    // The waitlist polls until a machine frees up or the user cancels. There is no
+    // attempt cap: giving up on someone's behalf after N tries just loses their place.
+    var queuePolls = 0;
+    var heartbeatTimer = null, minimized = false;
+    var tabEl = document.getElementById("vmTab");
+    var tabTimeEl = document.getElementById("vmTabTime");
+    var spinEl = document.getElementById("vmSpin");
+    var resumeBtn = document.getElementById("vmResume");
+    var retryBtn = document.getElementById("vmRetry");
+    var enterBtn = document.getElementById("vmEnter");
+    var restartBtn = document.getElementById("vmRestart");
+    var newBtn = document.getElementById("vmNew");
+
+    // The server suspends a VM after a few minutes "away". Away means the tab is
+    // hidden or the desktop is minimised inside the app — anything where the user
+    // is demonstrably not looking at the screen.
+    function isAway() { return !!(document.hidden || minimized); }
+
+    function beat() {
+        fetch("/api/vms/heartbeat", {
+            method: "POST", headers: { "Content-Type": "application/json" },
+            credentials: "same-origin", body: JSON.stringify({ away: isAway() })
+        }).then(function (r) { return r.ok ? r.json() : null; })
+          .then(function (d) { if (d && d.state === "stopped") showPaused(); })
+          .catch(function () {});
+        // A suspended machine has no web endpoint to poll, and polling it would
+        // just produce the 404 that used to end the session.
+        if (currentVmUrl && !paused) {
+            fetch(currentVmUrl, { method: "GET", credentials: "same-origin", cache: "no-store" })
+                .then(function (r) { if (r.status === 404) return confirmEnded(); })
+                .catch(function () {});
+        }
+    }
+    function confirmEnded() {
+        return fetch("/api/vms/status", { credentials: "same-origin", cache: "no-store" })
+            .then(function (r) { return r.json(); })
+            .then(function (d) {
+                if (!d) return;
+                // Suspended is not ended: the machine is still theirs, it is just
+                // stopped. Show the paused screen instead of tearing the session down.
+                if (d.state === "stopped") return showPaused();
+                if (d.state === "running") return reconnectFrame("The desktop dropped. Reconnecting.");
+                vmEnded();
+            })
+            .catch(function () {});
+    }
+    function startHeartbeat() { stopHeartbeat(); beat(); heartbeatTimer = setInterval(beat, 30000); }
+    function stopHeartbeat() { if (heartbeatTimer) { clearInterval(heartbeatTimer); heartbeatTimer = null; } }
+
+    function vmEnded() {
+        if (!currentVmUrl && !slotId && !paused) return;
+        ending = true;
+        clearPaused();
+        stopHeartbeat(); stopTimer(); clearWatch(); hideOverlay();
+        try { frameEl.src = "about:blank"; } catch (e) {}
+        var id = slotId; currentVmUrl = null; slotId = null; minimized = false; showTab(false);
+        activeEl.classList.remove("show"); homeEl.style.display = "flex";
+        requesting = false; launchBtn.disabled = false;
+        setStatus("Your VM ended. Launch another whenever you like.");
+        try {
+            fetch("/api/vms/end", { method: "POST", headers: { "Content-Type": "application/json" }, credentials: "same-origin", body: "{}" })
+                .catch(function () {}).then(function () { ending = false; });
+        } catch (e) { ending = false; }
+    }
+
+    function showTab(show) {
+        if (!tabEl) return;
+        if (show) tabEl.classList.add("show"); else tabEl.classList.remove("show");
+    }
+    function minimizeVm() {
+        if (!currentVmUrl) return;
+        minimized = true;
+        activeEl.classList.remove("show");
+        homeEl.style.display = "flex";
+        if (tabTimeEl) tabTimeEl.textContent = (timeLeft == null) ? "running" : ((timeEl ? timeEl.textContent : "") + " left");
+        showTab(true);
+        beat();
+    }
+    function restoreVm() {
+        minimized = false;
+        showTab(false);
+        homeEl.style.display = "none";
+        activeEl.classList.add("show");
+        beat();
+    }
+
+    function formatEta(sec) {
+        if (!sec || sec < 60) return "under a minute";
+        var m = Math.round(sec / 60);
+        return "~" + m + " min";
+    }
+
+    function showOverlay(title, sub, showActions) {
+        var ov = document.getElementById("vmOverlay");
+        if (!ov) return;
+        ov.classList.remove("hide");
+        var t = document.getElementById("vmOverlayTitle");
+        var s = document.getElementById("vmOverlaySub");
+        var a = document.getElementById("vmOverlayActions");
+        if (title != null && t) t.textContent = title;
+        if (sub != null && s) s.textContent = sub;
+        if (a) a.hidden = !showActions;
+    }
+    function hideOverlay() {
+        var ov = document.getElementById("vmOverlay");
+        if (ov) ov.classList.add("hide");
+        if (overlayWatch) { clearTimeout(overlayWatch); overlayWatch = null; }
+    }
+    function clearWatch() {
+        if (loadWatch) { clearTimeout(loadWatch); loadWatch = null; }
+        if (overlayWatch) { clearTimeout(overlayWatch); overlayWatch = null; }
+        if (typeof reconnectTimer !== "undefined" && reconnectTimer) { clearTimeout(reconnectTimer); reconnectTimer = null; }
+    }
+
+    function uid() {
+        if (!userId) userId = Math.random().toString(36).slice(2) + Date.now().toString(36);
+        return userId;
+    }
+    function setStatus(html) { if (statusEl) statusEl.innerHTML = html || ""; }
+    function setQueue(html) { if (queueEl) queueEl.innerHTML = html || ""; }
+
+    function resetIdle() {
+        queued = false; requesting = false;
+        launchBtn.disabled = false;
+        if (queuePollTimer) { clearTimeout(queuePollTimer); queuePollTimer = null; }
+    }
+
+    function cancelQueue() {
+        resetIdle();
+        setStatus(""); setQueue("");
+        ending = true;
+        try {
+            fetch("/api/vms/end", { method: "POST", headers: { "Content-Type": "application/json" }, credentials: "same-origin", body: "{}" })
+                .catch(function () {}).then(function () { ending = false; });
+        } catch (e) { ending = false; }
+    }
+
+    async function requestVM() {
+        if (requesting) return;
+        requesting = true;
+        queued = true;
+        launchBtn.disabled = true;
+        if (!queuePollTimer) setStatus("<span class=\"vm-spin\"></span>Starting your machine...");
+        try {
+            var res = await fetch("/api/vms/create", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                credentials: "same-origin",
+                body: "{}"
+            });
+            var data = await res.json().catch(function () { return {}; });
+            requesting = false;
+
+            if (res.status === 401) {
+                setStatus("");
+                setQueue("Please <a href=\"/account.html\" style=\"color:var(--accent)\">sign in</a> to launch a VM.");
+                resetIdle();
+                return;
+            }
+            if (data.queued) {
+                setStatus("");
+                if (data.rateLimited) {
+                    var rlMin = Math.max(1, Math.ceil((data.etaSeconds || 60) / 60));
+                    setQueue("<span class=\"vm-spin\"></span>All machines are at the provider's hourly limit right now. Retrying in about " + rlMin + " min… <a href=\"#\" data-cancel style=\"color:var(--fg-3);margin-left:4px\">Cancel</a>");
+                    queuePollTimer = setTimeout(requestVM, data.retryMs || 20000);
+                    return;
+                }
+                queuePolls++;
+                var cancel = " <a href=\"#\" data-cancel style=\"color:var(--fg-3);margin-left:4px\">Cancel</a>";
+                if (data.starting) {
+                    setQueue("<span class=\"vm-spin\"></span>You're next — spinning up your machine..." + cancel);
+                } else {
+                    var eta = "";
+                    if (data.etaSeconds) {
+                        eta = "<div class=\"vm-eta\"><span class=\"d\"></span>Roughly " + formatEta(data.etaSeconds) +
+                            " — just an estimate, waits are usually shorter.</div>";
+                    }
+                    setQueue("Waitlist: you're #" + data.position + (data.total ? " of " + data.total : "") +
+                        ". All machines are busy — holding your spot..." + cancel + eta);
+                }
+                queuePollTimer = setTimeout(requestVM, data.retryMs || 7000);
+                return;
+            }
+            if (!res.ok || !data.url) throw new Error(data.error || ("HTTP " + res.status));
+
+            queued = false;
+            if (queuePollTimer) { clearTimeout(queuePollTimer); queuePollTimer = null; }
+            slotId = data.sessionId || null;
+            timeLeft = (typeof data.maxMinutes === "number" && data.maxMinutes > 0) ? data.maxMinutes * 60 : null;
+            connect(data.url);
+        } catch (e) {
+            setStatus("Couldn't start a VM (" + (e && e.message ? e.message : e) + "). Try again in a moment.");
+            setQueue("");
+            resetIdle();
+        }
+    }
+
+    // Reload the desktop frame in place. Used by the Reload button and by the
+    // automatic retry below. There is no attempt limit: as long as the session is
+    // alive on the server, the page keeps trying to get a picture back.
+    var reconnects = 0, reconnectTimer = null;
+    function reconnectFrame(reason) {
+        if (!currentVmUrl) return;
+        reconnects++;
+        hideSlowOptions();
+        showOverlay("Reconnecting…", reason || "Reloading the desktop.", false);
+        clearWatch();
+        armLoadWatch();
+        try { frameEl.src = "about:blank"; } catch (e) {}
+        setTimeout(function () { if (currentVmUrl) frameEl.src = currentVmUrl; }, 60);
+    }
+
+    // A slow desktop is NOT a broken one. Reloading the frame on a timer used to
+    // throw away a KasmVNC session that was still coming up, which reset the VM the
+    // user was already halfway into. So nothing reloads by itself any more: if it
+    // takes a while, say so and let the user decide.
+    function showSlowOptions() {
+        if (spinEl) spinEl.hidden = true;
+        if (resumeBtn) resumeBtn.hidden = true;
+        if (retryBtn) retryBtn.hidden = true;
+        if (enterBtn) enterBtn.hidden = false;
+        if (restartBtn) restartBtn.hidden = false;
+        if (newBtn) newBtn.hidden = false;
+        showOverlay("This is taking a while",
+            "The desktop may still be coming up. Go on in and watch it finish, restart the machine, or ask for a different one.", true);
+    }
+
+    function hideSlowOptions() {
+        if (spinEl) spinEl.hidden = false;
+        if (enterBtn) enterBtn.hidden = true;
+        if (restartBtn) restartBtn.hidden = true;
+        if (newBtn) newBtn.hidden = true;
+        if (retryBtn) retryBtn.hidden = false;
+    }
+
+    function armLoadWatch() {
+        if (loadWatch) { clearTimeout(loadWatch); loadWatch = null; }
+        loadWatch = setTimeout(showSlowOptions, 18000);
+    }
+
+    // ---- suspended state -------------------------------------------------
+    // The server stops the container after a few minutes away and keeps the
+    // session. The desktop is still theirs; it just has no picture until they
+    // start it again, which they can do whenever they want.
+    var paused = false, resuming = false;
+
+    function showPaused() {
+        if (paused) return;
+        paused = true;
+        clearWatch();
+        stopTimer();
+        // Drop the frame URL so nothing tries to reconnect to a stopped container.
+        currentVmUrl = null;
+        homeEl.style.display = "none";
+        activeEl.classList.add("show");
+        minimized = false; showTab(false);
+        try { frameEl.src = "about:blank"; } catch (e) {}
+        if (spinEl) spinEl.hidden = true;
+        if (resumeBtn) resumeBtn.hidden = false;
+        if (retryBtn) retryBtn.hidden = true;
+        showPausedButtons();
+        showOverlay("Paused to save resources",
+            "You were away, so this machine was stopped. Start it again within a couple of minutes and you get the same desktop back; after that a fresh one starts instead.", true);
+    }
+
+    function clearPaused() {
+        paused = false;
+        if (spinEl) spinEl.hidden = false;
+        if (resumeBtn) resumeBtn.hidden = true;
+        if (retryBtn) retryBtn.hidden = false;
+    }
+
+    function showPausedButtons() {
+        if (enterBtn) enterBtn.hidden = true;
+        if (restartBtn) restartBtn.hidden = true;
+        if (newBtn) newBtn.hidden = false;   // a reaped machine still needs this way out
+    }
+
+    // "Enter VM": the desktop is probably fine, just slow. Get the overlay out of
+    // the way and stop watching the clock so it cannot reappear over their session.
+    function enterVm() {
+        clearWatch();
+        hideSlowOptions();
+        hideOverlay();
+    }
+
+    // "Restart VM": same machine, restarted at the provider.
+    async function restartVm() {
+        if (restarting) return;
+        restarting = true;
+        hideSlowOptions();
+        showOverlay("Restarting your machine…", "Rebooting the desktop. This takes a few seconds.", false);
+        try {
+            var r = await fetch("/api/vms/restart", {
+                method: "POST", headers: { "Content-Type": "application/json" },
+                credentials: "same-origin", body: "{}"
+            });
+            var d = await r.json().catch(function () { return {}; });
+            if (r.ok && d.url) {
+                reconnects = 0;
+                connect(d.url);
+            } else if (d.relaunch || d.gone) {
+                newVm(true);
+            } else {
+                showSlowOptions();
+                showOverlay("Couldn't restart it", (d.error || "The provider didn't respond.") + " You can try again or ask for a different machine.", true);
+            }
+        } catch (e) {
+            showSlowOptions();
+            showOverlay("Couldn't restart it", "Network error. Try again.", true);
+        }
+        restarting = false;
+    }
+
+    // "Request a new VM": let this one go and start a fresh one.
+    async function newVm(skipEnd) {
+        hideSlowOptions();
+        clearWatch();
+        showOverlay("Getting you a new machine…", "Releasing this one and starting another.", false);
+        currentVmUrl = null;
+        try { frameEl.src = "about:blank"; } catch (e) {}
+        if (!skipEnd) {
+            try {
+                await fetch("/api/vms/end", {
+                    method: "POST", headers: { "Content-Type": "application/json" },
+                    credentials: "same-origin", body: "{}"
+                });
+            } catch (e) {}
+        }
+        slotId = null;
+        paused = false;
+        stopTimer();
+        stopHeartbeat();
+        hideOverlay();
+        activeEl.classList.remove("show");
+        homeEl.style.display = "flex";
+        requesting = false;
+        queuePolls = 0;
+        launchBtn.disabled = false;
+        setStatus("<span class=\"vm-spin\"></span>Starting a new machine…");
+        requestVM();
+    }
+
+    var restarting = false;
+
+    async function resumeVm() {
+        if (resuming) return;
+        resuming = true;
+        if (resumeBtn) { resumeBtn.disabled = true; resumeBtn.textContent = "Starting…"; }
+        if (spinEl) spinEl.hidden = false;
+        showOverlay("Starting your machine…", "Bringing the desktop back up. This takes a few seconds.", false);
+        try {
+            var r = await fetch("/api/vms/resume", {
+                method: "POST", headers: { "Content-Type": "application/json" },
+                credentials: "same-origin", body: "{}"
+            });
+            var d = await r.json().catch(function () { return {}; });
+            if (r.ok && d.url) {
+                clearPaused();
+                connect(d.url);
+            } else if (d.gone) {
+                // The provider reaps a stopped container after a couple of minutes and
+                // there is no way to hold it open, so past that window "start it again"
+                // means starting a fresh machine. Do it for them rather than dead-ending.
+                clearPaused();
+                currentVmUrl = null; slotId = null;
+                activeEl.classList.remove("show");
+                homeEl.style.display = "flex";
+                hideOverlay();
+                setStatus("<span class=\"vm-spin\"></span>Your last machine had been cleaned up. Starting a fresh one…");
+                requesting = false;
+                queuePolls = 0;
+                requestVM();
+            } else {
+                showOverlay("Couldn't start it", (d.error || "The provider didn't respond.") + " You can try again or end the session.", true);
+                if (spinEl) spinEl.hidden = true;
+            }
+        } catch (e) {
+            showOverlay("Couldn't start it", "Network error. Try again.", true);
+            if (spinEl) spinEl.hidden = true;
+        }
+        resuming = false;
+        if (resumeBtn) { resumeBtn.disabled = false; resumeBtn.textContent = "Start it again"; }
+    }
+
+    function connect(url) {
+        requesting = false;
+        clearPaused();
+        hideSlowOptions();
+        currentVmUrl = url;
+        setStatus(""); setQueue("");
+        showOverlay("Connecting to your machine…", "This can take a few seconds while the desktop boots.", false);
+        clearWatch();
+        armLoadWatch();
+        timerStarted = false;
+        minimized = false; showTab(false);
+        renderTime();
+        frameEl.src = url;
+        homeEl.style.display = "none";
+        activeEl.classList.add("show");
+        startHeartbeat();
+    }
+
+    frameEl.addEventListener("load", function () {
+        if (!activeEl.classList.contains("show")) return;
+        if (!frameEl.src || frameEl.src === "about:blank") return;
+        if (loadWatch) { clearTimeout(loadWatch); loadWatch = null; }
+        if (reconnectTimer) { clearTimeout(reconnectTimer); reconnectTimer = null; }
+        reconnects = 0;
+        hideSlowOptions();
+        if (overlayWatch) clearTimeout(overlayWatch);
+        overlayWatch = setTimeout(hideOverlay, 1800);
+        if (!timerStarted) { timerStarted = true; startTimer(); }
+    });
+
+    function startTimer() {
+        stopTimer();
+        renderTime();
+        if (timeLeft == null) return;   // no limit, so nothing to count
+        timer = setInterval(function () {
+            timeLeft--;
+            renderTime();
+            if (timeLeft <= 0) endSession();
+        }, 1000);
+    }
+    function stopTimer() { if (timer) { clearInterval(timer); timer = null; } }
+    function renderTime() {
+        if (!timeEl) return;
+        // No limit: show how long it has been up rather than a clock running out.
+        if (timeLeft == null) {
+            timeEl.textContent = "No time limit";
+            timeEl.classList.remove("warn", "danger");
+            if (minimized && tabTimeEl) tabTimeEl.textContent = "running";
+            return;
+        }
+        // Show the real remaining time. This used to subtract an hour, so the
+        // clock read 00:00 with an hour still on the session.
+        var shown = Math.max(0, timeLeft);
+        var m = Math.max(0, Math.floor(shown / 60)).toString();
+        var s = Math.max(0, shown % 60).toString();
+        if (m.length < 2) m = "0" + m;
+        if (s.length < 2) s = "0" + s;
+        timeEl.textContent = m + ":" + s;
+        timeEl.classList.toggle("warn", shown <= 120 && shown > 30);
+        timeEl.classList.toggle("danger", shown <= 30);
+        if (minimized && tabTimeEl) tabTimeEl.textContent = m + ":" + s + " left";
+    }
+
+    async function endSession() {
+        ending = true;
+        clearPaused();
+        stopTimer();
+        stopHeartbeat();
+        clearWatch();
+        hideOverlay();
+        minimized = false; showTab(false);
+        currentVmUrl = null;
+        var id = slotId;
+        slotId = null;
+        try { frameEl.src = "about:blank"; } catch (e) {}
+        activeEl.classList.remove("show");
+        homeEl.style.display = "flex";
+        setStatus(""); setQueue("");
+        requesting = false;
+        launchBtn.disabled = false;
+        try {
+            await fetch("/api/vms/end", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                credentials: "same-origin",
+                body: "{}"
+            });
+        } catch (e) {}
+        finally { ending = false; }
+    }
+
+    function toggleFs() {
+        if (document.fullscreenElement) { document.exitFullscreen(); return; }
+        if (frameEl.requestFullscreen) frameEl.requestFullscreen();
+        else if (activeEl.requestFullscreen) activeEl.requestFullscreen();
+    }
+
+    var vmAccepted = false;
+    try { vmAccepted = localStorage.getItem("vm_guidelines_accepted") === "1"; } catch(e) {}
+
+    function showWelcome() {
+        var w = document.getElementById("vmWelcome");
+        if (!w) return;
+        w.style.display = "flex";
+        var cb = document.getElementById("vmAgree");
+        var btn = document.getElementById("vmAgreeBtn");
+        if (cb && btn) {
+            cb.checked = false; btn.disabled = true;
+            cb.onchange = function() { btn.disabled = !cb.checked; };
+            btn.onclick = function() {
+                vmAccepted = true;
+                try { localStorage.setItem("vm_guidelines_accepted", "1"); } catch(e) {}
+                w.style.display = "none";
+                queuePolls = 0; requestVM();
+            };
+        }
+    }
+
+    if (launchBtn) launchBtn.addEventListener("click", function () {
+        if (!vmAccepted) { showWelcome(); return; }
+        queuePolls = 0; requestVM();
+    });
+    var endBtn = document.getElementById("vmEnd");
+    var fsBtn = document.getElementById("vmFs");
+    if (endBtn) endBtn.addEventListener("click", endSession);
+    if (fsBtn) fsBtn.addEventListener("click", toggleFs);
+    var minBtn = document.getElementById("vmMin");
+    if (minBtn) minBtn.addEventListener("click", minimizeVm);
+    if (tabEl) tabEl.addEventListener("click", restoreVm);
+    var giveUpBtn = document.getElementById("vmGiveUp");
+    if (retryBtn) retryBtn.addEventListener("click", function () {
+        reconnects = 0;   // a deliberate reload restarts the backoff
+        reconnectFrame("Reloading the desktop.");
+    });
+    if (giveUpBtn) giveUpBtn.addEventListener("click", endSession);
+    if (resumeBtn) resumeBtn.addEventListener("click", resumeVm);
+    if (enterBtn) enterBtn.addEventListener("click", enterVm);
+    if (restartBtn) restartBtn.addEventListener("click", restartVm);
+    if (newBtn) newBtn.addEventListener("click", function () { newVm(false); });
+
+    // Tell the server the moment presence changes rather than waiting up to 30s
+    // for the next beat, so coming back from a hidden tab counts immediately.
+    document.addEventListener("visibilitychange", function () { if (currentVmUrl || paused) beat(); });
+
+    window.addEventListener("message", function (event) {
+        var d = event && event.data;
+        if (!d || d.source !== "jitter-vm") return;
+        if (d.vmState === "stopped") confirmEnded();
+        // The placeholder gave up waiting for the container to answer.
+        else if (d.vmState === "slow") showSlowOptions();
+        // "booting" needs nothing: that page retries itself for a bounded while.
+    });
+    if (queueEl) queueEl.addEventListener("click", function (e) {
+        var a = e.target.closest ? e.target.closest("[data-cancel]") : null;
+        if (a) { e.preventDefault(); cancelQueue(); }
+    });
+
+    window.addEventListener("pagehide", function () {
+        if (queued && !slotId && navigator.sendBeacon) {
+            try { navigator.sendBeacon("/api/vms/end", new Blob(["{}"], { type: "application/json" })); } catch (e) {}
+        }
+    });
+
+    function applyLive(data) {
+        var box = document.getElementById("vmLive");
+        var txt = document.getElementById("vmLiveText");
+        if (!txt || !data) return;
+        if (data.available === false) {
+            if (box) box.classList.add("off");
+            txt.textContent = "VMs offline";
+            return;
+        }
+        if (box) box.classList.remove("off");
+        var n = (typeof data.inUse === "number") ? data.inUse : 0;
+        var html = "<b>" + n + "</b> VM" + (n === 1 ? "" : "s") + " online";
+        if (data.waiting) html += " · " + data.waiting + " waiting";
+        if (data.rateLimited) {
+            var m = Math.max(1, Math.ceil((data.rateLimitSeconds || 60) / 60));
+            html += " · hourly limit, ~" + m + " min";
+        }
+        txt.innerHTML = html;
+    }
+    async function pollLive(handleReconnect) {
+        try {
+            var res = await fetch("/api/vms/status", { credentials: "same-origin" });
+            var data = await res.json().catch(function () { return {}; });
+            applyLive(data);
+            // Re-attach whenever the server still has a live VM for this user but
+            // this page is not showing one: a refresh, a dropped tab, a second
+            // window. Runs every tick, so reconnecting is never capped.
+            if (!data || ending) return;
+            // Suspended: show the paused screen wherever the user is, including
+            // after a refresh, so their machine is obviously still there.
+            if (data.state === "stopped") { showPaused(); return; }
+            // The server checked with the provider and the machine is genuinely
+            // gone. Stop retrying and offer a fresh one instead of looping on a
+            // container that no longer exists.
+            if (data.state === null && (currentVmUrl || paused || slotId)) {
+                var wasPaused = paused;
+                clearPaused();
+                vmEnded();
+                setStatus(wasPaused
+                    ? "Your machine was cleaned up after being idle. Launch another whenever you like."
+                    : "That machine is no longer available. Launch a new one whenever you like.");
+                return;
+            }
+            if (paused && data.state === "running") clearPaused();
+            if (handleReconnect && data.active && data.url && !currentVmUrl && !requesting) {
+                slotId = data.sessionId || slotId;
+                timeLeft = (typeof data.secondsLeft === "number" && data.secondsLeft > 0) ? data.secondsLeft : null;
+                connect(data.url);
+            }
+        } catch (e) {}
+    }
+    pollLive(true);
+    setInterval(function () { pollLive(true); }, 5000);
+})();
+</script>
+
+<script src="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.7/src/js/pu3927.js?v=20260929-2" defer></script>
+</body>
+</html>

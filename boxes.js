@@ -148,9 +148,13 @@ function boxView(b, stat) {
 // ── In-browser terminal (script-PTY piped over ws) ───────────────────────────
 function userFromReq(req) {
     try {
+        let token = null;
         const m = /(?:^|;\s*)nocturne_sid=([^;]+)/.exec(req.headers.cookie || "");
-        if (!m) return null;
-        const s = stmts.findSession.get(decodeURIComponent(m[1]), Date.now());
+        if (m) token = decodeURIComponent(m[1]);
+        // cross-origin ws (s3 frontend) can't send the cookie, so accept ?sid= too
+        if (!token) { try { token = new URL(req.url, "http://x").searchParams.get("sid"); } catch {} }
+        if (!token) return null;
+        const s = stmts.findSession.get(token, Date.now());
         return s ? { id: s.user_id, username: s.username } : null;
     } catch { return null; }
 }

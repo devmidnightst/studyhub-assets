@@ -13,7 +13,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="dark">
     <meta name="robots" content="noindex">
-    <title>nocturne</title>
+    <title>Nocturne - Applications</title>
     <meta name="description" content="Apply to join the Nocturne team — developer, moderator, support and staff roles.">
     <meta property="og:title" content="Nocturne · Applications">
     <meta property="og:description" content="Apply for developer, moderator and staff roles at Nocturne.">
@@ -24,22 +24,22 @@
     <meta property="og:site_name" content="Nocturne">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='9' fill='%230b0a14'/><circle cx='16' cy='16' r='9' fill='%23c9c1ff'/><circle cx='21' cy='14' r='8' fill='%230b0a14'/></svg>">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/src/css/global.css">
-    <link rel="stylesheet" href="/src/css/nocturne-select.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.5/src/css/global.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.5/src/css/nocturne-select.css">
     <style>
-        html, body { background:#05060d; color:#eae6ff; margin:0; font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; }
+        html, body { background:#060509; color:#ededf0; margin:0; font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; }
         .ap-wrap { max-width:680px; margin:0 auto; padding:42px 20px 96px; position:relative; z-index:1; }
         .ap-head { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; margin-bottom:8px; }
         .ap-title { font-size:26px; font-weight:600; letter-spacing:-.01em; }
         .ap-sub { color:#8a85a8; font-size:13.5px; margin-top:4px; line-height:1.5; }
         .ap-back { color:#807a9f; text-decoration:none; font-size:12.5px; white-space:nowrap; padding-top:6px; transition:color .15s ease; }
-        .ap-back:hover { color:#eae6ff; }
+        .ap-back:hover { color:#ededf0; }
 
         .ap-discord {
             display:flex; align-items:center; gap:14px;
             margin:22px 0 26px; padding:16px 18px;
-            background:linear-gradient(135deg, rgba(88,101,242,.16), rgba(201,193,255,.07));
-            border:1px solid rgba(124,131,242,.34); border-radius:14px;
+            background: rgba(88,101,242,.16);
+            border:1px solid rgba(124,131,242,.34); border-radius: 0;
         }
         .ap-discord svg { flex-shrink:0; }
         .ap-discord-txt { font-size:13.5px; line-height:1.5; color:#cdd0ff; }
@@ -54,13 +54,13 @@
         .field-hint { font-size:11.5px; color:#807a9f; margin-top:-2px; }
         .ap-input, .ap-textarea {
             width:100%; box-sizing:border-box;
-            background:rgba(255,255,255,.035); color:#eae6ff;
-            border:1px solid rgba(184,176,218,.16); border-radius:11px;
+            background:rgba(255,255,255,.035); color:#ededf0;
+            border:1px solid rgba(168, 152, 232, 0.112); border-radius: 0;
             padding:11px 13px; font:inherit; font-size:14px;
             transition:border-color .15s ease, background .15s ease;
         }
         .ap-input:focus, .ap-textarea:focus {
-            outline:none; border-color:rgba(201,193,255,.55); background:rgba(201,193,255,.06);
+            outline:none; border-color:rgba(168, 152, 232, 0.385); background:rgba(168, 152, 232, 0.042);
         }
         .ap-input::placeholder, .ap-textarea::placeholder { color:#5f5a7d; }
         .ap-textarea { resize:vertical; min-height:96px; line-height:1.5; }
@@ -76,11 +76,11 @@
 
         .ap-submit {
             align-self:flex-start; margin-top:4px;
-            background:#c9c1ff; color:#0b0a14; font:inherit; font-weight:600; font-size:14px;
-            border:0; border-radius:11px; padding:12px 26px; cursor:pointer;
+            background:#a898e8; color:#0a090d; font:inherit; font-weight:600; font-size:14px;
+            border:0; border-radius: 0; padding:12px 26px; cursor:pointer;
             transition:transform .12s ease, box-shadow .15s ease, opacity .15s ease;
         }
-        .ap-submit:hover:not(:disabled) { transform:translateY(-1px); box-shadow:0 8px 24px rgba(201,193,255,.24); }
+        .ap-submit:hover:not(:disabled) { transform:translateY(-1px); box-shadow:0 8px 24px rgba(168, 152, 232, 0.168); }
         .ap-submit:disabled { opacity:.55; cursor:default; }
         .ap-fine { font-size:11.5px; color:#6f6991; line-height:1.55; margin-top:2px; }
         @media (max-width:520px){ .ap-row{ flex-direction:column; gap:18px; } }
@@ -153,8 +153,8 @@
         </form>
     </div>
 
-    <script src="/src/js/wz6714.js" defer></script>
-    <script src="/src/js/qt3674.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.5/src/js/wz6714.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.5/src/js/qt3674.js" defer></script>
     <script>
     (function () {
         var form = document.getElementById("apForm");
@@ -199,6 +199,6 @@
         });
     })();
     </script>
-<script src="/src/js/pu3927.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.5/src/js/pu3927.js?v=20260929-2" defer></script>
 </body>
 </html>

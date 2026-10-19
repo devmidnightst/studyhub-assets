@@ -1,12 +1,12 @@
 :root {
-    --ad-bg: #05060d;
-    --ad-card: rgba(200, 195, 230, 0.035);
-    --ad-line: rgba(200, 195, 230, 0.12);
-    --ad-line-2: rgba(200, 195, 230, 0.2);
-    --ad-fg: #eae6ff;
-    --ad-fg-2: #b7b2d6;
-    --ad-fg-3: #80799f;
-    --ad-accent: #c9c1ff;
+    --ad-bg: #060509;
+    --ad-card: rgba(255, 255, 255, 0.035);
+    --ad-line: rgba(255, 255, 255, 0.12);
+    --ad-line-2: rgba(255, 255, 255, 0.2);
+    --ad-fg: #ededf0;
+    --ad-fg-2: #a8a7b0;
+    --ad-fg-3: #85848e;
+    --ad-accent: #a898e8;
     --ad-danger: #ff8f8f;
     --ad-ok: #8ad6a0;
     --ad-ease: cubic-bezier(0.22, 1, 0.36, 1);
@@ -17,7 +17,7 @@ body {
     margin: 0;
     font-family: 'Inter', system-ui, sans-serif;
     background:
-        radial-gradient(900px 500px at 80% -10%, rgba(201, 193, 255, 0.08), transparent 60%),
+        radial-gradient(900px 500px at 80% -10%, rgba(168, 152, 232, 0.056), transparent 60%),
         var(--ad-bg);
     color: var(--ad-fg);
     min-height: 100vh;
@@ -31,25 +31,25 @@ body {
 .ad-head {
     display: flex; align-items: center; gap: 16px;
     padding: 16px 22px; border-bottom: 1px solid var(--ad-line);
-    background: rgba(8, 9, 16, 0.6); backdrop-filter: blur(14px);
+    background: rgba(10, 9, 13, 0.94); 
     position: sticky; top: 0; z-index: 5;
 }
 .ad-brand { font-size: 16px; font-weight: 600; letter-spacing: -0.01em; }
 .ad-brand span { color: var(--ad-accent); }
 .ad-stats { display: flex; gap: 14px; font-size: 11.5px; color: var(--ad-fg-3); }
-.ad-stats span { background: var(--ad-card); border: 1px solid var(--ad-line); padding: 4px 10px; border-radius: 999px; }
+.ad-stats span { background: var(--ad-card); border: 1px solid var(--ad-line); padding: 4px 10px; border-radius: 0; }
 .ad-spacer { flex: 1; }
 .ad-owner {
     font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--ad-accent);
-    background: rgba(201, 193, 255, 0.1); border: 1px solid var(--ad-line-2);
-    padding: 5px 12px; border-radius: 999px;
+    background: rgba(168, 152, 232, 0.07); border: 1px solid var(--ad-line-2);
+    padding: 5px 12px; border-radius: 0;
 }
 
 .ad-tabs { display: flex; gap: 4px; padding: 14px 22px 0; flex-wrap: wrap; }
 .ad-tab {
     padding: 8px 16px; border: 1px solid transparent; background: transparent;
     color: var(--ad-fg-3); font: inherit; font-size: 13px; cursor: pointer;
-    border-radius: 9px 9px 0 0; transition: color 0.15s, background 0.15s;
+    border-radius: 0; transition: color 0.15s, background 0.15s;
 }
 .ad-tab:hover { color: var(--ad-fg); }
 .ad-tab.active { color: var(--ad-fg); background: var(--ad-card); border-color: var(--ad-line); border-bottom-color: transparent; }
@@ -60,10 +60,10 @@ body {
 @keyframes adIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
 .ad-row { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; align-items: center; }
-.ad-banform { background: var(--ad-card); border: 1px solid var(--ad-line); padding: 12px; border-radius: 12px; }
+.ad-banform { background: var(--ad-card); border: 1px solid var(--ad-line); padding: 12px; border-radius: 0; }
 
 .ad-input {
-    background: rgba(0, 0, 0, 0.25); border: 1px solid var(--ad-line-2); border-radius: 9px;
+    background: rgba(0, 0, 0, 0.25); border: 1px solid var(--ad-line-2); border-radius: 0;
     padding: 9px 12px; color: var(--ad-fg); font: inherit; font-size: 13px; outline: none;
     transition: border-color 0.15s;
 }
@@ -74,11 +74,11 @@ body {
 select.ad-input { cursor: pointer; }
 
 .ad-btn {
-    background: rgba(201, 193, 255, 0.12); border: 1px solid var(--ad-line-2); color: var(--ad-fg);
-    font: inherit; font-size: 12.5px; padding: 8px 14px; border-radius: 9px; cursor: pointer;
+    background: rgba(168, 152, 232, 0.084); border: 1px solid var(--ad-line-2); color: var(--ad-fg);
+    font: inherit; font-size: 12.5px; padding: 8px 14px; border-radius: 0; cursor: pointer;
     transition: background 0.15s, border-color 0.15s, transform 0.08s; white-space: nowrap;
 }
-.ad-btn:hover { background: rgba(201, 193, 255, 0.22); border-color: var(--ad-accent); }
+.ad-btn:hover { background: rgba(168, 152, 232, 0.154); border-color: var(--ad-accent); }
 .ad-btn:active { transform: scale(0.97); }
 .ad-btn.ad-danger { background: rgba(255, 120, 120, 0.1); border-color: rgba(255, 120, 120, 0.3); color: var(--ad-danger); }
 .ad-btn.ad-danger:hover { background: rgba(255, 120, 120, 0.2); }
@@ -90,7 +90,7 @@ select.ad-input { cursor: pointer; }
 
 .ad-card {
     display: flex; align-items: center; gap: 14px;
-    background: var(--ad-card); border: 1px solid var(--ad-line); border-radius: 12px; padding: 12px 14px;
+    background: var(--ad-card); border: 1px solid var(--ad-line); border-radius: 0; padding: 12px 14px;
     transition: border-color 0.15s;
 }
 .ad-card:hover { border-color: var(--ad-line-2); }
@@ -104,15 +104,15 @@ select.ad-input { cursor: pointer; }
 
 .ad-tag {
     font-size: 9.5px; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;
-    background: var(--ad-fg-3); color: var(--ad-bg); padding: 2px 7px; border-radius: 5px;
+    background: var(--ad-fg-3); color: var(--ad-bg); padding: 2px 7px; border-radius: 0;
 }
 .ad-tag.ok { background: var(--ad-ok); }
-.ad-tag.prem { background: linear-gradient(90deg, #c9a14f, #e6c976); color: #2a200a; }
+.ad-tag.prem { background: #c9a14f; color: #2a200a; }
 
 .ad-toast {
     position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%);
     background: rgba(12, 13, 22, 0.96); border: 1px solid var(--ad-line-2);
-    color: var(--ad-fg); padding: 10px 18px; border-radius: 10px; font-size: 13px;
+    color: var(--ad-fg); padding: 10px 18px; border-radius: 0; font-size: 13px;
     box-shadow: 0 10px 36px rgba(0, 0, 0, 0.5); z-index: 50;
 }
 .ad-toast.bad { border-color: rgba(255, 120, 120, 0.4); color: var(--ad-danger); }

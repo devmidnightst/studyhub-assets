@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="dark">
-    <title>nocturne</title>
-    <style>html,body{background:#05060d;color:#eae6ff;margin:0}</style>
+    <title>Nocturne - Voice</title>
+    <style>html,body{background:#060509;color:#ededf0;margin:0}</style>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='9' fill='%230b0a14'/><circle cx='16' cy='16' r='9' fill='%23c9c1ff'/><circle cx='21' cy='14' r='8' fill='%230b0a14'/></svg>">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/src/css/global.css">
-    <link rel="stylesheet" href="/src/css/dock.css">
-    <link rel="stylesheet" href="/src/css/voice.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.5/src/css/global.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.5/src/css/dock.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.5/src/css/voice.css">
 </head>
 <body>
 
@@ -46,7 +46,7 @@
 </div>
 
 <nav id="dock"></nav>
-<script src="/src/js/lr2815.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.5/src/js/lr2815.js" defer></script>
 <script>
 (function(){
 var ws, myPeerId, myUsername, currentChannel, muted=false, deafened=false;
@@ -127,9 +127,16 @@ function handle(msg){
     }
 }
 
+var channelRenderVersion=0;
+var channelRenderFrame=0;
+
 function renderChannels(channels){
-    channelArea.innerHTML="";
-    channels.forEach(function(ch){
+    var version=++channelRenderVersion;
+    if(channelRenderFrame)cancelAnimationFrame(channelRenderFrame);
+    channelRenderFrame=0;
+    var fragment=document.createDocumentFragment();
+    var jobs=[];
+    (Array.isArray(channels)?channels:[]).forEach(function(ch){
         var panel=document.createElement("div");
         panel.className="vc-panel";
         var inThis=currentChannel===ch.id;
@@ -139,9 +146,10 @@ function renderChannels(channels){
         title.textContent=ch.name;
         var right=document.createElement("div");
         right.style.cssText="display:flex;align-items:center;gap:8px";
+        var memberList=Array.isArray(ch.members)?ch.members:[];
         var count=document.createElement("span");
         count.className="vc-count";
-        count.textContent=ch.members.length+" online";
+        count.textContent=memberList.length+" online";
         right.appendChild(count);
         var btn=document.createElement("button");
         btn.className="vc-join "+(inThis?"leave":"join");
@@ -159,23 +167,34 @@ function renderChannels(channels){
         head.appendChild(title);
         head.appendChild(right);
         panel.appendChild(head);
-        var members=document.createElement("div");
-        members.className="vc-members";
-        if(!ch.members.length){
+        var membersEl=document.createElement("div");
+        membersEl.className="vc-members";
+        if(!memberList.length){
             var empty=document.createElement("div");
             empty.className="vc-empty";
             empty.textContent="No one here yet";
-            members.appendChild(empty);
-        } else {
-            ch.members.forEach(function(m){
-                members.appendChild(makeMemberEl(m,inThis));
-            });
+            membersEl.appendChild(empty);
+        }else{
+            jobs.push({data:memberList,target:membersEl,inThis:inThis,index:0});
         }
-        panel.appendChild(members);
-        channelArea.appendChild(panel);
+        panel.appendChild(membersEl);
+        fragment.appendChild(panel);
     });
+    channelArea.replaceChildren(fragment);
+    if(!jobs.length)return;
+    function appendBatch(){
+        channelRenderFrame=0;
+        if(version!==channelRenderVersion)return;
+        var job=jobs[0];
+        var batch=document.createDocumentFragment();
+        var end=Math.min(job.index+24,job.data.length);
+        while(job.index<end)batch.appendChild(makeMemberEl(job.data[job.index++],job.inThis));
+        job.target.appendChild(batch);
+        if(job.index>=job.data.length)jobs.shift();
+        if(jobs.length)channelRenderFrame=requestAnimationFrame(appendBatch);
+    }
+    channelRenderFrame=requestAnimationFrame(appendBatch);
 }
-
 function makeMemberEl(m,showControls){
     var el=document.createElement("div");
     el.className="vc-member";
@@ -287,7 +306,7 @@ function destroyPeer(peerId){
     if(pc){pc.close();delete peerConnections[peerId]}
     var audio=remoteAudios[peerId];
     if(audio){audio.srcObject=null;audio.remove();delete remoteAudios[peerId]}
-    if(analyserNodes[peerId]){delete analyserNodes[peerId]}
+    if(analyserNodes[peerId]){try{analyserNodes[peerId].src.disconnect();analyserNodes[peerId].analyser.disconnect()}catch(_){}delete analyserNodes[peerId];delete speakingState[peerId]}
     delete speakingState[peerId];
 }
 
@@ -305,17 +324,23 @@ function applyVolume(peerId){
 
 function setupSpeakingDetection(peerId,stream){
     try{
-        var ctx=new AudioContext();
+        var ctx=sharedAudioCtx||(sharedAudioCtx=new (window.AudioContext||window.webkitAudioContext)());
+        if(ctx.state==="suspended")ctx.resume().catch(function(){});
         var src=ctx.createMediaStreamSource(stream);
         var analyser=ctx.createAnalyser();
         analyser.fftSize=512;
         analyser.smoothingTimeConstant=0.4;
         src.connect(analyser);
-        analyserNodes[peerId]={analyser:analyser,data:new Uint8Array(analyser.frequencyBinCount)};
+        analyserNodes[peerId]={analyser:analyser,data:new Uint8Array(analyser.frequencyBinCount),src:src};
+        startSpeakingLoop();
     }catch(_){}
 }
+var sharedAudioCtx=null,speakingTimer=0;
+function startSpeakingLoop(){if(!speakingTimer)speakingTimer=setTimeout(speakingLoop,50)}
 
 function speakingLoop(){
+    speakingTimer=0;
+    if(document.hidden){if(Object.keys(analyserNodes).length)speakingTimer=setTimeout(speakingLoop,400);return}
     for(var pid in analyserNodes){
         var node=analyserNodes[pid];
         node.analyser.getByteFrequencyData(node.data);
@@ -332,9 +357,8 @@ function speakingLoop(){
             }
         }
     }
-    requestAnimationFrame(speakingLoop);
+    if(Object.keys(analyserNodes).length)speakingTimer=setTimeout(speakingLoop,50);
 }
-requestAnimationFrame(speakingLoop);
 
 btnMic.onclick=function(){
     muted=!muted;

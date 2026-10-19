@@ -25,12 +25,12 @@ body { height: auto; overflow-y: auto; }
 .doc-body a:hover { color: var(--fg); }
 .doc-body code {
     font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px;
-    background: rgba(200, 195, 230, 0.08); color: #d9d2ff; padding: 1px 5px; border-radius: 5px;
+    background: rgba(255, 255, 255, 0.08); color: #d9d2ff; padding: 1px 5px; border-radius: 0;
 }
 .doc-body hr { border: 0; border-top: 1px solid var(--line); margin: 26px 0; }
 .doc-body blockquote {
     margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line-2); border-left: 2px solid var(--accent);
-    border-radius: 0 10px 10px 0; background: rgba(200, 195, 230, 0.03);
+    border-radius: 0; background: rgba(255, 255, 255, 0.03);
     font-size: 13px; line-height: 1.62; color: var(--fg-2);
 }
 .doc-body blockquote strong { color: var(--fg); }

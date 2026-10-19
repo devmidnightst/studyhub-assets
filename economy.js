@@ -398,6 +398,13 @@ const CRASH_ACTIVE_PATH = path.join(DATA_DIR, 'crash-active.json');
 
 const crashRounds = new Map();
 let crashFair = null;
+
+// Every app process restores crash-active.json on boot, so the same round can
+// be armed in more than one place. The first process to record the round id
+// here settles it; any other copy just drops it, so nothing pays out twice.
+db.exec('CREATE TABLE IF NOT EXISTS crash_settled (round_id TEXT PRIMARY KEY, settled_at INTEGER NOT NULL)');
+const stmtCrashSettleClaim = db.prepare('INSERT OR IGNORE INTO crash_settled (round_id, settled_at) VALUES (?, ?)');
+const stmtCrashSettlePrune = db.prepare('DELETE FROM crash_settled WHERE settled_at < ?');
 let crashSettleHook = () => {};
 
 function saveJson(file, data) {
@@ -514,6 +521,12 @@ function settleCrash(r, kind, mult) {
     r.done = true;
     if (r.crashTimer) clearTimeout(r.crashTimer);
     if (r.autoTimer) clearTimeout(r.autoTimer);
+    let claimed = true;
+    try { claimed = stmtCrashSettleClaim.run(r.id, Date.now()).changes === 1; } catch {}
+    if (!claimed) {
+        if (crashRounds.get(r.userId) === r) crashRounds.delete(r.userId);
+        return null;
+    }
     const crashAt = r.startedAt + crashMsUntil(r.crashPoint);
     let won = false, push = false, payout = 0, cashMult = null;
     if (kind !== 'crash' && Date.now() < crashAt) {
@@ -599,6 +612,7 @@ export function cashoutCrash(userId) {
 
 export function armCrashRounds() {
     crashFair = loadCrashFair();
+    try { stmtCrashSettlePrune.run(Date.now() - 7 * 24 * 60 * 60 * 1000); } catch {}
     let list = [];
     try { list = JSON.parse(fs.readFileSync(CRASH_ACTIVE_PATH, 'utf8')); } catch { list = []; }
     if (!Array.isArray(list)) return;

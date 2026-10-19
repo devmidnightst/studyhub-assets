@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-69T9E59SM7"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-69T9E59SM7');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="dark">
+    <meta name="theme-color" content="#060509">
+    <title>Nocturne - Account</title>
+    <style>html,body{background:#060509;color:#ededf0;margin:0}</style>
+    <style id="acct-visible">html,body{position:static!important;height:auto!important;min-height:100%!important;overflow:auto!important}#authView:not(.hidden){display:flex!important;opacity:1!important;visibility:visible!important}.auth-card,.page-header,.hero-strip,.card{opacity:1!important}</style>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='9' fill='%230b0a14'/><circle cx='16' cy='16' r='9' fill='%23c9c1ff'/><circle cx='21' cy='14' r='8' fill='%230b0a14'/></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.7/src/css/global.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.7/src/css/dock.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.7/src/css/account.css">
+</head>
+<body>
+
+<div class="page-header">
+    <div>
+        <span class="brand-title">Nocturne</span>
+        <span class="brand-sub">Account</span>
+    </div>
+    <a href="/" class="back">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        Back
+    </a>
+</div>
+
+<main class="wrap">
+
+    <section id="authView" class="auth-view">
+        <div class="auth-card">
+            <div class="auth-tabs">
+                <button class="auth-tab active" data-mode="login">Sign in</button>
+                <button class="auth-tab" data-mode="signup">Create account</button>
+            </div>
+
+            <div class="auth-body">
+                <h1 id="authTitle" class="auth-title">Welcome back</h1>
+                <p id="authSub" class="auth-sub">Sign in to access account features.</p>
+
+                <form id="authForm" class="auth-form" autocomplete="on" onsubmit="event.preventDefault()">
+                    <div class="field">
+                        <label class="field-label" for="usernameIn">Username</label>
+                        <input id="usernameIn" name="username" type="text" autocomplete="username" required minlength="3" maxlength="32" placeholder="3-32 chars · letters, numbers, _ -">
+                    </div>
+                    <div class="field">
+                        <label class="field-label" for="passwordIn">Password</label>
+                        <input id="passwordIn" name="password" type="password" autocomplete="current-password" required minlength="8" maxlength="256" placeholder="Min 8 characters">
+                    </div>
+                    <div class="field">
+                        <cap-widget id="authCaptcha" data-cap-api-endpoint="/api/captcha/" data-cap-disable-haptics></cap-widget>
+                    </div>
+                    <div id="authErr" class="auth-err"></div>
+                    <button type="submit" class="auth-submit" id="authSubmit">Sign in</button>
+                </form>
+
+                <p class="auth-foot">
+                    Passwords are hashed with scrypt and never logged.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <section id="accountView" class="account-view hidden">
+
+        <div class="hero-strip">
+            <div>
+                <div class="who-tag">Signed in as</div>
+                <div class="who-name" id="whoName">-</div>
+                <div class="who-meta" id="whoMeta">-</div>
+            </div>
+            <button class="btn-ghost" id="signOutBtn">Sign out</button>
+        </div>
+
+        <div class="card owner-card hidden" id="ownerCard">
+            <div class="owner-badge">⚡ GOD MODE</div>
+            <h2 class="card-title">Admin control panel</h2>
+            <p class="card-blurb">Manage users, provision AI credits &amp; token quotas, ban / unban, review support tickets, and toggle model access.</p>
+            <div class="row-actions">
+                <a href="/admin.html" class="btn owner-btn">Open admin panel →</a>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2 class="card-title">Change password</h2>
+            <form id="pwForm" class="auth-form">
+                <div class="field">
+                    <label class="field-label" for="pwCurrent">Current password</label>
+                    <input id="pwCurrent" type="password" autocomplete="current-password" required>
+                </div>
+                <div class="field">
+                    <label class="field-label" for="pwNext">New password</label>
+                    <input id="pwNext" type="password" autocomplete="new-password" required minlength="8" maxlength="256">
+                </div>
+                <div id="pwErr" class="auth-err"></div>
+                <div class="row-actions">
+                    <button type="submit" class="btn">Update password</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="card" id="apiCard">
+            <h2 class="card-title">Developer API</h2>
+            <p class="card-blurb">Use Nocturne AI from your own apps — keys, models, usage, a live playground, and full docs all live on one page now.</p>
+            <div class="row-actions">
+                <a class="btn" href="/api" target="_top">Go to API Homepage →</a>
+            </div>
+        </div>
+
+        <div class="card danger-card">
+            <h2 class="card-title">Delete account</h2>
+            <p class="card-blurb">Permanently removes your account and all sessions. This cannot be undone.</p>
+            <form id="delForm" class="auth-form">
+                <div class="field">
+                    <label class="field-label" for="delPw">Confirm with password</label>
+                    <input id="delPw" type="password" autocomplete="current-password" required>
+                </div>
+                <div id="delErr" class="auth-err"></div>
+                <div class="row-actions">
+                    <button type="submit" class="btn-danger">Delete my account</button>
+                </div>
+            </form>
+        </div>
+
+    </section>
+
+    <section id="loadingView" class="loading-view hidden">
+        <div class="spinner"></div>
+    </section>
+
+</main>
+
+<nav id="dock"></nav>
+<script src="/cap.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.7/src/js/lr2815.js" defer></script>
+
+<script src="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.7/src/js/az4417.js?v=4"></script>
+
+<script src="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.7/src/js/pu3927.js?v=20260929-2" defer></script>
+</body>
+</html>

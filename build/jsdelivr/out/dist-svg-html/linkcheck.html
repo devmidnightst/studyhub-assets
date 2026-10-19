@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-69T9E59SM7"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-69T9E59SM7');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="dark">
+    <meta name="theme-color" content="#060509">
+    <title>Nocturne - Link Checker</title>
+    <style>html,body{background:#060509;color:#ededf0;margin:0}</style>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='9' fill='%230b0a14'/><circle cx='16' cy='16' r='9' fill='%23c9c1ff'/><circle cx='21' cy='14' r='8' fill='%230b0a14'/></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.7/src/css/global.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.7/src/css/dock.css">
+    <style>
+        body { overflow-y: auto; }
+        .page-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 22px 32px 0; max-width: 980px; margin: 0 auto;
+            opacity: 0; animation: slideDown 0.5s var(--ease) 0.05s forwards;
+        }
+        .brand-title { font-size: 15px; font-weight: 500; color: var(--fg); }
+        .brand-sub { font-size: 12px; color: var(--fg-3); margin-left: 10px; }
+        .back {
+            display: inline-flex; align-items: center; gap: 6px;
+            color: var(--fg-3); font-size: 12px; text-decoration: none;
+            transition: color 0.15s, transform 0.15s;
+        }
+        .back:hover { color: var(--fg); transform: translateX(-2px); }
+        .wrap { max-width: 880px; margin: 0 auto; padding: 32px; padding-bottom: 140px; }
+        @media (max-width: 600px) { .wrap { padding: 18px 16px 140px; } .intro h1 { font-size: 20px; } }
+
+        .intro {
+            opacity: 0; animation: slideUp 0.5s var(--ease) 0.1s forwards;
+            margin-bottom: 28px;
+        }
+        .intro h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 6px; }
+        .intro p { font-size: 13px; color: var(--fg-3); line-height: 1.55; }
+
+        .panel {
+            background: var(--panel); border: 1px solid var(--line-2);
+            border-radius: 0; padding: 22px;
+            
+            opacity: 0; animation: slideUp 0.5s var(--ease) 0.18s forwards;
+            margin-bottom: 18px;
+        }
+        .panel-title {
+            font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+            color: var(--accent); font-weight: 600; margin-bottom: 14px;
+        }
+        .panel-sub {
+            font-size: 12.5px; color: var(--fg-3); line-height: 1.55; margin-bottom: 16px;
+        }
+
+        .check-row {
+            display: flex; gap: 8px; flex-wrap: wrap;
+        }
+        .check-input {
+            flex: 1; min-width: 220px;
+            background: var(--bg-2); border: 1px solid var(--line);
+            border-radius: 0; padding: 11px 12px; color: var(--fg);
+            font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px;
+            transition: border-color 0.15s;
+        }
+        .check-input:focus { border-color: var(--line-3); outline: none; }
+
+        .btn {
+            padding: 10px 18px; border-radius: 0; font-size: 12.5px; font-weight: 500;
+            border: 1px solid var(--fg); color: var(--bg); background: var(--fg);
+            cursor: pointer; transition: all 0.15s;
+        }
+        .btn:hover { background: var(--accent); border-color: var(--accent); }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        .result {
+            margin-top: 18px;
+            padding: 18px;
+            border: 1px solid var(--line);
+            border-radius: 0;
+            background: var(--bg-2);
+            display: none;
+        }
+        .result.show { display: block; }
+
+        .result-host {
+            font-family: 'JetBrains Mono', ui-monospace, monospace;
+            font-size: 12px; color: var(--fg-3); margin-bottom: 12px;
+            overflow-wrap: anywhere;
+        }
+
+        .result-list { display: flex; flex-direction: column; gap: 6px; }
+        .result-row {
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            gap: 12px;
+            align-items: center;
+            padding: 10px 12px;
+            background: rgba(13, 12, 17, 0.5);
+            border: 1px solid var(--line);
+            border-radius: 0;
+            font-size: 12.5px;
+        }
+        .result-row .rr-name { color: var(--fg); font-weight: 500; }
+        .result-row .rr-cat { color: var(--fg-3); font-size: 11.5px; text-align: right; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 280px; }
+        .result-row .rr-badge {
+            font-size: 10.5px; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 600;
+            padding: 4px 8px; border-radius: 0;
+            min-width: 78px; text-align: center;
+        }
+        .rr-badge.pending { background: rgba(255, 255, 255, 0.06); color: var(--fg-3); border: 1px solid var(--line); }
+        .rr-badge.allowed { background: rgba(110, 231, 135, 0.12); color: #7ce0a8; border: 1px solid rgba(110, 231, 135, 0.25); }
+        .rr-badge.blocked { background: rgba(255, 107, 130, 0.12); color: #f0a6a6; border: 1px solid rgba(255, 107, 130, 0.25); }
+        .rr-badge.unknown { background: rgba(255, 255, 255, 0.04); color: var(--fg-2); border: 1px solid var(--line); }
+        .rr-badge.errored { background: rgba(208, 130, 130, 0.12); color: #f0c4c4; border: 1px solid rgba(208, 130, 130, 0.25); }
+        .rr-mini-spin {
+            display: inline-block; width: 10px; height: 10px;
+            border: 1.5px solid rgba(168, 152, 232, 0.175);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            vertical-align: -1px; margin-right: 5px;
+        }
+
+        .filter-bar {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 14px; gap: 12px;
+        }
+        .filter-dd {
+            position: relative; flex-shrink: 0;
+        }
+        .filter-toggle {
+            background: var(--bg-2); border: 1px solid var(--line);
+            color: var(--fg); border-radius: 0;
+            padding: 8px 12px;
+            font-size: 12px; font-family: inherit; font-weight: 500;
+            cursor: pointer;
+            display: inline-flex; align-items: center; gap: 8px;
+            transition: border-color 0.15s, background 0.15s;
+        }
+        .filter-toggle:hover { border-color: var(--line-3); background: rgba(255, 255, 255, 0.05); }
+        .filter-toggle svg { opacity: 0.7; transition: transform 0.2s; }
+        .filter-toggle[aria-expanded="true"] svg { transform: rotate(180deg); }
+        .filter-toggle .filter-count {
+            font-size: 10.5px; padding: 2px 7px; border-radius: 0;
+            background: rgba(168, 152, 232, 0.084); color: var(--accent);
+            font-weight: 600;
+        }
+
+        .filter-menu {
+            position: absolute; top: calc(100% + 6px); right: 0;
+            min-width: 240px; max-height: 360px; overflow-y: auto;
+            background: rgba(14, 15, 28, 0.96); border: 1px solid var(--line-2);
+            border-radius: 0; padding: 8px;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+            
+            z-index: 50;
+            display: none;
+        }
+        .filter-menu.open { display: block; }
+        .filter-menu-actions {
+            display: flex; gap: 4px; padding: 4px 4px 8px; border-bottom: 1px solid var(--line);
+            margin-bottom: 6px;
+        }
+        .filter-menu-action {
+            flex: 1; background: transparent; border: 1px solid var(--line);
+            color: var(--fg-3); border-radius: 0;
+            padding: 5px 8px; font-size: 11px; cursor: pointer; font-family: inherit;
+            transition: border-color 0.15s, color 0.15s;
+        }
+        .filter-menu-action:hover { border-color: var(--line-3); color: var(--fg); }
+        .filter-opt {
+            display: flex; align-items: center; gap: 8px;
+            padding: 6px 8px; border-radius: 0;
+            cursor: pointer; font-size: 12.5px; color: var(--fg-2);
+        }
+        .filter-opt:hover { background: rgba(255, 255, 255, 0.05); color: var(--fg); }
+        .filter-opt input { accent-color: var(--accent); margin: 0; cursor: pointer; }
+
+        .err {
+            margin-top: 14px;
+            padding: 12px 14px;
+            border-radius: 0;
+            background: rgba(208, 130, 130, 0.08);
+            border: 1px solid rgba(208, 130, 130, 0.3);
+            color: #f0c4c4;
+            font-size: 12.5px;
+            display: none;
+        }
+        .err.show { display: block; }
+
+        .spinner {
+            display: inline-block;
+            width: 13px; height: 13px;
+            border: 2px solid rgba(168, 152, 232, 0.175);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            vertical-align: -2px; margin-right: 6px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+<canvas id="bgCanvas" class="visible"></canvas>
+
+<div class="page-header">
+    <div>
+        <span class="brand-title">Nocturne</span>
+        <span class="brand-sub">Link Checker</span>
+    </div>
+    <a href="/" class="back">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        Back
+    </a>
+</div>
+
+<main class="wrap">
+
+    <div class="intro">
+        <h1>Link Checker</h1>
+        <p>Check whether a URL is filtered. Each selected service is queried in parallel; results appear as they come back.</p>
+    </div>
+
+    <section class="panel">
+        <div class="filter-bar">
+            <div class="panel-title" style="margin: 0">Link Checker</div>
+            <div class="filter-dd">
+                <button class="filter-toggle" id="filterToggle" aria-expanded="false" aria-haspopup="true">
+                    <span id="filterLabel">All filters</span>
+                    <span class="filter-count" id="filterCount">0</span>
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <div class="filter-menu" id="filterMenu" role="menu">
+                    <div class="filter-menu-actions">
+                        <button class="filter-menu-action" data-action="all">Select all</button>
+                        <button class="filter-menu-action" data-action="none">None</button>
+                    </div>
+                    <div id="filterOptions"></div>
+                </div>
+            </div>
+        </div>
+
+        <p class="panel-sub">Enter a URL or hostname - the full string is checked as-is.</p>
+
+        <div class="check-row">
+            <input type="text" class="check-input" id="domainIn" placeholder="example.com or https://example.com/path" autocomplete="off" spellcheck="false">
+            <button class="btn" id="checkBtn">Check</button>
+        </div>
+
+        <div class="err" id="errBox"></div>
+
+        <div class="result" id="resultBox">
+            <div class="result-host" id="resultHost"></div>
+            <div class="result-list" id="resultList"></div>
+        </div>
+    </section>
+
+</main>
+
+<nav id="dock"></nav>
+<script src="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.7/src/js/lr2815.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.7/src/js/wz6714.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.7/src/js/be9460.js"></script>
+
+<script>
+(function () {
+    const input = document.getElementById("domainIn");
+    const btn = document.getElementById("checkBtn");
+    const errBox = document.getElementById("errBox");
+    const resultBox = document.getElementById("resultBox");
+    const resultHost = document.getElementById("resultHost");
+    const resultList = document.getElementById("resultList");
+    const filterToggle = document.getElementById("filterToggle");
+    const filterMenu = document.getElementById("filterMenu");
+    const filterOptions = document.getElementById("filterOptions");
+    const filterLabel = document.getElementById("filterLabel");
+    const filterCount = document.getElementById("filterCount");
+
+    let allFilters = [];
+    const selected = new Set();
+    let currentSource = null;
+
+    function showError(msg) { errBox.textContent = msg; errBox.classList.add("show"); }
+    function clearError() { errBox.textContent = ""; errBox.classList.remove("show"); }
+
+    function renderFilterMenu() {
+        filterOptions.innerHTML = allFilters.map(f => `
+            <label class="filter-opt">
+                <input type="checkbox" data-id="${f.id}" ${selected.has(f.id) ? "checked" : ""}>
+                <span>${f.label}</span>
+            </label>
+        `).join("");
+        filterOptions.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+            cb.addEventListener("change", () => {
+                if (cb.checked) selected.add(cb.dataset.id);
+                else selected.delete(cb.dataset.id);
+                updateLabel();
+            });
+        });
+    }
+
+    function updateLabel() {
+        filterCount.textContent = String(selected.size);
+        if (selected.size === allFilters.length) filterLabel.textContent = "All filters";
+        else if (selected.size === 0) filterLabel.textContent = "No filters";
+        else if (selected.size === 1) {
+            const id = [...selected][0];
+            const f = allFilters.find(x => x.id === id);
+            filterLabel.textContent = f ? f.label : "1 filter";
+        }
+        else filterLabel.textContent = selected.size + " filters";
+    }
+
+    async function loadFilters() {
+        try {
+            const r = await fetch("/api/linkcheck");
+            const j = await r.json();
+            allFilters = (j.filters || []).filter(f => f.available);
+            for (const f of allFilters) selected.add(f.id);
+            renderFilterMenu();
+            updateLabel();
+        } catch {
+            showError("Could not load filter list.");
+        }
+    }
+
+    filterToggle.addEventListener("click", () => {
+        const open = filterMenu.classList.toggle("open");
+        filterToggle.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+    document.addEventListener("click", e => {
+        if (!filterMenu.classList.contains("open")) return;
+        if (e.target.closest(".filter-dd")) return;
+        filterMenu.classList.remove("open");
+        filterToggle.setAttribute("aria-expanded", "false");
+    });
+    filterMenu.querySelectorAll("[data-action]").forEach(b => {
+        b.addEventListener("click", () => {
+            selected.clear();
+            if (b.dataset.action === "all") for (const f of allFilters) selected.add(f.id);
+            renderFilterMenu();
+            updateLabel();
+        });
+    });
+
+    function rowHtml(f) {
+        return `
+            <div class="result-row" data-id="${f.id}">
+                <div class="rr-name">${f.label}</div>
+                <div class="rr-cat">-</div>
+                <div class="rr-badge pending"><span class="rr-mini-spin"></span>Checking</div>
+            </div>
+        `;
+    }
+
+    function applyResult(id, data) {
+        const row = resultList.querySelector(`.result-row[data-id="${id}"]`);
+        if (!row) return;
+        const cat = row.querySelector(".rr-cat");
+        const badge = row.querySelector(".rr-badge");
+        cat.textContent = data.category || (data.error ? data.error : "-");
+        cat.title = data.category || data.error || "";
+        if (data.error) {
+            badge.className = "rr-badge errored";
+            badge.textContent = "Error";
+        } else if (data.blocked === true) {
+            badge.className = "rr-badge blocked";
+            badge.textContent = "Blocked";
+        } else if (data.blocked === false) {
+            badge.className = "rr-badge allowed";
+            badge.textContent = "Allowed";
+        } else {
+            badge.className = "rr-badge unknown";
+            badge.textContent = "Unknown";
+        }
+    }
+
+    function check() {
+        clearError();
+        const raw = input.value.trim();
+        if (!raw) { showError("Enter a URL or hostname to check."); return; }
+        if (!selected.size) { showError("Select at least one filter."); return; }
+
+        if (currentSource) { try { currentSource.close(); } catch {} currentSource = null; }
+
+        btn.disabled = true;
+        const originalText = btn.textContent;
+        btn.innerHTML = '<span class="spinner"></span>Checking…';
+
+        resultHost.textContent = raw;
+        resultList.innerHTML = "";
+        resultBox.classList.add("show");
+
+        const filtersParam = selected.size === allFilters.length ? "all" : [...selected].join(",");
+        const ev = new EventSource("/api/linkcheck/stream?url=" + encodeURIComponent(raw) + "&filters=" + encodeURIComponent(filtersParam));
+        currentSource = ev;
+
+        ev.addEventListener("start", e => {
+            const d = JSON.parse(e.data);
+            resultList.innerHTML = d.filters.map(rowHtml).join("");
+        });
+        ev.addEventListener("result", e => {
+            applyResult(JSON.parse(e.data).id, JSON.parse(e.data));
+        });
+        const finish = () => {
+            try { ev.close(); } catch {}
+            currentSource = null;
+            btn.disabled = false;
+            btn.textContent = originalText;
+        };
+        ev.addEventListener("done", finish);
+        ev.onerror = () => {
+            if (ev.readyState === EventSource.CLOSED) return finish();
+            finish();
+            if (!resultList.querySelector(".result-row")) showError("Connection failed.");
+        };
+    }
+
+    btn.addEventListener("click", check);
+    input.addEventListener("keydown", e => { if (e.key === "Enter") check(); });
+
+    loadFilters();
+})();
+</script>
+
+<script src="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.7/src/js/pu3927.js?v=20260929-2" defer></script>
+</body>
+</html>

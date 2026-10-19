@@ -16,10 +16,10 @@ body.sp-page { overflow: hidden; }
     display: flex;
     flex-direction: column;
     padding: 24px 16px 16px;
-    background: linear-gradient(180deg, rgba(12, 13, 24, 0.78) 0%, rgba(8, 9, 18, 0.82) 100%);
+    background: rgba(13, 12, 17, 0.94);
     border-right: 1px solid var(--line);
-    backdrop-filter: blur(22px);
-    -webkit-backdrop-filter: blur(22px);
+    
+    
     opacity: 0;
     transform: translateX(-8px);
     animation: spSidebarIn 0.5s var(--ease) 0.05s forwards;
@@ -41,11 +41,11 @@ body.sp-page { overflow: hidden; }
 .sp-brand-mark {
     width: 22px;
     height: 22px;
-    border-radius: 50%;
+    border-radius: 0;
     background:
         radial-gradient(circle at 70% 35%, var(--bg) 38%, transparent 39%),
         radial-gradient(circle at 50% 50%, var(--accent) 0%, var(--accent-2) 100%);
-    box-shadow: 0 0 18px rgba(184, 176, 218, 0.32);
+    box-shadow: none;
     flex-shrink: 0;
 }
 
@@ -85,7 +85,7 @@ body.sp-page { overflow: hidden; }
     align-items: center;
     gap: 11px;
     padding: 9px 12px;
-    border-radius: 9px;
+    border-radius: 0;
     background: transparent;
     border: 1px solid transparent;
     color: var(--fg-2);
@@ -108,17 +108,17 @@ body.sp-page { overflow: hidden; }
 }
 
 .sp-nav-item:hover {
-    background: rgba(200, 195, 230, 0.04);
+    background: rgba(255, 255, 255, 0.04);
     color: var(--fg);
 }
 
 .sp-nav-item:hover svg { opacity: 1; }
 
 .sp-nav-item.active {
-    background: rgba(184, 176, 218, 0.10);
-    border-color: rgba(184, 176, 218, 0.18);
+    background: rgba(168, 152, 232, 0.07);
+    border-color: rgba(168, 152, 232, 0.126);
     color: var(--fg);
-    box-shadow: 0 0 0 1px rgba(184, 176, 218, 0.04) inset, 0 4px 14px rgba(0, 0, 0, 0.22);
+    box-shadow: 0 0 0 1px rgba(168, 152, 232, 0.028) inset, 0 4px 14px rgba(0, 0, 0, 0.22);
 }
 
 .sp-nav-item.active svg {
@@ -150,13 +150,13 @@ body.sp-page { overflow: hidden; }
     color: var(--fg-3);
     font-size: 12px;
     text-decoration: none;
-    border-radius: 8px;
+    border-radius: 0;
     transition: color 0.15s var(--ease), background 0.15s var(--ease), transform 0.15s var(--ease);
 }
 
 .sp-back:hover {
     color: var(--fg);
-    background: rgba(200, 195, 230, 0.05);
+    background: rgba(255, 255, 255, 0.05);
     transform: translateX(-2px);
 }
 
@@ -221,11 +221,11 @@ body.sp-page { overflow: hidden; }
 }
 
 .sp-card {
-    background: rgba(20, 22, 38, 0.55);
+    background: rgba(13, 12, 17, 0.94);
     border: 1px solid var(--line);
-    border-radius: 16px;
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    border-radius: 0;
+    
+    
     overflow: hidden;
     margin-bottom: 16px;
     box-shadow: 0 10px 32px rgba(0, 0, 0, 0.18);
@@ -304,8 +304,8 @@ body.sp-page { overflow: hidden; }
     font-family: 'JetBrains Mono', ui-monospace, monospace;
     font-size: 11px;
     padding: 1px 5px;
-    background: rgba(200, 195, 230, 0.07);
-    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.07);
+    border-radius: 0;
 }
 
 .row-control {
@@ -338,8 +338,8 @@ body.sp-page { overflow: hidden; }
 .toggle .track {
     position: absolute; cursor: pointer;
     inset: 0;
-    background: rgba(200, 195, 230, 0.1);
-    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 0;
     transition: background 0.22s var(--ease);
 }
 .toggle .track::before {
@@ -347,16 +347,16 @@ body.sp-page { overflow: hidden; }
     height: 16px; width: 16px;
     left: 3px; top: 3px;
     background: var(--fg-3);
-    border-radius: 50%;
+    border-radius: 0;
     transition: transform 0.22s var(--ease), background 0.22s var(--ease);
 }
 .toggle input:checked + .track { background: var(--accent); }
 .toggle input:checked + .track::before { background: var(--bg); transform: translateX(16px); }
 
 .select {
-    background: rgba(200, 195, 230, 0.04);
+    background: rgba(255, 255, 255, 0.04);
     border: 1px solid var(--line-2);
-    border-radius: 8px;
+    border-radius: 0;
     color: var(--fg);
     padding: 8px 12px;
     font-size: 12.5px;
@@ -364,17 +364,17 @@ body.sp-page { overflow: hidden; }
     min-width: 200px;
     transition: border-color 0.15s var(--ease), background 0.15s var(--ease);
 }
-.select:hover { border-color: var(--line-3); background: rgba(200, 195, 230, 0.07); }
+.select:hover { border-color: var(--line-3); background: rgba(255, 255, 255, 0.07); }
 .select:focus { border-color: var(--accent); outline: none; }
-.select option { background: #0c0d18; color: var(--fg); }
+.select option { background: #0a090d; color: var(--fg); }
 
 .btn {
     padding: 8px 14px;
-    border-radius: 8px;
+    border-radius: 0;
     font-size: 12px;
     font-weight: 500;
     color: var(--fg);
-    background: rgba(200, 195, 230, 0.05);
+    background: rgba(255, 255, 255, 0.05);
     border: 1px solid var(--line-2);
     transition: border-color 0.15s var(--ease), background 0.15s var(--ease), color 0.15s var(--ease), transform 0.15s var(--ease);
     font-family: inherit;
@@ -385,7 +385,7 @@ body.sp-page { overflow: hidden; }
     justify-content: center;
 }
 .btn:hover {
-    background: rgba(200, 195, 230, 0.09);
+    background: rgba(255, 255, 255, 0.09);
     border-color: var(--line-3);
     transform: translateY(-1px);
 }
@@ -397,7 +397,7 @@ body.sp-page { overflow: hidden; }
     color: var(--fg-3);
     padding: 8px 12px;
 }
-.btn.ghost:hover { color: var(--fg); background: rgba(200, 195, 230, 0.06); }
+.btn.ghost:hover { color: var(--fg); background: rgba(255, 255, 255, 0.06); }
 
 .btn.danger {
     color: #d08282;
@@ -411,8 +411,8 @@ body.sp-page { overflow: hidden; }
     -webkit-appearance: none;
     width: 160px;
     height: 4px;
-    background: rgba(200, 195, 230, 0.1);
-    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 0;
     outline: none;
 }
 .range::-webkit-slider-thumb {
@@ -420,14 +420,14 @@ body.sp-page { overflow: hidden; }
     -webkit-appearance: none;
     width: 14px; height: 14px;
     background: var(--accent);
-    border-radius: 50%;
+    border-radius: 0;
     cursor: pointer;
     transition: transform 0.15s var(--ease);
 }
 .range::-moz-range-thumb {
     width: 14px; height: 14px;
     background: var(--accent);
-    border-radius: 50%;
+    border-radius: 0;
     cursor: pointer;
     border: 0;
 }
@@ -448,7 +448,7 @@ body.sp-page { overflow: hidden; }
 }
 .swatch {
     width: 22px; height: 22px;
-    border-radius: 50%;
+    border-radius: 0;
     cursor: pointer;
     border: 2px solid transparent;
     padding: 0;
@@ -457,13 +457,13 @@ body.sp-page { overflow: hidden; }
 .swatch:hover { transform: scale(1.15); }
 .swatch.selected {
     border-color: var(--fg);
-    box-shadow: 0 0 0 2px rgba(184, 176, 218, 0.18);
+    box-shadow: 0 0 0 2px rgba(168, 152, 232, 0.126);
 }
 .color-picker {
     width: 22px; height: 22px;
     background: none;
     border: 1px dashed var(--line-3);
-    border-radius: 50%;
+    border-radius: 0;
     padding: 0;
     cursor: pointer;
     margin-left: 4px;
@@ -471,7 +471,7 @@ body.sp-page { overflow: hidden; }
 
 .bg-preview {
     width: 240px; height: 90px;
-    border-radius: 10px;
+    border-radius: 0;
     background: var(--bg-2) center/cover;
     border: 1px solid var(--line);
     display: flex;
@@ -529,8 +529,8 @@ body.sp-page { overflow: hidden; }
 .sp-hist-bar { display: flex; gap: 10px; align-items: center; margin-bottom: 12px; }
 .sp-hist-search-wrap {
     flex: 1; display: flex; align-items: center; gap: 8px;
-    background: rgba(200, 195, 230, 0.04);
-    border: 1px solid var(--line-2); border-radius: 8px; padding: 0 10px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--line-2); border-radius: 0; padding: 0 10px;
     transition: border-color 0.15s ease;
 }
 .sp-hist-search-wrap:focus-within { border-color: var(--line-3); }
@@ -544,18 +544,18 @@ body.sp-page { overflow: hidden; }
 .sp-hist-list { display: flex; flex-direction: column; gap: 1px; }
 .sp-hist-item {
     display: flex; align-items: center; gap: 12px;
-    padding: 9px 8px; border-radius: 8px; cursor: pointer;
+    padding: 9px 8px; border-radius: 0; cursor: pointer;
     border: 1px solid transparent;
     transition: background 0.14s ease, border-color 0.14s ease;
 }
-.sp-hist-item:hover { background: rgba(200, 195, 230, 0.05); border-color: var(--line); }
-.sp-hist-fav { width: 18px; height: 18px; border-radius: 4px; flex-shrink: 0; background: rgba(200, 195, 230, 0.06); object-fit: cover; }
+.sp-hist-item:hover { background: rgba(255, 255, 255, 0.05); border-color: var(--line); }
+.sp-hist-fav { width: 18px; height: 18px; border-radius: 0; flex-shrink: 0; background: rgba(255, 255, 255, 0.06); object-fit: cover; }
 .sp-hist-text { flex: 1; min-width: 0; }
 .sp-hist-title { font-size: 13px; color: var(--fg); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .sp-hist-url { font-size: 11px; color: var(--fg-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
 .sp-hist-time { font-size: 11px; color: var(--fg-3); flex-shrink: 0; font-variant-numeric: tabular-nums; }
 .sp-hist-del {
-    flex-shrink: 0; width: 22px; height: 22px; border-radius: 6px; border: none;
+    flex-shrink: 0; width: 22px; height: 22px; border-radius: 0; border: none;
     background: transparent; color: var(--fg-3); font-size: 17px; line-height: 1;
     cursor: pointer; opacity: 0;
     transition: opacity 0.14s ease, background 0.14s ease, color 0.14s ease;
@@ -567,8 +567,8 @@ body.sp-page { overflow: hidden; }
 .sp-flood { margin-top: 14px; }
 .sp-flood-add { display: flex; gap: 8px; margin-bottom: 10px; }
 .sp-flood-add input {
-    flex: 1; background: rgba(200, 195, 230, 0.04);
-    border: 1px solid var(--line-2); border-radius: 8px; padding: 9px 11px;
+    flex: 1; background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--line-2); border-radius: 0; padding: 9px 11px;
     color: var(--fg); font: inherit; font-size: 13px; outline: none;
     transition: border-color 0.15s ease;
 }
@@ -578,14 +578,14 @@ body.sp-page { overflow: hidden; }
 .sp-flood-list { display: flex; flex-direction: column; gap: 1px; max-height: 280px; overflow-y: auto; }
 .sp-flood-item {
     display: flex; align-items: center; gap: 10px;
-    padding: 8px; border-radius: 8px; border: 1px solid transparent;
+    padding: 8px; border-radius: 0; border: 1px solid transparent;
     transition: background 0.14s ease, border-color 0.14s ease;
 }
-.sp-flood-item:hover { background: rgba(200, 195, 230, 0.05); border-color: var(--line); }
-.sp-flood-fav { width: 16px; height: 16px; border-radius: 4px; flex-shrink: 0; background: rgba(200, 195, 230, 0.06); object-fit: cover; }
+.sp-flood-item:hover { background: rgba(255, 255, 255, 0.05); border-color: var(--line); }
+.sp-flood-fav { width: 16px; height: 16px; border-radius: 0; flex-shrink: 0; background: rgba(255, 255, 255, 0.06); object-fit: cover; }
 .sp-flood-url { flex: 1; min-width: 0; font-size: 13px; color: var(--fg-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .sp-flood-del {
-    flex-shrink: 0; width: 22px; height: 22px; border-radius: 6px; border: none;
+    flex-shrink: 0; width: 22px; height: 22px; border-radius: 0; border: none;
     background: transparent; color: var(--fg-3); font-size: 17px; line-height: 1; cursor: pointer;
     transition: background 0.14s ease, color 0.14s ease;
 }
@@ -594,11 +594,11 @@ body.sp-page { overflow: hidden; }
 
 .engine-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 16px; }
 .engine-opt {
-    border: 1px solid var(--line-2); border-radius: 12px; padding: 14px 16px;
-    background: rgba(200, 195, 230, 0.025);
+    border: 1px solid var(--line-2); border-radius: 0; padding: 14px 16px;
+    background: rgba(255, 255, 255, 0.025);
     display: flex; flex-direction: column; gap: 9px;
 }
-.engine-opt.is-current { border-color: rgba(184, 176, 218, 0.45); background: rgba(184, 176, 218, 0.06); }
+.engine-opt.is-current { border-color: rgba(168, 152, 232, 0.315); background: rgba(168, 152, 232, 0.042); }
 .engine-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .engine-name {
     font-size: 13.5px; font-weight: 600; color: var(--fg);
@@ -606,8 +606,8 @@ body.sp-page { overflow: hidden; }
 }
 .engine-tag {
     font-size: 9.5px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase;
-    padding: 2px 7px; border-radius: 999px;
-    background: rgba(200, 195, 230, 0.1); color: var(--fg-2);
+    padding: 2px 7px; border-radius: 0;
+    background: rgba(255, 255, 255, 0.1); color: var(--fg-2);
 }
 .engine-tag.beta { background: rgba(216, 184, 120, 0.14); color: #d8b878; }
 .engine-meta { font-size: 10.5px; color: var(--fg-3); font-family: 'JetBrains Mono', ui-monospace, monospace; }

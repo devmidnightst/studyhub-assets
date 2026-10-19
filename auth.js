@@ -1,4 +1,7 @@
-import { scryptSync, randomBytes, timingSafeEqual } from "crypto";
+import { shouldTouchSession } from "./session-refresh.js";
+import { randomBytes } from "crypto";
+import { hashPassword, verifyPassword } from "./password.js";
+export { hashPassword, verifyPassword } from "./password.js";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -12,8 +15,6 @@ export { clientIp };
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const SCRYPT_PARAMS = { N: 16384, r: 8, p: 1, maxmem: 64 * 1024 * 1024 };
-const SCRYPT_KEYLEN = 64;
 const SESSION_COOKIE = "nocturne_sid";
 
 const USERNAME_RE = /^[a-zA-Z0-9_-]{3,32}$/;
@@ -111,30 +112,6 @@ function fpFromReq(req) {
     } catch { return null; }
 }
 
-export function hashPassword(password) {
-    const salt = randomBytes(16);
-    const hash = scryptSync(password, salt, SCRYPT_KEYLEN, SCRYPT_PARAMS);
-    return `s1:${salt.toString("hex")}:${hash.toString("hex")}`;
-}
-
-export function verifyPassword(password, stored) {
-    if (!stored || typeof stored !== "string") return false;
-    const parts = stored.split(":");
-    if (parts.length !== 3 || parts[0] !== "s1") return false;
-    let salt, expected;
-    try {
-        salt = Buffer.from(parts[1], "hex");
-        expected = Buffer.from(parts[2], "hex");
-    } catch { return false; }
-    if (salt.length === 0 || expected.length === 0) return false;
-    let actual;
-    try {
-        actual = scryptSync(password, salt, expected.length, SCRYPT_PARAMS);
-    } catch { return false; }
-    if (actual.length !== expected.length) return false;
-    return timingSafeEqual(actual, expected);
-}
-
 export function newSessionToken() {
     return randomBytes(32).toString("hex");
 }
@@ -183,8 +160,10 @@ export function authMiddleware(req, res, next) {
     let session;
     try { session = stmts.findSession.get(token, Date.now()); } catch { session = null; }
     if (!session) return next();
-    const newExpiry = Date.now() + SESSION_TTL_MS;
-    try { stmts.touchSession.run(Date.now(), newExpiry, token); } catch {}
+    const touchedAt = Date.now();
+    if (shouldTouchSession(session, touchedAt, SESSION_TTL_MS)) {
+        try { stmts.touchSession.run(touchedAt, touchedAt + SESSION_TTL_MS, token); } catch {}
+    }
     req.user = { id: session.user_id, username: session.username, sessionToken: token };
     const now = Date.now();
     const lastLog = _sessionLogCache.get(session.user_id) || 0;
@@ -203,12 +182,13 @@ export function requireAuth(req, res, next) {
 // Verify account credentials for the public AI API (username + password). Returns
 // { id, username } on success, else null. Honors bans + the same scrypt check as
 // login. Used by /api/ai when an API key isn't supplied.
-export function authenticateUser(username, password) {
+export async function authenticateUser(username, password) {
     const v = validateCredentials({ username, password });
     if (v.error) return null;
     const user = stmts.findUserByName.get(v.username);
     if (!user) return null;
-    if (!verifyPassword(password, user.password_hash)) return null;
+    if (!(await verifyPassword(password, user.password_hash))) return null;
+    if (stmts.findUserByName.get(user.username)?.password_hash !== user.password_hash) return null;
     if (userBanned(user.username)) return null;
     return { id: user.id, username: user.username };
 }
@@ -224,10 +204,10 @@ function validateCredentials(body) {
 
 // Ensure the owner/"god" account exists with the configured password and a huge
 // credit balance. Idempotent — runs every boot, resetting the password to match.
-function seedOwner() {
+async function seedOwner() {
     try {
         const existing = stmts.findUserByName.get(OWNER_USERNAME);
-        const hash = hashPassword(OWNER_PASSWORD);
+        const hash = await hashPassword(OWNER_PASSWORD);
         if (!existing) {
             const info = stmts.insertUser.run(OWNER_USERNAME, hash, Date.now());
             stmts.aiCreditsSet.run(OWNER_CREDITS_MICRO, info.lastInsertRowid);
@@ -242,8 +222,8 @@ function seedOwner() {
     }
 }
 
-export function mountAuth(app) {
-    seedOwner();
+export async function mountAuth(app) {
+    await seedOwner();
 
     app.post("/api/auth/signup", async (req, res) => {
         if (burstLimited(clientIp(req))) {
@@ -263,10 +243,12 @@ export function mountAuth(app) {
 
         let info;
         try {
-            info = stmts.insertUser.run(v.username, hashPassword(v.password), Date.now());
+            const passwordHash = await hashPassword(v.password);
+            if (stmts.countUsers.get().n >= MAX_USERS) return res.status(503).json({ error: "Service is full. Try again later." });
+            info = stmts.insertUser.run(v.username, passwordHash, Date.now());
         } catch (e) {
             if (String(e.message || "").includes("UNIQUE")) return res.status(409).json({ error: "Username unavailable" });
-            return res.status(500).json({ error: "Signup failed" });
+            return res.status(e.status === 503 ? 503 : 500).json({ error: e.status === 503 ? "Password service busy; retry shortly." : "Signup failed" });
         }
         const userId = info.lastInsertRowid;
         const net = await connectionRestricted(clientIp(req));
@@ -301,10 +283,11 @@ export function mountAuth(app) {
 
         const user = stmts.findUserByName.get(v.username);
         if (!user) return res.status(401).json({ error: "Invalid credentials" });
-        if (!verifyPassword(v.password, user.password_hash)) {
+        if (!(await verifyPassword(v.password, user.password_hash))) {
             return res.status(401).json({ error: "Invalid credentials" });
         }
 
+        if (stmts.findUserByName.get(user.username)?.password_hash !== user.password_hash) return res.status(401).json({ error: "Credentials changed; sign in again." });
         const ban = userBanned(user.username);
         if (ban) return res.status(403).json({ error: "This account is banned." + (ban.reason ? " Reason: " + ban.reason : "") });
 
@@ -349,17 +332,19 @@ export function mountAuth(app) {
         });
     });
 
-    app.post("/api/auth/password", authMiddleware, requireAuth, (req, res) => {
+    app.post("/api/auth/password", authMiddleware, requireAuth, async (req, res) => {
         const current = typeof req.body?.current === "string" ? req.body.current : "";
         const next = typeof req.body?.next === "string" ? req.body.next : "";
         if (next.length < PASSWORD_MIN || next.length > PASSWORD_MAX) {
             return res.status(400).json({ error: "Invalid new password" });
         }
         const u = stmts.findUserByName.get(req.user.username);
-        if (!u || !verifyPassword(current, u.password_hash)) {
+        if (!u || !(await verifyPassword(current, u.password_hash))) {
             return res.status(401).json({ error: "Current password incorrect" });
         }
-        stmts.changePassword.run(hashPassword(next), u.id);
+        const replacementHash = await hashPassword(next);
+        if (stmts.findUserByName.get(u.username)?.password_hash !== u.password_hash) return res.status(409).json({ error: "Credentials changed; retry." });
+        stmts.changePassword.run(replacementHash, u.id);
         stmts.deleteUserSessions.run(u.id);
         const token = newSessionToken();
         const now = Date.now();
@@ -368,14 +353,19 @@ export function mountAuth(app) {
         res.json({ ok: true, sessionToken: token });
     });
 
-    app.post("/api/auth/delete", authMiddleware, requireAuth, (req, res) => {
+    app.post("/api/auth/delete", authMiddleware, requireAuth, async (req, res) => {
         const password = typeof req.body?.password === "string" ? req.body.password : "";
         const u = stmts.findUserByName.get(req.user.username);
-        if (!u || !verifyPassword(password, u.password_hash)) {
+        if (!u || !(await verifyPassword(password, u.password_hash))) {
             return res.status(401).json({ error: "Password incorrect" });
         }
+        if (stmts.findUserByName.get(u.username)?.password_hash !== u.password_hash) return res.status(409).json({ error: "Credentials changed; retry." });
         stmts.deleteUser.run(u.id);
         clearSessionCookie(req, res);
         res.json({ ok: true });
+    });
+    app.use("/api/auth", (error, req, res, next) => {
+        if (error.status !== 503) return next(error);
+        res.set("Retry-After", "2").status(503).json({ error: "Password service busy; retry shortly." });
     });
 }

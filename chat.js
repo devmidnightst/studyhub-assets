@@ -1,9 +1,13 @@
+import { rejectBlockedChatText } from "./chat-moderation.js";
 import fs from "fs";
 import path from "path";
 import dns from "node:dns/promises";
 import net from "node:net";
 import { fileURLToPath } from "url";
-import { stmts } from "./db.js";
+import { db, stmts } from "./db.js";
+import { createHistoryLoader } from "./chat-history.js";
+import { writeChatEvent, attachChatStream } from "./chat-stream.js";
+const loadHistory = createHistoryLoader(db);
 import { scoreMessageRisk, moderationConfigured } from "./groq.js";
 import { filterProfanity } from "./profanity.js";
 import { isOwnerName } from "./auth.js";
@@ -189,14 +193,14 @@ function broadcast(room, obj) {
     const set = subscribers.get(room);
     if (!set || !set.size) return;
     const payload = "data: " + JSON.stringify(obj) + "\n\n";
-    for (const res of set) { try { res.write(payload); } catch {} }
+    for (const res of set) { writeChatEvent(res, payload); }
 }
 
 // Send to every subscriber in every room (used for avatar changes).
 function broadcastAll(obj) {
     const payload = "data: " + JSON.stringify(obj) + "\n\n";
     for (const set of subscribers.values()) {
-        for (const res of set) { try { res.write(payload); } catch {} }
+        for (const res of set) { writeChatEvent(res, payload); }
     }
 }
 
@@ -212,7 +216,7 @@ function pushToUser(userId, obj) {
     const set = userSubs.get(userId);
     if (!set || !set.size) return;
     const payload = "data: " + JSON.stringify(obj) + "\n\n";
-    for (const res of set) { try { res.write(payload); } catch {} }
+    for (const res of set) { writeChatEvent(res, payload); }
 }
 
 function convoKey(a, b) { return a < b ? a + ":" + b : b + ":" + a; }
@@ -291,7 +295,7 @@ function reactionCounts(messageId) {
     return map;
 }
 
-function serialize(row, userId) {
+function serialize(row, userId, batch) {
     return {
         id: row.id,
         room: row.room,
@@ -302,9 +306,9 @@ function serialize(row, userId) {
         deleted: !!row.deleted,
         ts: row.created_at,
         edited: !!row.edited_at,
-        replyTo: replyPreview(row.reply_to),
+        replyTo: batch ? (batch.preview.get(row.reply_to) || null) : replyPreview(row.reply_to),
         fwd: row.fwd_user ? { username: row.fwd_user, room: row.fwd_room } : null,
-        reactions: reactionsFor(row.id, userId),
+        reactions: batch ? (batch.grouped.get(row.id) || {}) : reactionsFor(row.id, userId),
         ...(() => { const r = roleInfo(row); return { perm: r.perm, role: r.role, roleColor: r.roleColor }; })()
     };
 }
@@ -724,7 +728,8 @@ export function mountChat(app, { authMiddleware } = {}) {
                 ? stmts.chatAfter.all(room, after, limit)
                 : stmts.chatRecent.all(room, limit).reverse();
             res.setHeader("Cache-Control", "no-store");
-            res.json({ ok: true, room, messages: rows.map(r => serialize(r, req.user.id)) });
+            const batch = loadHistory(rows, req.user.id);
+            res.json({ ok: true, room, messages: rows.map(r => serialize(r, req.user.id, batch)) });
         } catch (e) {
             res.status(500).json({ error: e.message });
         }
@@ -738,8 +743,6 @@ export function mountChat(app, { authMiddleware } = {}) {
         res.setHeader("Connection", "keep-alive");
         res.setHeader("X-Accel-Buffering", "no");
         res.flushHeaders?.();
-        res.write("retry: 4000\n\n");
-        res.write("data: " + JSON.stringify({ type: "hello", room }) + "\n\n");
         const releaseVisit = holdVisitor(req);
         const remove = addSub(room, res);
         // Also register on the user's personal feed so direct messages reach them
@@ -747,15 +750,19 @@ export function mountChat(app, { authMiddleware } = {}) {
         const removeUser = addUserSub(req.user.id, res);
         const wasOffline = !presence.has(req.user.id);
         if (wasOffline) setPresence(req.user.id, "online");
-        broadcastAll({ type: "presence", userId: req.user.id, username: req.user.username, status: presenceOf(req.user.id) });
-        const ka = setInterval(() => { try { res.write(": ka\n\n"); } catch {} }, 25_000);
-        req.on("close", () => {
+        const ka = setInterval(() => { writeChatEvent(res, ": ka\n\n"); }, 25_000);
+        const close = attachChatStream(res, () => {
             clearInterval(ka); remove(); removeUser(); releaseVisit();
             if (!userSubs.has(req.user.id)) {
                 presence.delete(req.user.id);
                 broadcastAll({ type: "presence", userId: req.user.id, username: req.user.username, status: "offline" });
             }
         });
+        req.on("close", close);
+        broadcastAll({ type: "presence", userId: req.user.id, username: req.user.username, status: presenceOf(req.user.id) });
+
+        writeChatEvent(res, "retry: 4000\n\n");
+        writeChatEvent(res, "data: " + JSON.stringify({ type: "hello", room }) + "\n\n");
     });
 
     // Set your presence status (online / idle / dnd / invisible).
@@ -818,12 +825,14 @@ export function mountChat(app, { authMiddleware } = {}) {
             if (!orig || orig.deleted) return res.status(404).json({ error: "That message is no longer available." });
             text = cleanText(orig.text);
             if (!text) return res.status(400).json({ error: "Nothing to forward." });
+            if (rejectBlockedChatText(res, text)) return;
             fwdUser = orig.username;
             fwdRoom = orig.room;
         } else {
             text = cleanText(req.body?.text);
             if (!text) return res.status(400).json({ error: "Message is empty." });
             if (text.length > MAX_LEN) return res.status(400).json({ error: `Message is too long (max ${MAX_LEN} characters).` });
+            if (rejectBlockedChatText(res, text)) return;
 
             const replyId = parseInt(req.body?.replyTo, 10);
             if (replyId > 0) {
@@ -871,6 +880,8 @@ export function mountChat(app, { authMiddleware } = {}) {
         const rank = isOwner ? 3 : (() => { try { const u = stmts.findUserByName.get(req.user.username); return u ? roleInfo(u).rank : 0; } catch { return 0; } })();
         const room = sanitizeRoom(req.body?.room);
         const raw = String(req.body?.text || "").trim();
+        if (raw.length > MAX_LEN) return res.status(400).json({ error: "Command is too long." });
+        if (rejectBlockedChatText(res, raw)) return;
         if (!raw.startsWith("/")) return res.status(400).json({ error: "Not a command." });
         const parts = raw.slice(1).split(/\s+/);
         const cmd = (parts.shift() || "").toLowerCase();
@@ -1187,6 +1198,7 @@ export function mountChat(app, { authMiddleware } = {}) {
         const text = cleanText(req.body?.text);
         if (!text) return res.status(400).json({ error: "Message is empty." });
         if (text.length > MAX_LEN) return res.status(400).json({ error: `Message is too long (max ${MAX_LEN} characters).` });
+        if (rejectBlockedChatText(res, text)) return;
 
         const gate = await gateText(text, { ...roomPolicy(row.room), scan: deslugUrls(text) });
         if (gate.blocked) {
@@ -1346,6 +1358,7 @@ export function mountChat(app, { authMiddleware } = {}) {
         const text0 = cleanText(req.body?.text);
         if (!text0) return res.status(400).json({ error: "Message is empty." });
         if (text0.length > MAX_LEN) return res.status(400).json({ error: `Message is too long (max ${MAX_LEN} characters).` });
+        if (rejectBlockedChatText(res, text0)) return;
 
         const key = convoKey(req.user.id, other.id);
         let replyTo = null;
@@ -1391,6 +1404,7 @@ export function mountChat(app, { authMiddleware } = {}) {
         const text = cleanText(req.body?.text);
         if (!text) return res.status(400).json({ error: "Message is empty." });
         if (text.length > MAX_LEN) return res.status(400).json({ error: `Message is too long (max ${MAX_LEN} characters).` });
+        if (rejectBlockedChatText(res, text)) return;
         const dmFilterOff = !!(stmts.dmSettingsGet.get(row.convo_key)?.filter_off);
         const gate = await gateText(text, { mask: !dmFilterOff, scan: deslugUrls(text) });
         if (gate.blocked) return res.json({ ok: false, blocked: true, score: gate.score, category: gate.category, reason: gate.reason, support: gate.support });

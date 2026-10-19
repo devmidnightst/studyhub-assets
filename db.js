@@ -571,7 +571,7 @@ export const stmts = {
 
     insertSession: db.prepare("INSERT INTO sessions (token, user_id, created_at, expires_at, last_seen, ip) VALUES (?, ?, ?, ?, ?, ?)"),
     findSession: db.prepare(`
-        SELECT s.token, s.user_id, s.expires_at, u.username
+        SELECT s.token, s.user_id, s.expires_at, s.last_seen, u.username
         FROM sessions s
         JOIN users u ON u.id = s.user_id
         WHERE s.token = ? AND s.expires_at > ?

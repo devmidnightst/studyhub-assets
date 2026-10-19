@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-69T9E59SM7"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-69T9E59SM7');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="dark">
+    <meta name="theme-color" content="#060509">
+    <title>Nocturne - Code Editor</title>
+    <style>html,body{background:#060509;color:#ededf0;margin:0}</style>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='9' fill='%230b0a14'/><circle cx='16' cy='16' r='9' fill='%23c9c1ff'/><circle cx='21' cy='14' r='8' fill='%230b0a14'/></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.7/src/css/global.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.7/src/css/dock.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.7/src/css/nocturne-select.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.7/src/css/code.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.7/src/css/ai.css">
+</head>
+<body>
+
+<div id="codeTopbar">
+    <div class="ct-brand">
+        <span>Nocturne</span>
+        <span class="sub">Editor</span>
+    </div>
+    <input type="text" id="fileName" class="ct-file" value="untitled" spellcheck="false">
+
+    <div class="ct-spacer"></div>
+
+    <select id="langSelect" class="ct-lang" title="Language">
+        <optgroup label="Runs in browser">
+            <option value="javascript">JavaScript</option>
+            <option value="typescript">TypeScript</option>
+            <option value="python">Python</option>
+            <option value="html">HTML</option>
+            <option value="markdown">Markdown</option>
+            <option value="json">JSON</option>
+        </optgroup>
+        <optgroup label="Styles &amp; web">
+            <option value="css">CSS</option>
+            <option value="scss">SCSS</option>
+            <option value="sass">Sass</option>
+            <option value="less">Less</option>
+            <option value="vue">Vue</option>
+            <option value="svelte">Svelte</option>
+            <option value="xml">XML</option>
+            <option value="yaml">YAML</option>
+            <option value="toml">TOML</option>
+            <option value="graphql">GraphQL</option>
+        </optgroup>
+        <optgroup label="Compiled &amp; more">
+            <option value="kotlin">Kotlin</option>
+            <option value="dart">Dart</option>
+            <option value="c">C</option>
+            <option value="cpp">C++</option>
+            <option value="csharp">C#</option>
+            <option value="rust">Rust</option>
+            <option value="go">Go</option>
+            <option value="java">Java</option>
+            <option value="swift">Swift</option>
+            <option value="ruby">Ruby</option>
+            <option value="php">PHP</option>
+            <option value="lua">Lua</option>
+            <option value="sql">SQL (SQLite)</option>
+            <option value="bash">Bash</option>
+            <option value="r">R</option>
+            <option value="perl">Perl</option>
+            <option value="scala">Scala</option>
+            <option value="haskell">Haskell</option>
+            <option value="crystal">Crystal</option>
+            <option value="d">D</option>
+            <option value="elixir">Elixir</option>
+            <option value="erlang">Erlang</option>
+            <option value="groovy">Groovy</option>
+            <option value="julia">Julia</option>
+            <option value="nim">Nim</option>
+            <option value="ocaml">OCaml</option>
+            <option value="pascal">Pascal</option>
+            <option value="lisp">Lisp</option>
+            <option value="zig">Zig</option>
+        </optgroup>
+        <optgroup label="Other">
+            <option value="plaintext">Plain text</option>
+        </optgroup>
+    </select>
+
+    <button id="btnProjects" class="ct-icon" title="Projects — save, open, import, export">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+    </button>
+    <button id="btnTemplate" class="ct-icon" title="New from template">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+    </button>
+    <button id="btnFormat" class="ct-icon" title="Format (Alt+Shift+F)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="21" y1="6" x2="3" y2="6"/><line x1="15" y1="12" x2="3" y2="12"/><line x1="17" y1="18" x2="3" y2="18"/></svg>
+    </button>
+    <button id="btnCopy" class="ct-icon" title="Copy all">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+    </button>
+    <button id="btnShare" class="ct-icon" title="Share via URL">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="13.5" x2="15.4" y2="17.5"/><line x1="15.4" y1="6.5" x2="8.6" y2="10.5"/></svg>
+    </button>
+    <button id="btnDownload" class="ct-icon" title="Download file">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    </button>
+    <button id="btnUpload" class="ct-icon" title="Upload file">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+    </button>
+    <input type="file" id="uploadInput" multiple style="display:none" accept=".js,.ts,.py,.html,.htm,.css,.json,.md,.markdown,.sql,.rs,.go,.c,.cpp,.cc,.h,.hpp,.cs,.java,.swift,.rb,.php,.lua,.sh,.bash,.r,.pl,.scala,.hs,.cr,.d,.ex,.exs,.erl,.groovy,.jl,.nim,.ml,.pas,.lisp,.lsp,.zig,.txt">
+    <button id="btnStdin" class="ct-icon" title="Program input (stdin)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+    </button>
+    <button id="btnPrefs" class="ct-icon" title="Editor preferences">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
+    </button>
+    <button id="btnClear" class="ct-icon" title="Clear">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+    </button>
+    <button id="btnAi" class="ct-ai" title="AI assistant">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.5 6.5L21 11l-6.5 2.5L12 20l-2.5-6.5L3 11l6.5-2.5z"/></svg>
+        <span>AI</span>
+    </button>
+    <button id="btnRun" class="ct-run" title="Run (Ctrl+Enter)">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M8 5v14l11-7z"/></svg>
+        <span>Run</span>
+    </button>
+</div>
+
+<div id="codeBooting"><span>loading<span class="dots"></span></span></div>
+
+<div id="fileTabs"></div>
+
+<div id="editor"></div>
+
+<div id="agentOverlay" aria-hidden="true">
+    <div class="ao-badge">
+        <span class="ao-dot"></span>
+        <span class="ao-text">AI in action</span>
+        <span class="ao-sub"></span>
+    </div>
+</div>
+
+<div id="prefsPanel">
+    <div class="pp-title">Preferences</div>
+    <div class="pp-row pp-row-agent">
+        <label for="prefAgent">AI agent mode</label>
+        <label class="toggle-wrap">
+            <input type="checkbox" id="prefAgent">
+            <span class="toggle-track"></span>
+        </label>
+    </div>
+    <div class="pp-hint">When on, the AI takes over the editor — live-typing files and running code on its own to build what you ask. Uses your AI credits.</div>
+    <div class="pp-divider"></div>
+    <div class="pp-row">
+        <label for="prefFont">Font size</label>
+        <div class="pp-right">
+            <input type="range" id="prefFont" min="10" max="22" step="0.5">
+            <span id="prefFontVal" class="pp-val"></span>
+        </div>
+    </div>
+    <div class="pp-row">
+        <label for="prefWrap">Word wrap</label>
+        <label class="toggle-wrap">
+            <input type="checkbox" id="prefWrap">
+            <span class="toggle-track"></span>
+        </label>
+    </div>
+    <div class="pp-row">
+        <label for="prefMini">Minimap</label>
+        <label class="toggle-wrap">
+            <input type="checkbox" id="prefMini">
+            <span class="toggle-track"></span>
+        </label>
+    </div>
+    <div class="pp-row">
+        <label for="prefLig">Font ligatures</label>
+        <label class="toggle-wrap">
+            <input type="checkbox" id="prefLig">
+            <span class="toggle-track"></span>
+        </label>
+    </div>
+</div>
+
+<div id="stdinPanel">
+    <div class="pp-title">Program input · stdin</div>
+    <textarea id="stdinBox" spellcheck="false" placeholder="Text typed here is sent to your program's standard input when you Run."></textarea>
+    <div class="sp-hint">Used by Python and the compiled / server languages (C, C++, Java, Rust, and so on).</div>
+</div>
+
+<div id="templateOverlay">
+    <div id="templateModal">
+        <div class="tm-head">
+            <span class="tm-title">Templates</span>
+            <button id="btnTemplateClose" class="ct-icon" title="Close">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+        <div id="templateGrid"></div>
+    </div>
+</div>
+
+<div id="outputPanel">
+    <div id="outputHeader">
+        <span class="oh-label">Output</span>
+        <div class="oh-spacer"></div>
+        <button id="btnBackToCode" title="Switch back to the code">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            <span>Code</span>
+        </button>
+        <button id="btnNewTabOut" class="ct-icon" title="Open in new tab">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        </button>
+        <button id="btnFullOut" class="ct-icon" title="Fullscreen">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 8 4 4 8 4"/><polyline points="20 8 20 4 16 4"/><polyline points="4 16 4 20 8 20"/><polyline points="20 16 20 20 16 20"/></svg>
+        </button>
+        <button id="btnClearOut" class="ct-icon" title="Clear output">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+        </button>
+        <button id="btnCloseOut" class="ct-icon" title="Close">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+    </div>
+    <div id="outputLog"></div>
+</div>
+
+<button id="outputTab" title="Show the run output"><span class="dot"></span>Output</button>
+
+<div id="codeStatusBar">
+    <span id="stStatus">ready</span>
+    <span class="sep">·</span>
+    <span id="stLang">javascript</span>
+    <span class="sep">·</span>
+    <span id="cursorInfo">ln 1, col 1</span>
+    <span class="sep">·</span>
+    <span id="stLines">0 lines</span>
+    <span class="sep">·</span>
+    <span id="stChars">0 chars</span>
+</div>
+
+<aside id="aiPanel">
+    <div class="ai-head">
+        <button id="btnAgentMode" class="ai-mode-toggle" title="Agent mode — the AI edits files and runs code on its own" aria-pressed="false">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.5 6.5L21 11l-6.5 2.5L12 20l-2.5-6.5L3 11l6.5-2.5z"/></svg>
+            <span>Agent</span>
+        </button>
+        <span class="ai-title">AI · <span id="aiModel">gemini-3-flash</span></span>
+        <span id="aiCredits" class="ai-credits" title="AI credits remaining for agent mode" hidden></span>
+        <button class="ct-icon" id="btnAiClear" title="New chat">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+        <button class="ct-icon" id="btnAiSettings" title="AI settings">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+        </button>
+        <button class="ct-icon" id="btnAiClose" title="Close">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+    </div>
+
+    <div class="ai-messages"></div>
+
+    <div class="ai-quick">
+        <button class="ai-quick-btn" data-action="explain">Explain</button>
+        <button class="ai-quick-btn" data-action="refactor">Refactor</button>
+        <button class="ai-quick-btn" data-action="comment">Comment</button>
+        <button class="ai-quick-btn" data-action="debug">Debug</button>
+        <button class="ai-quick-btn" data-action="test">Tests</button>
+        <button class="ai-quick-btn" data-action="optimize">Optimize</button>
+        <button class="ai-quick-btn" data-action="document">Document</button>
+        <button class="ai-quick-btn" data-action="types">Types</button>
+    </div>
+
+    <div class="ai-settings">
+        <label>Model
+            <select id="aiModelSelect"></select>
+        </label>
+        <label>
+            <span>Include current code</span>
+            <input type="checkbox" id="aiIncludeCode" checked>
+        </label>
+    </div>
+
+    <div class="ai-est" id="aiEst" hidden></div>
+
+    <div class="ai-input-wrap">
+        <textarea class="ai-input" placeholder="Ask anything... (Enter to send, Shift+Enter for newline)"></textarea>
+        <button id="aiSend">Send</button>
+        <button id="aiStop" title="Stop the agent" hidden>Stop</button>
+    </div>
+</aside>
+
+<nav id="dock"></nav>
+<script src="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.7/src/js/lr2815.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.7/src/js/qt3674.js" defer></script>
+
+<script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.47.0/min/vs/loader.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.7/src/js/be9460.js" defer></script>
+<script src="/cap.js" defer></script>
+<script src="https://nocturne.lol/src/js/nx8924.js" type="module"></script>
+
+<script src="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.7/src/js/pu3927.js?v=20260929-2" defer></script>
+</body>
+</html>

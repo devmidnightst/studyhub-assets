@@ -2,9 +2,9 @@
     display: none;
     position: fixed;
     top: 46px;
-    left: 0;
-    width: 100%;
-    height: calc(100% - 46px);
+    left: var(--sb-w, 0px);
+    right: 0;
+    bottom: 0;
     background: var(--bg);
     z-index: 45;
     flex-direction: column;
@@ -17,14 +17,14 @@
 #errorPage.visible { display: flex; }
 
 .err-title {
-    font-size: 15px;
+    font-size: 16px;
     font-weight: 500;
     color: var(--fg);
     letter-spacing: -0.01em;
 }
 
 .err-desc {
-    font-size: 12.5px;
+    font-size: 13px;
     color: var(--fg-3);
     max-width: 400px;
     text-align: center;
@@ -38,17 +38,19 @@
 }
 
 .err-btn {
-    padding: 8px 18px;
+    height: 34px;
+    padding: 0 18px;
     background: transparent;
     border: 1px solid var(--line-2);
-    border-radius: 7px;
+    border-radius: 0;
     color: var(--fg-2);
-    font-size: 12px;
-    transition: border-color 0.15s, color 0.15s, background 0.15s;
+    font-size: 13px;
+    transition: border-color 0.15s var(--ease), color 0.15s var(--ease), background 0.15s var(--ease);
 }
+.err-btn:focus-visible { outline: 2px solid rgba(168, 152, 232, 0.6); outline-offset: 2px; }
 
 .err-btn:hover {
-    background: rgba(200, 195, 230, 0.05);
+    background: rgba(255, 255, 255, 0.05);
     border-color: var(--line-3);
     color: var(--fg);
 }
@@ -61,6 +63,6 @@
 }
 
 .err-btn.primary:hover {
-    background: #c9c1ee;
+    background: #c4b8f0;
     color: var(--bg);
 }

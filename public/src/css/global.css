@@ -1,17 +1,24 @@
 :root {
-    --bg:        #05060d;
-    --bg-2:      #0a0b14;
-    --panel:     rgba(20, 22, 38, 0.55);
-    --line:      rgba(200, 195, 230, 0.06);
-    --line-2:    rgba(200, 195, 230, 0.11);
-    --line-3:    rgba(200, 195, 230, 0.18);
-    --fg:        #e8e5f4;
-    --fg-2:      #a9a3c7;
-    --fg-3:      #706b8f;
-    --dim:       #3f3c5a;
-    --accent:    #b8b0da;
-    --accent-2:  #8a80b6;
+    /* nocturne midnight: near-black, neutral hairlines, violet only as an accent */
+    --bg:        #060509;
+    --bg-2:      #0a090d;
+    --surface:   #0d0c11;
+    --surface-2: #131218;
+    --panel:     rgba(13, 12, 17, 0.92);
+    --line:      rgba(255, 255, 255, 0.06);
+    --line-2:    rgba(255, 255, 255, 0.10);
+    --line-3:    rgba(255, 255, 255, 0.18);
+    --fg:        #ededf0;
+    --fg-2:      #a8a7b0;
+    --fg-3:      #85848e;
+    --dim:       #3c3b45;
+    --accent:    #a898e8;
+    --accent-2:  #7e6bd0;
+    --glow:      126, 107, 208;
+    --r-sm:      0;
+    --r-md:      0;
     --ease:      cubic-bezier(0.22, 0.72, 0.14, 1);
+    --ease-out:  cubic-bezier(0.16, 1, 0.3, 1);
     --font:      'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
@@ -36,23 +43,22 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
-*, *::before, *::after {
-    cursor: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='23' height='23'><path d='M5.4 4 L5.4 19.2 L9.3 15.5 L11.8 20.9 L14.1 19.8 L11.6 14.6 L16.7 14.6 Z' fill='%23000' opacity='0.28' transform='translate(0.6,0.7)'/><path d='M5 3.5 L5 18.9 L8.9 15.2 L11.5 20.7 L14 19.5 L11.4 14.2 L16.6 14.2 Z' fill='%23cdc2ff' stroke='%23241a45' stroke-width='1.25' stroke-linejoin='round'/></svg>") 5 4, auto !important;
-}
+/* cursor inherits, so one declaration on html covers every element */
+html { cursor: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='23' height='23'><path d='M5.4 4 L5.4 19.2 L9.3 15.5 L11.8 20.9 L14.1 19.8 L11.6 14.6 L16.7 14.6 Z' fill='%23000' opacity='0.28' transform='translate(0.6,0.7)'/><path d='M5 3.5 L5 18.9 L8.9 15.2 L11.5 20.7 L14 19.5 L11.4 14.2 L16.6 14.2 Z' fill='%23cdc2ff' stroke='%23241a45' stroke-width='1.25' stroke-linejoin='round'/></svg>") 5 4, auto; }
 a, button, [role="button"], select, summary, label[for], [onclick],
 .clickable, .nav-card, .link-btn, .dock-btn, .rail-item, .quick-chip, .suggest-item,
-.tab-item, .tab-add, .tab-close, .tb-btn, .game-card, .chip, .lib-chip, .g-sb-btn,
+.tab-item, .tab-add, .tab-close, .tb-btn, .gc-tile, .chip, .lib-chip, .g-sb-btn,
 .seg-btn, .cfg-btn, .ai-quick-btn, .settings-nav-item, .toggle-wrap,
 .swiper-button-next, .swiper-button-prev,
-input[type=checkbox], input[type=radio], input[type=submit], input[type=button] {
-    cursor: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='23' height='23'><path d='M11 3.5a1.5 1.5 0 0 1 3 0v7.5h1V9a1.5 1.5 0 0 1 3 0v2h1v-1a1.5 1.5 0 0 1 3 0v6a5 5 0 0 1-5 5h-3a5 5 0 0 1-3.5-1.5l-3.5-3.5a1.5 1.5 0 0 1 2.1-2.1l1.9 1.9V3.5z' fill='%23cdc2ff' stroke='%23241a45' stroke-width='1.05' stroke-linejoin='round'/></svg>") 11 3, pointer !important;
+input[type=checkbox], input[type=radio], input[type=button] {
+    cursor: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='23' height='23'><path d='M11 3.5a1.5 1.5 0 0 1 3 0v7.5h1V9a1.5 1.5 0 0 1 3 0v2h1v-1a1.5 1.5 0 0 1 3 0v6a5 5 0 0 1-5 5h-3a5 5 0 0 1-3.5-1.5l-3.5-3.5a1.5 1.5 0 0 1 2.1-2.1l1.9 1.9V3.5z' fill='%23cdc2ff' stroke='%23241a45' stroke-width='1.05' stroke-linejoin='round'/></svg>") 11 3, pointer;
 }
-input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=color]):not([type=submit]):not([type=button]),
-textarea, [contenteditable="true"], #urlBar, .search-field, #searchHome, #searchBar {
+input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=color]):not([type=button]),
+textarea, [contenteditable="true"], #navBar, .search-field, #searchHome, #searchBar {
     cursor: text !important;
 }
 
-.verify-badge { display: inline-flex; align-items: center; gap: 7px; padding: 5px 11px; border-radius: 999px; font-size: 12px; font-weight: 600; border: 1px solid var(--line-2); background: rgba(200, 195, 230, 0.04); color: var(--fg-2); white-space: nowrap; }
+.verify-badge { display: inline-flex; align-items: center; gap: 7px; padding: 5px 11px; border-radius: 0; font-size: 12px; font-weight: 600; border: 1px solid var(--line-2); background: rgba(255, 255, 255, 0.04); color: var(--fg-2); white-space: nowrap; }
 .verify-badge .verify-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--fg-3); flex-shrink: 0; }
 .verify-badge.ok { color: #7ce0a8; border-color: rgba(124, 224, 168, 0.32); background: rgba(124, 224, 168, 0.09); }
 .verify-badge.ok .verify-dot { background: #7ce0a8; box-shadow: 0 0 8px rgba(124, 224, 168, 0.65); }
@@ -63,10 +69,13 @@ textarea, [contenteditable="true"], #urlBar, .search-field, #searchHome, #search
     z-index: 0;
     pointer-events: none;
     opacity: 0;
-    animation: bgFadeIn 1.2s ease 0.2s forwards;
+    animation: bgDust 1.2s ease 0.2s forwards;
 }
 
-#bgCanvas.visible { animation: bgFadeIn 1.2s ease 0.2s forwards; }
+#bgCanvas.visible { animation: bgDust 1.2s ease 0.2s forwards; }
+
+/* the starfield is kept only as faint dust on inner pages */
+@keyframes bgDust { to { opacity: 0.2; } }
 
 #bgParticles {
     position: fixed;
@@ -127,7 +136,7 @@ textarea, [contenteditable="true"], #urlBar, .search-field, #searchHome, #search
     background:
         radial-gradient(60% 50% at 18% 22%, rgba(155, 218, 176, 0.18), transparent 60%),
         radial-gradient(55% 50% at 82% 78%, rgba(149, 200, 224, 0.22), transparent 60%),
-        radial-gradient(45% 40% at 62% 36%, rgba(184, 176, 218, 0.22), transparent 60%),
+        radial-gradient(45% 40% at 62% 36%, rgba(168, 152, 232, 0.154), transparent 60%),
         var(--bg);
     animation: bgAuroraDrift 36s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
 }
@@ -216,10 +225,10 @@ textarea, [contenteditable="true"], #urlBar, .search-field, #searchHome, #search
 
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(200, 195, 230, 0.09); border-radius: 8px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(200, 195, 230, 0.16); }
+::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.09); border-radius: 0; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.16); }
 
-::selection { background: rgba(184, 176, 218, 0.22); color: #fff; }
+::selection { background: rgba(168, 152, 232, 0.154); color: #fff; }
 
 button, input, textarea, select { font-family: inherit; color: inherit; outline: none; }
 button { cursor: pointer; background: none; border: none; }
@@ -235,7 +244,7 @@ button { cursor: pointer; background: none; border: none; }
     scroll-behavior: auto !important;
 }
 
-html.perf-lite { --panel: rgba(18, 20, 34, 0.94); }
+html.perf-lite { --panel: rgba(13, 12, 17, 0.94); }
 html.perf-lite *,
 html.perf-lite *::before,
 html.perf-lite *::after,
@@ -292,7 +301,7 @@ html.perf-min .noc-canvas {
     padding: 7px 12px 7px 11px;
     background: rgba(40, 16, 22, 0.85);
     border: 1px solid rgba(208, 130, 130, 0.32);
-    border-radius: 999px;
+    border-radius: 0;
     color: #f0c4c4;
     font-size: 12px;
     font-weight: 500;
@@ -329,7 +338,7 @@ body.banned #searchHome {
 body.banned #searchHome::placeholder {
     color: #d08282;
 }
-body.banned #urlBar {
+body.banned #navBar {
     pointer-events: none;
     opacity: 0.5;
 }
@@ -342,12 +351,12 @@ cap-widget {
     --cap-widget-width: 100%;
     --cap-background: var(--bg-2);
     --cap-border-color: var(--line);
-    --cap-border-radius: 8px;
+    --cap-border-radius: 0;
     --cap-color: var(--fg-2);
     --cap-font: var(--font);
-    --cap-checkbox-background: rgba(200, 195, 230, 0.04);
+    --cap-checkbox-background: rgba(255, 255, 255, 0.04);
     --cap-checkbox-border: 1px solid var(--line-3);
-    --cap-checkbox-border-radius: 5px;
+    --cap-checkbox-border-radius: 0;
     --cap-spinner-color: var(--accent);
     --cap-spinner-background-color: var(--line-2);
     --cap-focus-ring: var(--accent-2);
@@ -360,7 +369,11 @@ cap-widget {
 }
 
 @media (max-width: 768px) and (pointer: coarse) {
-    input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=color]):not([type=submit]):not([type=button]),
+    input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=color]):not([type=button]),
     textarea,
     select { font-size: 16px !important; }
 }
+
+/* Square corners are the system default. Anything that needs a circle (spinners,
+   status dots) says so explicitly; :where keeps this at zero specificity. */
+:where(*) { border-radius: 0; }

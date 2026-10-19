@@ -213,12 +213,18 @@ export function mountAdmin(app, { authMiddleware } = {}) {
     });
 
     // Reset a user's password without knowing the old one.
-    app.post("/api/admin/password", ...guard, (req, res) => {
+    app.post("/api/admin/password", ...guard, async (req, res) => {
         const u = resolveUser(req.body);
         if (!u) return res.status(404).json({ error: "user not found" });
         const pw = typeof req.body?.password === "string" ? req.body.password : "";
         if (pw.length < 8 || pw.length > 256) return res.status(400).json({ error: "password must be 8-256 chars" });
-        stmts.changePassword.run(hashPassword(pw), u.id);
+        let hash;
+        try { hash = await hashPassword(pw); }
+        catch (error) {
+            if (error.status !== 503) throw error;
+            return res.set("Retry-After", "2").status(503).json({ error: "Password service busy; retry shortly." });
+        }
+        stmts.changePassword.run(hash, u.id);
         stmts.deleteUserSessions.run(u.id);
         res.json({ ok: true, userId: u.id, username: u.username });
     });

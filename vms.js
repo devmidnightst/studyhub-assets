@@ -97,7 +97,7 @@ const VM_ISOLATION = "<script>(function(){try{"
     + "var mem=new Map();function box(){return{getItem:function(k){return mem.has(k)?mem.get(k):null;},setItem:function(k,v){mem.set(String(k),String(v));},removeItem:function(k){mem.delete(k);},clear:function(){mem.clear();},key:function(i){return Array.from(mem.keys())[i]||null;},get length(){return mem.size;}};}"
     + "var store=box();"
     + "try{Object.defineProperty(window,'localStorage',{get:function(){return store;}});}catch(e){}"
-    + "try{Object.defineProperty(window,'sessionStorage',{get:function(){return box();}});}catch(e){}"
+    + "var sess=box();try{Object.defineProperty(window,'sessionStorage',{get:function(){return sess;}});}catch(e){}"
     + "try{Object.defineProperty(document,'cookie',{get:function(){return '';},set:function(){}});}catch(e){}"
     + "}catch(e){}})();</script>";
 
@@ -113,13 +113,17 @@ function vmIsolationCsp(host) {
         "base-uri 'none'",
         "form-action 'none'",
         "frame-src 'none'",
-        "worker-src 'none'",
-        "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+        // The Selkies client opens its stream WebSocket inside a blob: Worker and
+        // loads its audio worklets from blob: URLs. 'none' here blocked that socket
+        // silently and the desktop sat on "Connecting" for ever. Workers inherit
+        // this policy, so connect-src below still fences them to /vm/.
+        "worker-src 'self' blob: data:",
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' blob:",
         "style-src 'self' 'unsafe-inline'",
         "img-src 'self' data: blob:",
         "font-src 'self' data:",
         "media-src 'self' blob:",
-        "connect-src " + connect.join(" ")
+        "connect-src blob: data: " + connect.join(" ")
     ].join("; ");
 }
 

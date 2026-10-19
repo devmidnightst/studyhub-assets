@@ -19,7 +19,13 @@ import crypto from "node:crypto";
 import { db } from "./db.js";
 import { requireAuth, isOwnerName } from "./auth.js";
 
-const ENABLED = process.env.NOCTURNE_RUNNER === "1";
+// User apps run arbitrary code, so they are only ever served from their own
+// hostname (NOCTURNE_RUNNER_HOST, e.g. a separate apex domain). On the main
+// origin an app could read the visitor's session from localStorage or open
+// the owner terminal socket. Without a dedicated host the runner stays off.
+const RUNNER_FLAG = process.env.NOCTURNE_RUNNER === "1";
+const RUNNER_HOST = String(process.env.NOCTURNE_RUNNER_HOST || "").trim().toLowerCase().replace(/^https?:\/\//, "").replace(/\/.*$/, "");
+const ENABLED = RUNNER_FLAG && !!RUNNER_HOST;
 // Limited-testing gate: when set, only the owner account may start backend apps.
 const OWNER_ONLY = process.env.NOCTURNE_RUNNER_OWNER_ONLY === "1";
 // In-memory set of users with a running app — for idle-reaping + the kill-switch.
@@ -355,6 +361,21 @@ import http from "node:http";
 
 const DEV_PREFIX = "/code/dev";
 function devPath(token) { return `${DEV_PREFIX}/${token}/`; }
+function devUrl(token) { return `https://${RUNNER_HOST}${devPath(token)}`; }
+function hostOf(req) { return String(req.headers?.host || "").trim().toLowerCase(); }
+function onRunnerHost(req) {
+    const h = hostOf(req);
+    return !!RUNNER_HOST && (h === RUNNER_HOST || h.replace(/:\d+$/, "") === RUNNER_HOST);
+}
+
+// Mounted first in index.js: the runner host serves user apps and nothing
+// else, so none of Nocturne's own pages or APIs ever load on that origin.
+export function runnerHostGuard(req, res, next) {
+    if (!ENABLED || !onRunnerHost(req)) return next();
+    if (RUN_RE.test(req.url || "")) return next();
+    res.statusCode = 404;
+    res.end("not found");
+}
 
 function resolveToken(token) { return q.wsByToken.get(token) || null; }
 
@@ -439,7 +460,10 @@ export function scrubDevOriginAuth(req, res, next) {
 export function runnerProxyUpgrade(req, socket, head) {
     if (!ENABLED) return false;
     const m = RUN_RE.exec(req.url || "");
-    if (!m) return false;
+    const onHost = onRunnerHost(req);
+    if (!m && !onHost) return false;
+    // Nothing but app sockets on the runner host, and app sockets only there.
+    if (!m || !onHost) { try { socket.destroy(); } catch {} return true; }
     const token = m[1];
     const fullPath = (m[2] || "/") + (m[3] || "");
     const ws = resolveToken(token);
@@ -473,7 +497,8 @@ export function runnerProxyUpgrade(req, socket, head) {
 import express from "express";
 
 export function mountRunner(app, { authMiddleware } = {}) {
-    if (!ENABLED) { console.log("[runner] disabled (set NOCTURNE_RUNNER=1 to enable)"); return; }
+    if (RUNNER_FLAG && !RUNNER_HOST) { console.error("[runner] NOT enabled: NOCTURNE_RUNNER=1 needs NOCTURNE_RUNNER_HOST (a separate hostname for user apps)"); return; }
+    if (!ENABLED) { console.log("[runner] disabled (set NOCTURNE_RUNNER=1 and NOCTURNE_RUNNER_HOST to enable)"); return; }
     // Best-effort: make sure the shared container is up at boot.
     ensureShared().then(() => console.log("[runner] shared container ready")).catch(e => console.error("[runner] shared container init failed:", e.message));
 
@@ -496,6 +521,11 @@ export function mountRunner(app, { authMiddleware } = {}) {
     app.use((req, res, next) => {
         const m = RUN_RE.exec(req.url || "");
         if (!m) return next();
+        if (!onRunnerHost(req)) {
+            // Old same-origin links: bounce GETs to the app host, refuse the rest.
+            if (req.method === "GET" || req.method === "HEAD") { res.statusCode = 302; res.setHeader("Location", `https://${RUNNER_HOST}${req.url}`); return res.end(); }
+            res.statusCode = 404; return res.end("not found");
+        }
         proxyToApp(req, res, m[1], (m[2] || "/") + (m[3] || "")).catch(() => { try { res.statusCode = 502; res.end(); } catch {} });
     });
 
@@ -520,7 +550,7 @@ export function mountRunner(app, { authMiddleware } = {}) {
             if (!cmd) return res.status(400).json({ error: "Could not determine how to start this project — set a start script or pass an explicit command." });
             await startApp(container, dir, port, cmd);
             running.set(req.user.id, { container, dir, at: Date.now() });
-            res.json({ ok: true, token, url: devPath(token), appUrl: devPath(token), port, cmd });
+            res.json({ ok: true, token, url: devUrl(token), appUrl: devUrl(token), port, cmd });
         } catch (e) {
             res.status(500).json({ error: String(e?.message || e) });
         }
@@ -566,7 +596,7 @@ export function mountRunner(app, { authMiddleware } = {}) {
             if (!ws) return res.json({ provisioned: false });
             const ip = await containerIp(ws.container);
             const [alive, live] = await Promise.all([appAlive(ws.container, ws.dir), ip ? probePort(ip, ws.port) : false]);
-            res.json({ provisioned: true, running: alive, live, url: devPath(ws.token), appUrl: devPath(ws.token), port: ws.port });
+            res.json({ provisioned: true, running: alive, live, url: devUrl(ws.token), appUrl: devUrl(ws.token), port: ws.port });
         } catch (e) { res.status(500).json({ error: String(e?.message || e) }); }
     });
 

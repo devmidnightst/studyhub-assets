@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="dark">
+    <meta name="theme-color" content="#060509">
+    <title>Nocturne - Chat</title>
+    <style>html,body{background:#060509;color:#ededf0;margin:0;overflow:hidden}html{position:fixed;inset:0}</style>
+    <script>document.addEventListener("scroll",function(){document.documentElement.scrollTop=0;document.body.scrollTop=0},!0)</script>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='9' fill='%230b0a14'/><circle cx='16' cy='16' r='9' fill='%23c9c1ff'/><circle cx='21' cy='14' r='8' fill='%230b0a14'/></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.7/src/css/global.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.7/src/css/dock.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.7/src/css/chat.css?v=20260923-3">
+</head>
+<body>
+
+<div class="page-header">
+    <div style="display:flex;align-items:center;min-width:0">
+        <button class="menu-btn" id="menuBtn" aria-label="Channels">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <span class="brand-title">Nocturne</span>
+        <span class="brand-sub">Chat</span>
+    </div>
+    <div class="header-actions">
+        <span class="hdr-online" id="onlineChip" title="People on the site right now"><span class="od"></span><b id="onlineCount">-</b>&nbsp;online</span>
+        <button class="icon-btn" id="notifBtn" title="DM notifications" aria-label="Notifications">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        </button>
+        <button class="me-btn" id="meBtn" title="Edit your profile">
+            <span class="me-avatar" id="meAvatar">?</span>
+            <span class="me-name" id="meName">Profile</span>
+        </button>
+        <a href="/" class="back">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+            Back
+        </a>
+    </div>
+</div>
+
+<div class="chat-body">
+    <aside class="chat-rooms" id="rooms">
+        <div class="cr-scroll">
+            <div class="cr-label">Channels</div>
+            <div id="roomList"></div>
+            <div class="cr-label cr-dm-label">
+                <span>Direct Messages <span class="cr-dm-total" id="dmTotal" hidden>0</span></span>
+                <button class="cr-add" id="dmAddBtn" type="button" title="Find people to message" aria-label="Find people">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                </button>
+            </div>
+            <div id="dmList" class="dm-list"></div>
+        </div>
+        <div class="cr-foot">
+            <span class="shield">&#9728;</span> Messages are AI safety-checked and profanity-filtered before posting. Right-click a message for more.
+        </div>
+    </aside>
+
+    <main class="chat-main">
+        <div class="convo-bar" id="convoBar"></div>
+        <div class="chat-stream" id="stream" aria-live="polite"></div>
+
+        <div class="chat-composer">
+            <div class="chat-notice" id="notice" role="status"></div>
+            <div class="compose-ctx" id="composeCtx">
+                <span class="cc-label" id="ccLabel">Replying to</span>
+                <span class="cc-text" id="ccText"></span>
+                <button class="cc-x" id="ccCancel" type="button" aria-label="Cancel">&times;</button>
+            </div>
+            <div class="gif-picker" id="gifPicker" hidden>
+                <div class="gif-top">
+                    <span class="gif-logo"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2.5"/><circle cx="8.5" cy="8.5" r="1.7"/><path d="M21 15l-5-5L5 21"/></svg></span>
+                    <input id="gifInput" class="modal-input" type="text" placeholder="Search GIFs..." autocomplete="off" spellcheck="false">
+                    <button class="gif-close" id="gifClose" type="button" aria-label="Close">&times;</button>
+                </div>
+                <div class="gif-tabs" id="gifTabs">
+                    <button class="gif-tab active" data-tab="trending" type="button">Trending</button>
+                    <button class="gif-tab" data-tab="favorites" type="button">Favorites</button>
+                </div>
+                <div class="gif-grid" id="gifGrid"></div>
+                <div class="gif-attr">Powered by GIPHY</div>
+            </div>
+            <form class="composer-row" id="composer">
+                <div class="composer-box">
+                    <textarea id="chatInput" rows="1" placeholder="Message #general" autocomplete="off" spellcheck="true" maxlength="1000"></textarea>
+                </div>
+                <button type="button" class="gif-btn" id="gifBtn" title="Media &amp; GIFs" aria-label="Media and GIFs" hidden>
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2.5"/><circle cx="8.5" cy="8.5" r="1.7"/><path d="M21 15l-5-5L5 21"/></svg>
+                </button>
+                <button type="submit" class="send-btn" id="sendBtn" aria-label="Send" disabled>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                </button>
+            </form>
+            <div class="composer-foot">
+                <span class="cf-shield">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5z"/><path d="m9 12 2 2 4-4"/></svg>
+                    AI safety + profanity filter on
+                </span>
+                <span class="cf-count" id="charCount"></span>
+            </div>
+        </div>
+
+        <div class="chat-gate" id="gate">
+            <div class="gate-card">
+                <div class="gate-ico">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                </div>
+                <div class="gate-title">Sign in to join the chat</div>
+                <div class="gate-sub">The Nocturne community chat is for signed-in members. Create a free account or log in to start talking.</div>
+                <a href="/account.html" class="gate-btn">Sign in / Sign up</a>
+                <button class="gate-reload" id="gateReload">I&rsquo;ve signed in &mdash; reload</button>
+            </div>
+        </div>
+    </main>
+</div>
+
+<div class="ctx-menu" id="ctxMenu" role="menu"></div>
+
+<div class="modal-back" id="profileModal">
+    <div class="modal modal-lg">
+        <div class="modal-title">Edit profile</div>
+        <div class="modal-sub">Customize how you appear. Images up to 3MB.</div>
+
+        <div class="pe-banner" id="peBanner">
+            <div class="pe-banner-actions">
+                <button class="pe-img-btn" id="bannerUploadBtn" type="button">Banner</button>
+                <button class="pe-img-btn" id="bannerRemoveBtn" type="button">&times;</button>
+            </div>
+            <div class="pe-avatar" id="avatarPreview">?</div>
+        </div>
+        <div class="pe-avatar-actions">
+            <button class="btn-soft" id="avatarUploadBtn" type="button">Upload avatar</button>
+            <button class="btn-soft btn-danger" id="avatarRemoveBtn" type="button">Remove avatar</button>
+        </div>
+
+        <div class="modal-field">
+            <label for="pronounsInput">Pronouns</label>
+            <input class="modal-input" id="pronounsInput" type="text" placeholder="they/them" maxlength="40" autocomplete="off">
+        </div>
+        <div class="modal-field">
+            <label for="bioInput">About you</label>
+            <textarea class="modal-input" id="bioInput" rows="3" placeholder="A short description..." maxlength="500" style="height:auto;padding:9px 12px;resize:vertical"></textarea>
+        </div>
+        <div class="modal-field">
+            <label>Profile card background</label>
+            <div class="pe-bg-row">
+                <div class="pe-bg-preview" id="bgPreview"></div>
+                <button class="btn-soft" id="bgUploadBtn" type="button">Upload</button>
+                <button class="btn-soft btn-danger" id="bgRemoveBtn" type="button">Remove</button>
+            </div>
+        </div>
+
+        <input type="file" id="avatarFile" accept="image/png,image/jpeg,image/webp,image/gif" hidden>
+        <input type="file" id="bannerFile" accept="image/png,image/jpeg,image/webp,image/gif" hidden>
+        <input type="file" id="bgFile" accept="image/png,image/jpeg,image/webp,image/gif" hidden>
+        <div class="modal-err" id="profileErr"></div>
+        <div class="modal-actions">
+            <button class="btn-soft grow" id="profileCancel" type="button">Cancel</button>
+            <button class="btn-soft btn-primary grow" id="profileSave" type="button">Save</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-back" id="profileView">
+    <div class="profile-card" id="profileCard">
+        <div class="pc-banner" id="pcBanner"></div>
+        <div class="pc-av" id="pcAvatar"></div>
+        <div class="pc-body">
+            <div class="pc-name" id="pcName"></div>
+            <div class="pc-pronouns" id="pcPronouns"></div>
+            <div class="pc-bio" id="pcBio"></div>
+            <div class="pc-actions">
+                <button class="btn-soft grow" id="pcClose" type="button">Close</button>
+                <button class="btn-soft btn-primary grow" id="pcMessage" type="button">Message</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal-back" id="findModal">
+    <div class="modal">
+        <div class="modal-title">Find people</div>
+        <div class="modal-sub">Search by username to start a private direct message.</div>
+        <div class="modal-field" style="margin-bottom:10px">
+            <input class="modal-input" id="findInput" type="text" placeholder="Search a username..." autocomplete="off" spellcheck="false">
+        </div>
+        <div class="find-results" id="findResults"></div>
+        <div class="modal-actions">
+            <button class="btn-soft grow" id="findCancel" type="button">Close</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-back" id="fwdModal">
+    <div class="modal">
+        <div class="modal-title">Forward message</div>
+        <div class="modal-sub">Choose a channel to forward this message to.</div>
+        <div class="fwd-rooms" id="fwdRooms"></div>
+        <div class="modal-actions">
+            <button class="btn-soft grow" id="fwdCancel" type="button">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-back" id="mediaViewer">
+    <div class="media-view">
+        <img id="mvImg" alt="">
+        <div class="mv-actions">
+            <button class="mv-btn mv-fav" id="mvFav" type="button" hidden><span>&#9733;</span> Favorite</button>
+            <a class="mv-btn" id="mvOpen" href="#" target="_blank" rel="noopener noreferrer">Open original</a>
+            <button class="mv-btn" id="mvClose" type="button">Close</button>
+        </div>
+    </div>
+</div>
+
+<div class="chat-toast" id="toast"></div>
+
+<nav id="dock"></nav>
+<script src="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.7/src/js/lr2815.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.7/src/js/rb8350.js?v=20260925-1"></script>
+
+<script src="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.7/src/js/pu3927.js?v=20260929-2" defer></script>
+</body>
+</html>

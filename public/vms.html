@@ -11,13 +11,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="dark">
-    <meta name="theme-color" content="#05060d">
-    <title>nocturne</title>
-    <style>html,body{background:#05060d;color:#eae6ff;margin:0}</style>
+    <meta name="theme-color" content="#060509">
+    <title>Nocturne - Cloud VMs</title>
+    <style>html,body{background:#060509;color:#ededf0;margin:0}</style>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='9' fill='%230b0a14'/><circle cx='16' cy='16' r='9' fill='%23c9c1ff'/><circle cx='21' cy='14' r='8' fill='%230b0a14'/></svg>">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/src/css/global.css">
-    <link rel="stylesheet" href="/src/css/dock.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.5/src/css/global.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.5/src/css/dock.css">
     <style>
         html, body { height: 100%; overflow: hidden; }
 
@@ -31,12 +31,12 @@
         .vm-icon {
             width: 66px; height: 66px;
             display: flex; align-items: center; justify-content: center;
-            border-radius: 18px;
-            background: rgba(184, 176, 218, 0.07);
+            border-radius: 0;
+            background: rgba(168, 152, 232, 0.049);
             border: 1px solid var(--line-2);
             color: var(--accent);
             margin-bottom: 24px;
-            box-shadow: 0 0 46px rgba(184, 176, 218, 0.10);
+            box-shadow: none;
             opacity: 0; animation: slideDown 0.5s var(--ease) forwards;
         }
         .vm-title {
@@ -51,9 +51,9 @@
         .vm-launch {
             margin-top: 30px;
             display: inline-flex; align-items: center; gap: 9px;
-            background: linear-gradient(180deg, var(--accent), var(--accent-2));
-            color: #0b0a16; font-weight: 600; font-size: 14px; font-family: inherit;
-            border: none; border-radius: 11px; padding: 13px 34px;
+            background: var(--accent);
+            color: #0a090d; font-weight: 600; font-size: 14px; font-family: inherit;
+            border: none; border-radius: 0; padding: 13px 34px;
             cursor: pointer;
             box-shadow: 0 6px 26px rgba(138, 128, 182, 0.30);
             transition: transform 0.15s var(--ease), box-shadow 0.2s var(--ease), filter 0.15s var(--ease);
@@ -66,9 +66,9 @@
             margin-top: 30px;
             display: inline-flex; align-items: center; gap: 9px;
             font-size: 13px; color: var(--fg-2);
-            background: rgba(200, 195, 230, 0.03);
+            background: rgba(255, 255, 255, 0.03);
             border: 1px solid var(--line-2);
-            border-radius: 11px;
+            border-radius: 0;
             padding: 12px 22px;
             opacity: 0; animation: slideUp 0.55s var(--ease) 0.24s forwards;
         }
@@ -92,25 +92,25 @@
             border-bottom: 1px solid var(--line);
         }
         .vm-bar-left { display: flex; align-items: center; gap: 9px; font-size: 13px; font-weight: 500; color: var(--fg); }
-        .vm-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 10px var(--accent); }
+        .vm-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: none; }
         .vm-bar-right { display: flex; align-items: center; gap: 9px; }
         .vm-time {
             font-variant-numeric: tabular-nums; font-size: 13px; font-weight: 600;
             color: var(--accent); letter-spacing: 0.03em;
-            padding: 5px 11px; border-radius: 8px;
-            background: rgba(184, 176, 218, 0.08); border: 1px solid var(--line-2);
+            padding: 5px 11px; border-radius: 0;
+            background: rgba(168, 152, 232, 0.056); border: 1px solid var(--line-2);
         }
         .vm-time.warn { color: #e8b06a; background: rgba(232, 176, 106, 0.10); border-color: rgba(232, 176, 106, 0.30); }
         .vm-time.danger { color: #e87a7a; background: rgba(232, 122, 122, 0.12); border-color: rgba(232, 122, 122, 0.35); animation: vmpulse 1s var(--ease) infinite; }
         @keyframes vmpulse { 50% { opacity: 0.5; } }
         .vm-btn {
             font-size: 12.5px; font-weight: 500; color: var(--fg-2); font-family: inherit;
-            background: rgba(200, 195, 230, 0.04); border: 1px solid var(--line-2);
-            border-radius: 8px; padding: 6px 13px; cursor: pointer;
+            background: rgba(255, 255, 255, 0.04); border: 1px solid var(--line-2);
+            border-radius: 0; padding: 6px 13px; cursor: pointer;
             display: inline-flex; align-items: center; gap: 6px;
             transition: color 0.15s var(--ease), background 0.15s var(--ease), border-color 0.15s var(--ease);
         }
-        .vm-btn:hover { color: var(--fg); background: rgba(200, 195, 230, 0.08); border-color: var(--line-3); }
+        .vm-btn:hover { color: var(--fg); background: rgba(255, 255, 255, 0.08); border-color: var(--line-3); }
         .vm-btn.danger:hover { color: #ff9b9b; border-color: rgba(232, 122, 122, 0.40); background: rgba(232, 122, 122, 0.10); }
         .vm-frame { flex: 1; border: none; width: 100%; background: #000; }
 
@@ -120,12 +120,12 @@
             z-index: 60; display: flex; align-items: center; gap: 9px;
             padding: 12px 16px 12px 13px;
             background: var(--bg-2); border: 1px solid var(--line-2); border-left: none;
-            border-radius: 0 13px 13px 0; cursor: pointer; color: var(--fg);
+            border-radius: 0; cursor: pointer; color: var(--fg);
             box-shadow: 6px 0 26px rgba(0,0,0,0.32);
             transition: transform 0.28s var(--ease), background 0.15s var(--ease);
         }
         .vm-tab.show { transform: translateY(-50%) translateX(0); }
-        .vm-tab:hover { background: rgba(200,195,230,0.06); }
+        .vm-tab:hover { background: rgba(255, 255, 255, 0.06); }
         .vm-tab .vm-dot { width: 9px; height: 9px; }
         .vm-tab-label { display: flex; flex-direction: column; align-items: flex-start; line-height: 1.25; }
         .vm-tab-label b { font-size: 12.5px; font-weight: 600; }
@@ -134,7 +134,7 @@
         .vm-eta {
             display: inline-flex; align-items: center; gap: 6px; margin-top: 8px;
             font-size: 10.5px; color: var(--fg-3);
-            border: 1px dashed var(--line-2); border-radius: 999px; padding: 3px 11px;
+            border: 1px dashed var(--line-2); border-radius: 0; padding: 3px 11px;
         }
         .vm-eta .d { width: 4px; height: 4px; border-radius: 50%; background: var(--fg-3); }
 
@@ -142,21 +142,21 @@
         .vm-live {
             display: inline-flex; align-items: center; gap: 8px; margin-top: 18px;
             font-size: 12.5px; color: var(--fg-2); font-variant-numeric: tabular-nums;
-            border: 1px solid var(--line-2); border-radius: 999px; padding: 5px 14px;
-            background: rgba(200, 195, 230, 0.02);
+            border: 1px solid var(--line-2); border-radius: 0; padding: 5px 14px;
+            background: rgba(255, 255, 255, 0.02);
             opacity: 0; animation: slideUp 0.55s var(--ease) 0.16s forwards;
         }
         .vm-live b { color: var(--fg); font-weight: 600; }
         .vm-live-dot {
             width: 7px; height: 7px; border-radius: 50%;
-            background: #5fd08a; box-shadow: 0 0 8px rgba(95, 208, 138, 0.7);
+            background: #5fd08a; box-shadow: none;
             animation: vmLivePulse 1.8s ease-in-out infinite;
         }
         @keyframes vmLivePulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
         .vm-live.off { color: var(--fg-3); }
         .vm-live.off .vm-live-dot { background: var(--fg-3); box-shadow: none; animation: none; }
     </style>
-<script src="/src/js/df5162.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.5/src/js/df5162.js" defer></script>
 </head>
 <body>
 
@@ -182,7 +182,7 @@
     <div id="vmStatus" class="vm-status"></div>
     <div id="vmQueue" class="vm-queue"></div>
     <div id="boxWrap" style="margin-top:28px;width:100%;max-width:560px;display:none">
-        <div style="font-size:12px;color:#80799f;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;text-align:left">Your boxes</div>
+        <div style="font-size:12px;color:#85848e;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;text-align:left">Your boxes</div>
         <div id="boxList" style="display:flex;flex-direction:column;gap:10px"></div>
     </div>
 </section>
@@ -234,7 +234,7 @@
 .vm-stage { position: relative; flex: 1; min-height: 0; display: flex; }
 .vm-stage .vm-frame { flex: 1; }
 .vm-overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
-    background: radial-gradient(circle at 50% 40%, rgba(18,20,34,0.96), rgba(6,7,14,0.98)); z-index: 5;
+    background: radial-gradient(circle at 50% 40%, rgba(13, 12, 17, 0.96), rgba(6,7,14,0.98)); z-index: 5;
     transition: opacity .35s ease; }
 .vm-overlay.hide { opacity: 0; pointer-events: none; }
 .vm-overlay-card { text-align: center; max-width: 360px; padding: 24px; }
@@ -307,19 +307,19 @@
 .vm-welcome-back {
     position: fixed; inset: 0; z-index: 200;
     display: flex; align-items: center; justify-content: center;
-    background: rgba(5, 6, 13, 0.92); backdrop-filter: blur(12px);
+    background: rgba(6, 5, 9, 0.92); 
     animation: fadeIn 0.3s ease;
     overflow-y: auto; padding: 24px;
 }
 @keyframes fadeIn { from { opacity: 0; } }
 .vm-welcome {
-    background: var(--bg-2, #0e0d1a); border: 1px solid var(--line-2, rgba(200,195,230,0.12));
-    border-radius: 18px; max-width: 520px; width: 100%; padding: 32px 28px;
+    background: var(--bg-2, #0e0d1a); border: 1px solid var(--line-2, rgba(255, 255, 255, 0.12));
+    border-radius: 0; max-width: 520px; width: 100%; padding: 32px 28px;
     animation: slideUp 0.4s var(--ease, ease) forwards;
 }
 .vw-icon {
     width: 52px; height: 52px; display: flex; align-items: center; justify-content: center;
-    border-radius: 14px; background: rgba(184, 176, 218, 0.07); border: 1px solid var(--line-2);
+    border-radius: 0; background: rgba(168, 152, 232, 0.049); border: 1px solid var(--line-2);
     color: var(--accent); margin-bottom: 18px;
 }
 .vw-title { font-size: 20px; font-weight: 600; color: var(--fg); margin: 0 0 6px; }
@@ -333,16 +333,16 @@
 .vw-list { margin: 0; padding: 0 0 0 18px; font-size: 13px; color: var(--fg-2); line-height: 1.7; }
 .vw-list li { margin-bottom: 2px; }
 .vw-list.tech { list-style: none; padding: 0; }
-.vw-list.tech li { padding: 4px 0; border-bottom: 1px solid rgba(200,195,230,0.06); }
+.vw-list.tech li { padding: 4px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.06); }
 .vw-list.tech li:last-child { border: none; }
 .vw-list.tech b { color: var(--fg); font-weight: 500; }
 .vw-note { font-size: 12.5px; color: var(--fg-3); margin: 6px 0 8px; line-height: 1.5; }
-.vw-note code { background: rgba(200,195,230,0.08); padding: 1px 5px; border-radius: 4px; font-size: 12px; }
+.vw-note code { background: rgba(255, 255, 255, 0.08); padding: 1px 5px; border-radius: 0; font-size: 12px; }
 .vw-note.warn { color: #e0b15e; }
 .vw-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 6px; }
 .vw-tags span {
-    font-size: 11.5px; padding: 3px 10px; border-radius: 6px;
-    background: rgba(200,195,230,0.06); border: 1px solid rgba(200,195,230,0.10);
+    font-size: 11.5px; padding: 3px 10px; border-radius: 0;
+    background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.10);
     color: var(--fg-2);
 }
 .vw-foot { margin-top: 22px; display: flex; flex-direction: column; align-items: center; gap: 14px; }
@@ -352,8 +352,8 @@
 </style>
 
 <nav id="dock"></nav>
-<script src="/src/js/lr2815.js" defer></script>
-<script src="/src/js/wz6714.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.5/src/js/lr2815.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.5/src/js/wz6714.js" defer></script>
 <script>
 (function(){
   function gb(mb){return (mb/1024).toFixed(1)}
@@ -363,7 +363,7 @@
       var boxes=d.boxes||[],wrap=document.getElementById("boxWrap"),list=document.getElementById("boxList");
       if(!wrap||!boxes.length){if(wrap)wrap.style.display="none";return}
       wrap.style.display="block";
-      list.innerHTML=boxes.map(function(b){return '<div style="display:flex;align-items:center;gap:10px;background:rgba(200,195,230,.05);border:1px solid rgba(200,195,230,.13);border-radius:12px;padding:12px 14px"><div style="flex:1;text-align:left"><div style="font-weight:600">'+esc(b.name)+' <span style="color:#80799f;font-size:12px;font-weight:400">Ubuntu 26.04 · '+b.cpus+'c / '+gb(b.memoryMb)+'GB</span></div><div style="font-size:12px;color:#80799f">'+(b.up?"running":"stopped")+'</div></div><button data-bt="'+b.id+'" style="background:rgba(126,231,135,.16);border:1px solid rgba(126,231,135,.4);color:#7ee787;border-radius:8px;padding:7px 14px;font:13px system-ui;cursor:pointer">Connect</button><button data-br="'+b.id+'" style="background:rgba(201,193,255,.1);border:1px solid rgba(200,195,230,.22);color:#eae6ff;border-radius:8px;padding:7px 11px;font:12px system-ui;cursor:pointer">Reset</button></div>'}).join("");
+      list.innerHTML=boxes.map(function(b){return '<div style="display:flex;align-items:center;gap:10px;background:rgba(255, 255, 255, .05);border:1px solid rgba(255, 255, 255, .13);border-radius: 0;padding:12px 14px"><div style="flex:1;text-align:left"><div style="font-weight:600">'+esc(b.name)+' <span style="color:#85848e;font-size:12px;font-weight:400">Ubuntu 26.04 · '+b.cpus+'c / '+gb(b.memoryMb)+'GB</span></div><div style="font-size:12px;color:#85848e">'+(b.up?"running":"stopped")+'</div></div><button data-bt="'+b.id+'" style="background:rgba(126,231,135,.16);border:1px solid rgba(126,231,135,.4);color:#7ee787;border-radius: 0;padding:7px 14px;font:13px system-ui;cursor:pointer">Connect</button><button data-br="'+b.id+'" style="background:rgba(168, 152, 232, 0.07);border:1px solid rgba(255, 255, 255, .22);color:#ededf0;border-radius: 0;padding:7px 11px;font:12px system-ui;cursor:pointer">Reset</button></div>'}).join("");
     }).catch(function(){});
   }
   document.addEventListener("click",function(e){
@@ -999,6 +999,6 @@
 })();
 </script>
 
-<script src="/src/js/pu3927.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/devmidnightst/studyhub-assets@v1.0.5/src/js/pu3927.js?v=20260929-2" defer></script>
 </body>
 </html>

@@ -27,6 +27,18 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://nocturne.lol/about.html</loc>
+    <lastmod>2026-10-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://nocturne.lol/tools.html</loc>
+    <lastmod>2026-10-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://nocturne.lol/support.html</loc>
     <lastmod>2026-08-13</lastmod>
     <changefreq>yearly</changefreq>

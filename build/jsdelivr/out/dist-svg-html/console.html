@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="color-scheme" content="dark">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Nocturne - Console</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='9' fill='%230b0a14'/><circle cx='16' cy='16' r='9' fill='%23c9c1ff'/><circle cx='21' cy='14' r='8' fill='%230b0a14'/></svg>">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@xterm/xterm@5.5.0/css/xterm.min.css">
+    <style>
+        :root {
+            --bg:#060509; --panel:#0a090d; --panel-2:#0e1020; --line:rgba(255, 255, 255, .14);
+            --fg:#ededf0; --fg2:#d6d5de; --fg3:#8a85a8; --accent:#a898e8; --accent-2:#a898e8;
+            --good:#82d0a4; --bad:#e07c7c; --warn:#e6c976;
+            --r:12px;
+        }
+        * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+        html,body { margin:0; height:100%; background:var(--bg); color:var(--fg);
+            font-family:'Inter',system-ui,-apple-system,sans-serif; overflow:hidden; }
+        body { background:
+            radial-gradient(60% 50% at 15% 0%, rgba(168, 152, 232, 0.07), transparent 60%),
+            radial-gradient(55% 45% at 100% 100%, rgba(130,208,164,.06), transparent 60%),
+            var(--bg); }
+        .wrap { display:flex; flex-direction:column; height:100vh; height:100dvh; }
+
+        /* ── header ── */
+        header { display:flex; align-items:center; gap:10px; padding:12px 16px;
+            background: rgba(14,16,32,.9);
+             border-bottom:1px solid var(--line); flex-wrap:wrap; }
+        .brand { display:flex; align-items:center; gap:9px; font-weight:700; font-size:14px; letter-spacing:-.01em; }
+        .brand .glyph { width:26px; height:26px; border-radius: 0; display:grid; place-items:center;
+            background: rgba(168, 152, 232, 0.175);
+            border:1px solid rgba(168, 152, 232, 0.21); font-size:14px; }
+        .pill { display:inline-flex; align-items:center; gap:6px; font-size:11px; font-weight:600;
+            padding:4px 10px; border-radius: 0; border:1px solid var(--line); color:var(--fg3);
+            font-family:'JetBrains Mono',ui-monospace,monospace; }
+        .pill .dot { width:7px; height:7px; border-radius:50%; background:var(--fg3); box-shadow:0 0 0 0 rgba(0,0,0,0); }
+        .pill.on { color:var(--good); border-color:rgba(130,208,164,.35); background:rgba(130,208,164,.08); }
+        .pill.on .dot { background:var(--good); animation:pulse 2s infinite; }
+        .pill.off { color:var(--bad); border-color:rgba(224,124,124,.3); }
+        .pill.off .dot { background:var(--bad); }
+        @keyframes pulse { 0%{box-shadow:0 0 0 0 rgba(130,208,164,.5)} 70%{box-shadow:0 0 0 6px rgba(130,208,164,0)} 100%{box-shadow:0 0 0 0 rgba(130,208,164,0)} }
+        .sp { flex:1; }
+        .tools { display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+        .ic { display:inline-grid; place-items:center; min-width:34px; height:34px; padding:0 9px;
+            background:var(--panel-2); border:1px solid var(--line); border-radius: 0; color:var(--fg2);
+            font:inherit; font-size:13px; cursor:pointer; text-decoration:none; transition:.15s; user-select:none; }
+        .ic:hover { color:var(--fg); border-color:rgba(168, 152, 232, 0.28); background:rgba(168, 152, 232, 0.07); }
+        .ic:active { transform:scale(.94); }
+
+        .stat { font-size:11.5px; color:var(--fg3); padding:5px 16px; border-bottom:1px solid var(--line);
+            font-family:'JetBrains Mono',ui-monospace,monospace; background:rgba(10, 9, 13, .5); }
+
+        #term { flex:1; min-height:0; padding:10px 12px; overflow:hidden; }
+        .xterm-viewport::-webkit-scrollbar { width:8px; }
+        .xterm-viewport::-webkit-scrollbar-thumb { background:rgba(168, 152, 232, 0.175); border-radius: 0; }
+
+        /* ── mobile key bar ── */
+        .keys { display:flex; gap:6px; padding:8px 10px; overflow-x:auto; border-top:1px solid var(--line);
+            background:rgba(14,16,32,0.94);  scrollbar-width:none; }
+        .keys::-webkit-scrollbar { display:none; }
+        .key { flex:0 0 auto; min-width:42px; height:36px; padding:0 12px; display:grid; place-items:center;
+            background:var(--panel-2); border:1px solid var(--line); border-radius: 0; color:var(--fg2);
+            font-family:'JetBrains Mono',ui-monospace,monospace; font-size:13px; font-weight:600; cursor:pointer;
+            user-select:none; transition:.12s; }
+        .key:active { transform:scale(.9); background:rgba(168, 152, 232, 0.126); color:var(--fg); }
+
+        /* ── command bar ── */
+        .cmd { display:flex; gap:8px; padding:10px 12px; border-top:1px solid var(--line);
+            background: rgba(14,16,32,.9);  }
+        .cmd input { flex:1; background:var(--bg); border:1px solid var(--line); color:var(--fg);
+            border-radius: 0; padding:11px 13px; font-family:'JetBrains Mono',ui-monospace,monospace;
+            font-size:14px; outline:none; }
+        .cmd input:focus { border-color:rgba(168, 152, 232, 0.35); box-shadow:0 0 0 3px rgba(168, 152, 232, 0.084); }
+        .cmd button { background: var(--accent); color:#0a090d; border:none;
+            border-radius: 0; padding:0 20px; font:inherit; font-weight:700; font-size:14px; cursor:pointer; }
+        .cmd button:active { transform:scale(.96); }
+
+        /* ── gate + lock ── */
+        .gate { display:flex; align-items:center; justify-content:center; height:100vh; height:100dvh; text-align:center; padding:24px; }
+        .gate h2 { margin:0 0 6px; } .gate a { color:var(--accent); } .hint { font-size:12px; color:var(--fg3); }
+        .lock { position:fixed; inset:0; background:rgba(6, 5, 9, .9); 
+            display:none; align-items:center; justify-content:center; z-index:60; padding:20px; }
+        .lock.show { display:flex; }
+        .lock .card { background: var(--panel-2); border:1px solid var(--line);
+            border-radius: 0; padding:30px 28px; width:100%; max-width:360px; text-align:center;
+            box-shadow:0 30px 70px rgba(0,0,0,.6), 0 0 0 1px rgba(168, 152, 232, 0.035); }
+        .lock .ring { width:52px; height:52px; margin:0 auto 14px; border-radius: 0; display:grid; place-items:center;
+            font-size:24px; background:radial-gradient(circle at 50% 30%, rgba(168, 152, 232, 0.175), rgba(168, 152, 232, 0.042));
+            border:1px solid rgba(168, 152, 232, 0.21); }
+        .lock h2 { margin:0 0 4px; font-size:17px; }
+        .lock p { margin:0 0 16px; font-size:12.5px; color:var(--fg3); }
+        .lock input { width:100%; background:var(--bg); border:1px solid var(--line); color:var(--fg);
+            border-radius: 0; padding:13px 14px; font:inherit; font-size:15px; margin-bottom:12px; outline:none; text-align:center; letter-spacing:2px; }
+        .lock input:focus { border-color:rgba(168, 152, 232, 0.35); box-shadow:0 0 0 3px rgba(168, 152, 232, 0.084); }
+        .lock button { width:100%; background: var(--accent); color:#0a090d; border:none;
+            border-radius: 0; padding:13px; font:inherit; font-weight:700; font-size:14px; cursor:pointer; }
+        .lock button:disabled { opacity:.5; } .lock .err { color:var(--bad); font-size:12.5px; min-height:18px; margin-bottom:8px; }
+
+        @media (max-width:640px) {
+            .brand span.t { display:none; } header { padding:10px 12px; } .tools .lbl { display:none; }
+        }
+    </style>
+</head>
+<body>
+<div id="gate" class="gate"><div><div class="hint">checking access…</div></div></div>
+
+<div id="app" class="wrap" style="display:none">
+    <header>
+        <div class="brand"><span class="glyph">🖥️</span><span class="t">Server terminal</span></div>
+        <span class="pill off" id="pill"><span class="dot"></span><span id="pillTxt">offline</span></span>
+        <span class="sp"></span>
+        <div class="tools">
+            <button class="ic" id="fontDown" title="Smaller text">A−</button>
+            <button class="ic" id="fontUp" title="Bigger text">A+</button>
+            <button class="ic" id="clear" title="Clear screen">Clear</button>
+            <button class="ic" id="full" title="Fullscreen">⛶</button>
+            <button class="ic" id="cmdToggle" title="Toggle command bar">⌨</button>
+            <button class="ic" id="setpw" title="Set / change / remove the console password">🔒</button>
+            <button class="ic" id="reconnect" title="Reconnect">⟳</button>
+            <a class="ic" href="/admin.html" title="Back to admin">←</a>
+        </div>
+    </header>
+    <div class="stat" id="status">connecting…</div>
+
+    <div id="term"></div>
+
+    <div class="keys" id="keys"></div>
+
+    <div class="cmd" id="cmdBar" style="display:none">
+        <input id="cmdInput" placeholder="type a command, tap Send…" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+        <button id="cmdSend">Send</button>
+    </div>
+</div>
+
+<div class="lock" id="lock">
+    <div class="card">
+        <div class="ring">🔒</div>
+        <h2>Console locked</h2>
+        <p>Enter the console password to open the terminal.</p>
+        <div class="err" id="lockErr"></div>
+        <input id="lockPw" type="password" placeholder="password" autocomplete="off">
+        <button id="lockGo">Unlock</button>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@xterm/xterm@5.5.0/lib/xterm.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@xterm/addon-fit@0.10.0/lib/addon-fit.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@xterm/addon-web-links@0.11.0/lib/addon-web-links.min.js"></script>
+<script>
+(async function () {
+    const $ = id => document.getElementById(id);
+
+    // ── owner gate (UX only; real checks are server-side) ──
+    try {
+        const me = await fetch("/api/auth/me", { credentials: "same-origin", cache: "no-store" }).then(r => r.json());
+        if (!(me && me.authenticated && me.user && String(me.user.username || "").toLowerCase() === "midnightsweat")) {
+            $("gate").innerHTML = '<div><h2>Owner only</h2><p class="hint">Sign in as the owner account to use the terminal.</p><a href="/account">→ sign in</a></div>';
+            return;
+        }
+    } catch {
+        $("gate").innerHTML = '<div><p class="hint">Couldn\'t verify your session.</p></div>'; return;
+    }
+    $("gate").style.display = "none";
+    $("app").style.display = "flex";
+
+    // ── terminal ──
+    let fontSize = Math.max(11, Math.min(18, parseInt(localStorage.getItem("noc-term-font") || "13", 10)));
+    const term = new Terminal({
+        cursorBlink: true, fontFamily: "'JetBrains Mono', ui-monospace, monospace", fontSize,
+        scrollback: 10000, allowProposedApi: true,
+        theme: { background: "#0a090d", foreground: "#ededf0", cursor: "#a898e8", selectionBackground: "rgba(168, 152, 232, 0.21)",
+            black:"#0a090d", brightBlack:"#3a3550", red:"#e07c7c", green:"#82d0a4", yellow:"#e6c976",
+            blue:"#88b8e0", magenta:"#c188e0", cyan:"#7ad0d0", white:"#d6d5de", brightWhite:"#ededf0" }
+    });
+    const fit = new FitAddon.FitAddon();
+    term.loadAddon(fit);
+    try { term.loadAddon(new WebLinksAddon.WebLinksAddon()); } catch {}
+    term.open($("term"));
+    // Only fit when the container actually has a laid-out size, so we never compute
+    // a broken 0-col grid (which is what garbles fonts/wrapping in web terminals).
+    const safeFit = () => { try { const el = $("term"); if (el.clientHeight > 8 && el.clientWidth > 8) fit.fit(); } catch {} };
+    requestAnimationFrame(safeFit);
+
+    // ── connection ──
+    let ws = null;
+    const pill = $("pill"), pillTxt = $("pillTxt");
+    const setPill = (state, txt) => { pill.className = "pill " + state; pillTxt.textContent = txt; };
+    const send = d => { if (ws && ws.readyState === 1) ws.send(d); };
+
+    function connect() {
+        safeFit();   // measure current size first so the shell's PTY matches this screen
+        if (ws) { try { ws.onclose = null; ws.onmessage = null; ws.onerror = null; ws.close(); } catch (e) {} }
+        const proto = location.protocol === "https:" ? "wss" : "ws";
+        var tok = "";
+        try { tok = localStorage.getItem("noc-session") || ""; } catch (e) {}
+        const q = "?cols=" + (term.cols || 80) + "&rows=" + (term.rows || 24) + (tok ? "&_noc_session=" + encodeURIComponent(tok) : "");
+        const sock = new WebSocket(proto + "://" + location.host + "/api/admin/term" + q);
+        ws = sock;
+        sock.binaryType = "arraybuffer";
+        setPill("off", "connecting"); $("status").textContent = "connecting…";
+        sock.onopen = () => { if (ws === sock) { setPill("on", "online"); $("status").textContent = "● connected"; } };
+        sock.onmessage = (e) => {
+            if (ws !== sock) return;
+            if (typeof e.data === "string") {
+                let m = null; try { m = JSON.parse(e.data); } catch {}
+                if (m && m.__auth === "password-required") { $("lock").classList.add("show"); $("lockPw").focus(); $("status").textContent = "🔒 locked — enter password"; return; }
+                if (m && m.__auth === "denied") { $("lockErr").textContent = "Wrong password." + (m.remaining != null ? " " + m.remaining + " tr" + (m.remaining === 1 ? "y" : "ies") + " left." : ""); $("lockPw").value = ""; $("lockPw").focus(); return; }
+                if (m && m.__auth === "locked") { startLockCountdown(Number(m.seconds) || 120); return; }
+                term.write(e.data); return;
+            }
+            $("lock").classList.remove("show"); $("lockErr").textContent = ""; term.focus();
+            term.write(new Uint8Array(e.data));
+        };
+        sock.onclose = () => { if (ws !== sock) return; setPill("off", "offline"); $("status").textContent = "○ disconnected — tap ⟳ to reconnect"; };
+        sock.onerror = () => { if (ws !== sock) return; setPill("off", "error"); $("status").textContent = "websocket error"; };
+    }
+    term.onData(d => send(d));
+
+    // ── lock countdown ──
+    let lockTimer = null;
+    function startLockCountdown(seconds) {
+        $("lock").classList.add("show");
+        $("lockPw").disabled = true; $("lockGo").disabled = true;
+        clearInterval(lockTimer);
+        let left = seconds;
+        const tick = () => {
+            if (left <= 0) { clearInterval(lockTimer); $("lockErr").textContent = "You can try again now — tap ⟳ Reconnect."; $("lockPw").disabled = false; $("lockGo").disabled = false; return; }
+            $("lockErr").textContent = "🔒 Locked out — try again in " + left + "s."; left--;
+        };
+        tick(); lockTimer = setInterval(tick, 1000);
+    }
+    function unlock() { send(JSON.stringify({ type: "auth", password: $("lockPw").value })); }
+    $("lockGo").addEventListener("click", unlock);
+    $("lockPw").addEventListener("keydown", e => { if (e.key === "Enter") unlock(); });
+
+    // ── mobile key bar ──
+    const KEYS = [
+        ["Esc","\x1b"], ["Tab","\x09"], ["↑","\x1b[A"], ["↓","\x1b[B"], ["←","\x1b[D"], ["→","\x1b[C"],
+        ["^C","\x03"], ["^D","\x04"], ["^Z","\x1a"], ["^L","\x0c"], ["|","|"], ["~","~"], ["/","/"], ["-","-"]
+    ];
+    const keysEl = $("keys");
+    KEYS.forEach(([label, seq]) => {
+        const b = document.createElement("div"); b.className = "key"; b.textContent = label;
+        b.addEventListener("click", () => { send(seq); term.focus(); });
+        keysEl.appendChild(b);
+    });
+
+    // ── command bar ──
+    $("cmdToggle").addEventListener("click", () => {
+        const bar = $("cmdBar"); const show = bar.style.display === "none";
+        bar.style.display = show ? "flex" : "none"; if (show) $("cmdInput").focus(); safeFit();
+    });
+    function sendCmd() { const v = $("cmdInput").value; send(v + "\r"); $("cmdInput").value = ""; $("cmdInput").focus(); }
+    $("cmdSend").addEventListener("click", sendCmd);
+    $("cmdInput").addEventListener("keydown", e => { if (e.key === "Enter") sendCmd(); });
+
+    // ── toolbar actions ──
+    function applyFont(n) { fontSize = Math.max(9, Math.min(22, n)); term.options.fontSize = fontSize; localStorage.setItem("noc-term-font", fontSize); safeFit(); }
+    $("fontUp").addEventListener("click", () => applyFont(fontSize + 1));
+    $("fontDown").addEventListener("click", () => applyFont(fontSize - 1));
+    $("clear").addEventListener("click", () => { term.clear(); term.focus(); });
+    $("full").addEventListener("click", () => { const el = document.documentElement; if (document.fullscreenElement) document.exitFullscreen(); else el.requestFullscreen && el.requestFullscreen(); });
+    $("reconnect").addEventListener("click", () => { try { ws && ws.close(); } catch {} $("lock").classList.remove("show"); clearInterval(lockTimer); $("lockPw").disabled = false; $("lockGo").disabled = false; connect(); });
+
+    // password management
+    async function refreshPwState() {
+        try { const s = await fetch("/api/admin/console-password/status", { credentials: "same-origin", cache: "no-store" }).then(r => r.json());
+            $("setpw").title = s.set ? "Console password is SET — tap to change/remove" : "No console password — tap to set one";
+            $("setpw").textContent = s.set ? "🔒" : "🔓";
+        } catch {}
+    }
+    $("setpw").addEventListener("click", async () => {
+        const pw = prompt("New console password (min 6 chars). Leave blank + OK to REMOVE it:");
+        if (pw === null) return;
+        try {
+            const r = await fetch("/api/admin/console-password", { method: "POST", credentials: "same-origin", headers: { "Content-Type": "application/json" }, body: JSON.stringify(pw === "" ? { clear: true } : { password: pw }) });
+            const d = await r.json();
+            if (!r.ok) return alert(d.error || "Failed");
+            alert(d.set ? "Console password set." : "Console password removed.");
+            refreshPwState();
+        } catch { alert("Request failed."); }
+    });
+    refreshPwState();
+
+    addEventListener("resize", safeFit);
+    if (window.visualViewport) window.visualViewport.addEventListener("resize", safeFit);   // mobile keyboard open/close
+    connect();
+})();
+</script>
+</body>
+</html>
