@@ -1,0 +1,148 @@
+.noc-select {
+    position: relative;
+    display: inline-flex;
+    vertical-align: middle;
+    max-width: 100%;
+}
+
+.noc-select-native {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    border: 0 !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+.noc-select-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    text-align: left;
+    line-height: 1.2;
+    box-sizing: border-box;
+    user-select: none;
+    background-image: none !important;
+}
+.noc-select-trigger:focus-visible {
+    outline: 2px solid var(--accent, #a898e8);
+    outline-offset: 1px;
+}
+/* Disabled <select> — reads as a static chip, not something you can open. */
+.noc-select-trigger.noc-select-disabled { cursor: default; opacity: 0.72; }
+.noc-select-trigger.noc-select-disabled .noc-select-caret { display: none; }
+
+.noc-select-label {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.noc-select-caret {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+    opacity: 0.75;
+    transition: transform 0.18s var(--ease, ease), opacity 0.15s var(--ease, ease);
+}
+.noc-select-trigger:hover .noc-select-caret { opacity: 1; }
+.noc-select.open .noc-select-caret { transform: rotate(180deg); }
+
+.noc-select-menu {
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 99999;
+    min-width: 160px;
+    max-width: min(360px, 92vw);
+    max-height: 320px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 5px;
+    background: rgba(13, 14, 24, 0.98);
+    border: 1px solid var(--line-2, rgba(255, 255, 255, 0.14));
+    border-radius: 0;
+    box-shadow: 0 18px 52px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(0, 0, 0, 0.2);
+    
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+    transform-origin: top center;
+    pointer-events: none;
+    transition: opacity 0.16s var(--ease, ease), transform 0.16s var(--ease, ease);
+}
+.noc-select-menu.open {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+}
+.noc-select-menu::-webkit-scrollbar { width: 6px; }
+.noc-select-menu::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.14); border-radius: 0; }
+
+.noc-select-opt {
+    position: relative;
+    padding: 8px 12px 8px 11px;
+    border-radius: 0;
+    font-size: 12.5px;
+    color: var(--fg-2, #b9b4d6);
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    border: 1px solid transparent;
+    transition: background 0.12s var(--ease, ease), color 0.12s var(--ease, ease), border-color 0.12s var(--ease, ease);
+}
+.noc-select-opt:hover,
+.noc-select-opt.active {
+    background: rgba(168, 152, 232, 0.084);
+    color: var(--fg, #ededf0);
+    border-color: rgba(168, 152, 232, 0.112);
+}
+.noc-select-opt.selected {
+    color: var(--accent, #a898e8);
+    font-weight: 500;
+    padding-right: 26px;
+}
+.noc-select-opt.selected::after {
+    content: "";
+    position: absolute;
+    right: 11px;
+    top: 50%;
+    width: 9px;
+    height: 5px;
+    margin-top: -4px;
+    border-left: 1.6px solid var(--accent, #a898e8);
+    border-bottom: 1.6px solid var(--accent, #a898e8);
+    transform: rotate(-45deg);
+}
+.noc-select-opt.selected:hover,
+.noc-select-opt.selected.active {
+    background: rgba(168, 152, 232, 0.126);
+    color: #ffffff;
+}
+.noc-select-opt.disabled {
+    opacity: 0.4;
+    cursor: default;
+    background: none;
+    border-color: transparent;
+}
+
+.noc-select-group + .noc-select-group {
+    margin-top: 5px;
+    padding-top: 5px;
+    border-top: 1px solid var(--line, rgba(255, 255, 255, 0.08));
+}
+.noc-select-grouplabel {
+    padding: 6px 11px 4px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--fg-3, #85848e);
+}
