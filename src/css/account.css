@@ -58,15 +58,15 @@ body {
     width: 100%; max-width: 440px;
     background: var(--panel);
     border: 1px solid var(--line-2);
-    border-radius: 14px;
+    border-radius: var(--r-md, 10px);
     overflow: hidden;
-    backdrop-filter: blur(20px);
+    
     animation: slideUp 0.5s var(--ease) 0.1s both;
 }
 .auth-tabs {
     display: flex;
     border-bottom: 1px solid var(--line);
-    background: rgba(10, 11, 20, 0.5);
+    background: rgba(10, 9, 13, 0.5);
 }
 .auth-tab {
     flex: 1; padding: 14px 0;
@@ -78,7 +78,7 @@ body {
 .auth-tab.active { color: var(--fg); }
 .auth-tab.active::after {
     content: ""; position: absolute; bottom: 0; left: 24%; right: 24%;
-    height: 2px; background: var(--accent); border-radius: 2px 2px 0 0;
+    height: 2px; background: var(--accent); border-radius: 0;
 }
 
 .auth-body { padding: 28px 28px 24px; }
@@ -101,7 +101,7 @@ body {
 .field input {
     background: var(--bg-2);
     border: 1px solid var(--line);
-    border-radius: 8px;
+    border-radius: var(--r-sm, 6px);
     padding: 10px 12px;
     color: var(--fg);
     font-size: 13px;
@@ -122,7 +122,7 @@ body {
     background: var(--fg);
     color: var(--bg);
     padding: 11px 18px;
-    border-radius: 8px;
+    border-radius: var(--r-sm, 6px);
     font-size: 13px;
     font-weight: 500;
     border: 1px solid var(--fg);
@@ -146,8 +146,8 @@ body {
 .hero-strip {
     display: flex; align-items: center; justify-content: space-between;
     background: var(--panel); border: 1px solid var(--line-2);
-    border-radius: 14px; padding: 22px 24px;
-    backdrop-filter: blur(20px);
+    border-radius: var(--r-md, 10px); padding: 22px 24px;
+    
     animation: slideUp 0.45s var(--ease) 0.05s both;
 }
 .who-tag {
@@ -161,12 +161,80 @@ body {
 }
 .who-meta { font-size: 11px; color: var(--fg-3); }
 
+.card.upgrade-card {
+    position: relative;
+    overflow: hidden;
+    border-radius: 0;
+    background: #100e16;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    padding: 28px 28px 22px;
+}
+.card.upgrade-card .orb {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+}
+.card.upgrade-card .orb.a {
+    width: 180px; height: 180px; right: -70px; top: -80px;
+    background: radial-gradient(circle, rgba(184, 176, 218, 0.5), transparent 68%);
+}
+.card.upgrade-card .orb.b {
+    width: 56px; height: 56px; right: 16px; top: 16px;
+    border: 1px solid rgba(184, 176, 218, 0.55);
+}
+.card.upgrade-card .orb.c {
+    width: 10px; height: 10px; left: 22px; top: 22px;
+    background: #eae6ff;
+}
+.card.upgrade-card .upgrade-body { position: relative; z-index: 1; }
+.card.upgrade-card .upgrade-kicker {
+    font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase;
+    color: #b8b0da; font-weight: 600; margin-bottom: 8px;
+}
+.card.upgrade-card .card-title {
+    font-size: 22px; letter-spacing: -0.03em; margin: 0 0 4px;
+}
+.card.upgrade-card .upgrade-perks {
+    list-style: none; margin: 0 0 16px; padding: 0;
+    display: grid; gap: 8px;
+}
+.card.upgrade-card .upgrade-perks li {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 13px; color: var(--fg);
+}
+.card.upgrade-card .upgrade-perks i {
+    width: 8px; height: 8px; border-radius: 50%; flex: none;
+    background: #b8b0da; box-shadow: 0 0 0 4px rgba(184, 176, 218, 0.16);
+}
+.card.upgrade-card .upgrade-actions { display: flex; gap: 10px; margin-bottom: 14px; }
+.card.upgrade-card .upgrade-buy {
+    display: inline-flex; align-items: center; justify-content: center;
+    background: #b8b0da; color: #14121c; border: 0; border-radius: 0;
+    padding: 11px 16px; font-size: 13px; font-weight: 600; text-decoration: none;
+}
+.card.upgrade-card .upgrade-buy:hover { background: #cdc4ff; }
+.card.upgrade-card .upgrade-form { display: grid; gap: 8px; }
+.card.upgrade-card .upgrade-note { margin: 0; font-size: 12px; color: var(--fg-3); line-height: 1.5; }
+.card.upgrade-card .upgrade-form input {
+    width: 100%; box-sizing: border-box; border-radius: 0;
+    background: rgba(255, 255, 255, 0.03); color: var(--fg);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    padding: 10px 12px; font: inherit;
+}
+.card.upgrade-card .upgrade-form .btn {
+    border-radius: 0; background: transparent; color: #eae6ff;
+    border: 1px solid rgba(184, 176, 218, 0.45); padding: 11px 16px; font-weight: 600;
+}
+.card.upgrade-card .upgrade-msg { font-size: 12px; color: #b7b3c7; min-height: 1em; }
+.card.upgrade-card.is-on .upgrade-form,
+.card.upgrade-card.is-on .upgrade-actions { display: none; }
+
 .card {
     background: var(--panel);
     border: 1px solid var(--line-2);
-    border-radius: 14px;
+    border-radius: var(--r-md, 10px);
     padding: 22px 24px;
-    backdrop-filter: blur(20px);
+    
     animation: slideUp 0.45s var(--ease) 0.1s both;
 }
 .card-head {
@@ -184,18 +252,18 @@ body {
 }
 
 .quota-bar {
-    height: 8px; background: rgba(200, 195, 230, 0.07);
-    border-radius: 4px; overflow: hidden;
+    height: 8px; background: rgba(255, 255, 255, 0.07);
+    border-radius: var(--r-sm, 6px); overflow: hidden;
 }
 .quota-fill {
     height: 100%;
-    background: linear-gradient(90deg, var(--accent-2), var(--accent));
-    border-radius: 4px;
+    background: var(--accent-2);
+    border-radius: var(--r-sm, 6px);
     transition: width 0.5s var(--ease);
     width: 0%;
 }
-.quota-fill.warn { background: linear-gradient(90deg, #c8a35a, #d8b16a); }
-.quota-fill.full { background: linear-gradient(90deg, #c46868, #d68080); }
+.quota-fill.warn { background: #c8a35a; }
+.quota-fill.full { background: #c46868; }
 .quota-foot {
     display: flex; justify-content: space-between; align-items: center;
     margin-top: 10px;
@@ -211,9 +279,9 @@ body {
     grid-template-columns: 1fr auto auto auto;
     gap: 12px; align-items: center;
     padding: 9px 12px;
-    background: rgba(20, 22, 38, 0.45);
+    background: rgba(13, 12, 17, 0.45);
     border: 1px solid var(--line);
-    border-radius: 8px;
+    border-radius: var(--r-sm, 6px);
     font-size: 12px;
     transition: background 0.15s, border-color 0.15s;
 }
@@ -228,7 +296,7 @@ body {
 .domain-size { color: var(--fg-3); font-size: 11px; font-variant-numeric: tabular-nums; }
 .domain-clear {
     font-size: 11px; color: var(--fg-3);
-    padding: 4px 8px; border-radius: 5px;
+    padding: 4px 8px; border-radius: var(--r-sm, 6px);
     transition: all 0.15s;
 }
 .domain-clear:hover { color: #d08282; background: rgba(208, 130, 130, 0.08); }
@@ -238,9 +306,9 @@ body {
 }
 
 .btn {
-    background: rgba(20, 22, 38, 0.6);
+    background: rgba(13, 12, 17, 0.6);
     border: 1px solid var(--line-2);
-    border-radius: 8px;
+    border-radius: var(--r-sm, 6px);
     padding: 9px 16px;
     color: var(--fg);
     font-size: 12px; font-weight: 500;
@@ -250,19 +318,19 @@ body {
 
 .btn-ghost {
     padding: 7px 12px;
-    border-radius: 7px;
+    border-radius: var(--r-sm, 6px);
     font-size: 12px;
     color: var(--fg-3);
     transition: all 0.15s;
     background: none;
 }
-.btn-ghost:hover { color: var(--fg); background: rgba(200, 195, 230, 0.06); }
+.btn-ghost:hover { color: var(--fg); background: rgba(255, 255, 255, 0.06); }
 
 .btn-danger {
     color: #d08282;
     background: rgba(208, 130, 130, 0.06);
     border: 1px solid rgba(208, 130, 130, 0.18);
-    border-radius: 8px;
+    border-radius: var(--r-sm, 6px);
     padding: 9px 16px;
     font-size: 12px; font-weight: 500;
     transition: all 0.15s;
@@ -295,13 +363,13 @@ body {
     font-weight: 700;
     letter-spacing: 0.12em;
     color: #2a200a;
-    background: linear-gradient(90deg, #c9a14f, #e6c976);
+    background: #c9a14f;
     padding: 4px 10px;
-    border-radius: 999px;
+    border-radius: var(--r-sm, 6px);
     margin-bottom: 10px;
 }
 .owner-btn {
-    background: linear-gradient(90deg, #c9a14f, #e6c976) !important;
+    background: #c9a14f !important;
     color: #2a200a !important;
     font-weight: 600 !important;
     border: none !important;
@@ -315,7 +383,7 @@ body.is-owner .hero-strip {
         rgba(230, 201, 118, 0.03);
 }
 body.is-owner .who-name {
-    background: linear-gradient(90deg, #e6c976, #fff 60%, #e6c976);
+    background: #e6c976;
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -326,15 +394,15 @@ body.is-owner .who-tag::after {
 }
 
 .api-example {
-    background: #05060d;
+    background: #060509;
     border: 1px solid var(--line-2);
-    border-radius: 10px;
+    border-radius: var(--r-sm, 6px);
     padding: 12px 14px;
     margin: 4px 0 14px;
     font-family: 'JetBrains Mono', Menlo, Consolas, monospace;
     font-size: 11.5px;
     line-height: 1.55;
-    color: #a9a3c7;
+    color: #a8a7b0;
     white-space: pre-wrap;
     word-break: break-word;
     overflow-x: auto;
@@ -342,35 +410,58 @@ body.is-owner .who-tag::after {
 .api-label {
     flex: 1;
     min-width: 120px;
-    background: #05060d;
+    background: #060509;
     border: 1px solid var(--line-2);
-    border-radius: 8px;
+    border-radius: var(--r-sm, 6px);
     padding: 8px 11px;
-    color: var(--fg, #eae6ff);
+    color: var(--fg, #ededf0);
     font: inherit;
     font-size: 13px;
     outline: none;
 }
-.api-label:focus { border-color: var(--accent, #b8b0da); }
+.api-label:focus { border-color: var(--accent, #a898e8); }
 .api-new { margin-top: 12px; }
 .api-new.hidden { display: none; }
 .api-new-label { font-size: 12px; color: #e6c976; margin-bottom: 6px; }
 .api-new-key {
     display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
-    background: rgba(184, 176, 218, 0.08);
-    border: 1px solid rgba(184, 176, 218, 0.3);
-    border-radius: 8px; padding: 8px 10px;
+    background: rgba(168, 152, 232, 0.056);
+    border: 1px solid rgba(168, 152, 232, 0.21);
+    border-radius: var(--r-sm, 6px); padding: 8px 10px;
 }
 .api-new-key code {
-    font-family: 'JetBrains Mono', monospace; font-size: 12.5px; color: #c9c1ff;
+    font-family: 'JetBrains Mono', monospace; font-size: 12.5px; color: #a898e8;
     word-break: break-all; flex: 1;
 }
 .api-keys { margin-top: 14px; display: flex; flex-direction: column; gap: 6px; }
-.api-empty { font-size: 12.5px; color: var(--fg-3, #706b8f); }
+.api-empty { font-size: 12.5px; color: var(--fg-3, #85848e); }
 .api-key-row {
     display: flex; align-items: center; justify-content: space-between; gap: 10px;
-    padding: 9px 12px; border: 1px solid var(--line, #1a1b2b); border-radius: 8px;
+    padding: 9px 12px; border: 1px solid var(--line, #1a1b2b); border-radius: var(--r-sm, 6px);
     font-size: 13px;
 }
-.api-key-meta { font-size: 11.5px; color: var(--fg-3, #706b8f); }
+.api-key-meta { font-size: 11.5px; color: var(--fg-3, #85848e); }
 .api-revoke { font-size: 12px; padding: 5px 12px; }
+
+#upgradeCard{position:relative;overflow:hidden;border-radius:0!important;background:#100e16!important;border:1px solid rgba(255,255,255,.18)!important;padding:28px 28px 22px!important;color:#eae6ff}
+#upgradeCard.hidden{display:none!important}
+#upgradeCard .orb{position:absolute;border-radius:50%;pointer-events:none}
+#upgradeCard .orb.a{width:180px;height:180px;right:-70px;top:-80px;background:radial-gradient(circle,rgba(184,176,218,.5),transparent 68%)}
+#upgradeCard .orb.b{width:56px;height:56px;right:16px;top:16px;border:1px solid rgba(184,176,218,.55)}
+#upgradeCard .orb.c{width:10px;height:10px;left:22px;top:22px;background:#eae6ff}
+#upgradeCard .upgrade-body{position:relative;z-index:1}
+#upgradeCard .upgrade-kicker{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#b8b0da;font-weight:600;margin:0 0 8px}
+#upgradeCard .card-title{font-size:22px;line-height:1.15;letter-spacing:-.03em;font-weight:600;color:#eae6ff;margin:0 0 6px}
+#upgradeCard .card-blurb{margin:0 0 16px;color:#b7b3c7;font-size:13px;line-height:1.5}
+#upgradeCard .upgrade-perks{list-style:none;margin:0 0 16px;padding:0;display:grid;gap:8px}
+#upgradeCard .upgrade-perks li{display:flex;align-items:center;gap:10px;font-size:13px;color:#eae6ff}
+#upgradeCard .upgrade-perks i{width:8px;height:8px;border-radius:50%;flex:none;background:#b8b0da;box-shadow:0 0 0 4px rgba(184,176,218,.16)}
+#upgradeCard .upgrade-actions{display:flex;margin:0 0 14px}
+#upgradeCard .upgrade-buy{display:inline-flex;align-items:center;justify-content:center;background:#b8b0da!important;color:#14121c!important;border:0!important;border-radius:0!important;padding:12px 16px!important;font-size:13px;font-weight:600;text-decoration:none!important}
+#upgradeCard .upgrade-buy:hover{background:#cdc4ff!important}
+#upgradeCard .upgrade-form{display:grid;gap:8px}
+#upgradeCard .upgrade-note{margin:0;font-size:12px;line-height:1.5;color:#b7b3c7}
+#upgradeCard input{width:100%;box-sizing:border-box;border-radius:0!important;background:rgba(255,255,255,.04)!important;color:#eae6ff!important;border:1px solid rgba(255,255,255,.18)!important;padding:11px 12px!important;font:inherit}
+#upgradeCard .upgrade-form .btn{border-radius:0!important;background:transparent!important;color:#eae6ff!important;border:1px solid rgba(184,176,218,.45)!important;padding:12px 16px!important;font-weight:600;cursor:pointer}
+#upgradeCard .upgrade-msg{font-size:12px;color:#b7b3c7;min-height:1em}
+#upgradeCard.is-on .upgrade-form,#upgradeCard.is-on .upgrade-actions{display:none!important}
